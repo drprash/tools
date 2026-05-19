@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Compare — Multi-Column Aware</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+  /* ── Theme tokens ── */
+  :root,[data-theme="dark"]{
+    --bg:#0b0b10;--surface:#13131a;--card:#1a1a24;--border:#2c2c3e;
+    --accent:#7ef0a0;--accent-dim:#7ef0a012;--text:#e8e8f0;--muted:#5a5a78;
+    --added-bg:#0a2618;--added:#4ade80;--removed-bg:#26080a;--removed:#f87171;
+    --eq-color:#5a5a78;--shadow:0 2px 12px #0006;
+    --glow1:#7ef0a008;--glow2:#6060f008;
+  }
+  [data-theme="light"]{
+    --bg:#f4f4f8;--surface:#ffffff;--card:#ffffff;--border:#d4d4e0;
+    --accent:#1a8c40;--accent-dim:#1a8c4012;--text:#1a1a2e;--muted:#7a7a96;
+    --added-bg:#e8fbef;--added:#16a34a;--removed-bg:#fef2f2;--removed:#dc2626;
+    --eq-color:#9090b0;--shadow:0 2px 12px #0001;
+    --glow1:#1a8c4006;--glow2:#4040d006;
+  }
+
+  /* OS preference fallback when data-theme="auto" */
+  [data-theme="auto"]{
+    --bg:#f4f4f8;--surface:#ffffff;--card:#ffffff;--border:#d4d4e0;
+    --accent:#1a8c40;--accent-dim:#1a8c4012;--text:#1a1a2e;--muted:#7a7a96;
+    --added-bg:#e8fbef;--added:#16a34a;--removed-bg:#fef2f2;--removed:#dc2626;
+    --eq-color:#9090b0;--shadow:0 2px 12px #0001;
+    --glow1:#1a8c4006;--glow2:#4040d006;
+  }
+  @media(prefers-color-scheme:dark){
+    [data-theme="auto"]{
+      --bg:#0b0b10;--surface:#13131a;--card:#1a1a24;--border:#2c2c3e;
+      --accent:#7ef0a0;--accent-dim:#7ef0a012;--text:#e8e8f0;--muted:#5a5a78;
+      --added-bg:#0a2618;--added:#4ade80;--removed-bg:#26080a;--removed:#f87171;
+      --eq-color:#5a5a78;--shadow:0 2px 12px #0006;
+      --glow1:#7ef0a008;--glow2:#6060f008;
+    }
+  }
+
+  body{
+    background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;
+    min-height:100vh;padding:40px 24px 80px;transition:background .25s,color .25s;
+  }
+  body::before{
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:radial-gradient(circle at 20% 20%,var(--glow1) 0%,transparent 50%),
+                     radial-gradient(circle at 80% 80%,var(--glow2) 0%,transparent 50%);
+  }
+  .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto}
+
+  /* ── Theme toggle ── */
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+  .theme-toggle{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:3px;box-shadow:var(--shadow)}
+  .theme-btn{
+    display:flex;align-items:center;gap:5px;padding:5px 10px;border:none;border-radius:5px;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+    cursor:pointer;background:transparent;color:var(--muted);transition:all .18s;white-space:nowrap;
+  }
+  .theme-btn:hover{color:var(--text)}
+  .theme-btn.active{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
+  .theme-btn svg{width:12px;height:12px;flex-shrink:0}
+
+  /* ── Header ── */
+  .tag{display:inline-flex;align-items:center;gap:8px;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;padding:5px 12px;border-radius:4px;margin-bottom:16px}
+  h1{font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-2px;margin-bottom:8px}
+  h1 span{color:var(--accent)}
+  .subtitle{color:var(--muted);font-size:13px;margin-bottom:28px;line-height:1.6}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:var(--added-bg);border:1px solid var(--added);color:var(--added);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;padding:4px 10px;border-radius:20px;margin-left:8px;vertical-align:middle}
+
+  /* ── Drop zones ── */
+  .drop-row{display:grid;grid-template-columns:1fr 36px 1fr;align-items:center;margin-bottom:20px}
+  .vs{text-align:center;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px}
+  .drop-zone{
+    background:var(--card);border:2px dashed var(--border);border-radius:14px;
+    padding:26px 18px;text-align:center;cursor:pointer;transition:all .2s;
+    min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+    box-shadow:var(--shadow);
+  }
+  .drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:var(--accent-dim)}
+  .drop-zone.has-file{border-style:solid;border-color:#6060f0;background:var(--surface)}
+  .drop-icon{font-size:32px}
+  .drop-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--accent)}
+  .drop-text{font-size:13px;color:var(--muted)}
+  .drop-zone.has-file .drop-text{color:var(--text);font-weight:700;font-size:13px}
+  .file-meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
+
+  /* ── Options rows ── */
+  .options-row,.col-mode-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+  .col-mode-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow)}
+  .col-mode-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);margin-right:4px}
+  .col-desc{font-size:12px;color:var(--muted);margin-left:4px;font-style:italic}
+  .opt-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;white-space:nowrap}
+  .opt-group{display:flex;gap:6px;flex-wrap:wrap}
+  .opt-btn{
+    background:var(--card);border:1px solid var(--border);color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;
+    padding:6px 12px;border-radius:6px;cursor:pointer;transition:all .15s;
+  }
+  .opt-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+  .opt-btn:hover:not(.active){border-color:var(--muted);color:var(--text)}
+
+  /* ── Compare button ── */
+  #compareBtn{
+    width:100%;padding:14px;background:var(--accent);color:var(--bg);
+    border:none;border-radius:12px;font-family:'IBM Plex Mono',monospace;
+    font-size:13px;font-weight:600;letter-spacing:3px;text-transform:uppercase;
+    cursor:pointer;transition:all .2s;margin-bottom:28px;
+  }
+  #compareBtn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  #compareBtn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none;filter:none}
+
+  /* ── Loader ── */
+  .loader{display:none;text-align:center;padding:40px}
+  .loader.active{display:block}
+  .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loader-text{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--muted);animation:pulse 1.5s ease-in-out infinite}
+  .loader-stage{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);margin-top:8px;letter-spacing:1px}
+  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+  /* ── Error ── */
+  .error-box{display:none;background:var(--removed-bg);border:1px solid var(--removed);border-radius:10px;padding:14px 18px;color:var(--removed);font-size:13px;margin-bottom:20px;font-family:'IBM Plex Mono',monospace}
+  .error-box.active{display:block}
+
+  /* ── Results ── */
+  #results{animation:fadeUp .4s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Stats */
+  .stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:24px}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;box-shadow:var(--shadow)}
+  .stat-num{font-size:26px;font-weight:800;letter-spacing:-1px;display:block}
+  .stat-lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);display:block;margin-top:3px}
+  .num-add{color:var(--added)}.num-rem{color:var(--removed)}.num-tot{color:var(--accent)}.num-sim{color:#a0a0ff}
+  [data-theme="light"] .num-sim{color:#5050cc}
+
+  .sec-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:10px}
+  .sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+  .identical-banner{background:var(--added-bg);border:1px solid var(--added);border-radius:12px;padding:20px 24px;text-align:center;margin-bottom:24px}
+  .identical-banner .big{font-size:36px;margin-bottom:8px}
+  .identical-banner .msg{font-weight:700;font-size:16px;color:var(--added)}
+  .identical-banner .sub{font-size:13px;color:var(--muted);margin-top:4px}
+
+  /* Tabs */
+  .view-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .view-tab{background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;padding:7px 14px;border-radius:6px;cursor:pointer;transition:all .15s}
+  .view-tab.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+  /* Diff views */
+  .diff-view{display:none}.diff-view.active{display:block}
+
+  /* Unified */
+  .diff-unified{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-family:'IBM Plex Mono',monospace;font-size:12.5px;box-shadow:var(--shadow)}
+  .diff-line{display:flex;line-height:1.7}
+  .diff-line:hover{filter:brightness(1.06)}
+  .diff-line.add{background:var(--added-bg)}.diff-line.rem{background:var(--removed-bg)}.diff-line.ctx{background:transparent}.diff-line.sep{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .line-num{min-width:42px;padding:2px 8px;text-align:right;color:var(--muted);font-size:11px;user-select:none;border-right:1px solid var(--border);flex-shrink:0}
+  .line-sign{min-width:20px;padding:2px 4px;text-align:center;font-weight:600;flex-shrink:0;user-select:none}
+  .diff-line.add .line-sign{color:var(--added)}.diff-line.rem .line-sign{color:var(--removed)}.diff-line.ctx .line-sign,.diff-line.sep .line-sign{color:var(--muted)}
+  .line-text{padding:2px 10px;white-space:pre-wrap;word-break:break-word;flex:1}
+  .diff-line.add .line-text{color:var(--added)}.diff-line.rem .line-text{color:var(--removed)}.diff-line.ctx .line-text{color:var(--eq-color)}.diff-line.sep .line-text{color:var(--muted);font-style:italic}
+
+  /* Split */
+  .diff-split{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);border-radius:12px;overflow:hidden;font-family:'IBM Plex Mono',monospace;font-size:11.5px;box-shadow:var(--shadow)}
+  .split-header{background:var(--surface);padding:10px 14px;font-size:10px;letter-spacing:2px;color:var(--muted);border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace}
+  .split-col:first-child{border-right:1px solid var(--border)}
+  .split-line{display:flex;line-height:1.65;min-height:26px;align-items:flex-start}
+  .split-line.add{background:var(--added-bg)}.split-line.rem{background:var(--removed-bg)}.split-line.ctx{background:transparent}.split-line.empty{background:var(--surface);opacity:.4}
+  .split-line .line-num{min-width:34px;padding:2px 6px;font-size:10px;color:var(--muted);border-right:1px solid var(--border);flex-shrink:0;font-family:'IBM Plex Mono',monospace}
+  .split-line .line-text{padding:2px 8px;white-space:pre-wrap;word-break:break-word;flex:1}
+  .split-line.add .line-text{color:var(--added)}.split-line.rem .line-text{color:var(--removed)}.split-line.ctx .line-text{color:var(--eq-color)}
+
+  /* Preview */
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+  .summary-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+  .summary-card h3{font-size:11px;color:var(--muted);letter-spacing:2px;font-family:'IBM Plex Mono',monospace;margin-bottom:10px}
+  .text-preview{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);line-height:1.6;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+
+  /* Extract info */
+  .extract-info{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:18px;display:flex;gap:20px;flex-wrap:wrap}
+  .extract-info span{color:var(--text)}
+
+  footer{margin-top:56px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
+  footer span{color:var(--accent)}
+
+  /* ── Mobile — base ── */
+  @media(max-width:768px){
+    body{padding:20px 14px 60px}
+    .wrap{max-width:100%}
+
+    /* Topbar */
+    .topbar{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:14px}
+    .theme-toggle{width:100%;justify-content:stretch}
+    .theme-btn{flex:1;justify-content:center;padding:6px 4px;font-size:9px;letter-spacing:1px}
+    .theme-btn svg{width:11px;height:11px}
+
+    /* Header */
+    h1{font-size:clamp(22px,7vw,36px);letter-spacing:-1px}
+    .subtitle{font-size:12px;margin-bottom:20px}
+    .badge{font-size:9px;padding:3px 7px}
+
+    /* Drop zones */
+    .drop-row{grid-template-columns:1fr;gap:10px}
+    .vs{display:none}
+    .drop-zone{padding:18px 14px;min-height:110px}
+    .drop-icon{font-size:26px}
+    .drop-label{font-size:9px;letter-spacing:2px}
+    .drop-text{font-size:12px}
+
+    /* Layout / options rows */
+    .col-mode-row{flex-direction:column;align-items:flex-start;gap:8px;padding:10px 12px}
+    .col-mode-title{margin-right:0}
+    .col-desc{margin-left:0;display:block;width:100%}
+    .options-row{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:12px}
+    .opt-label{margin-left:0!important}
+    .opt-group{flex-wrap:wrap;gap:5px}
+    .opt-btn{font-size:10px;padding:6px 10px}
+
+    /* Compare button */
+    #compareBtn{padding:13px;font-size:12px;letter-spacing:2px}
+
+    /* Stats bar */
+    .stats-bar{grid-template-columns:repeat(2,1fr);gap:8px}
+    .stat{padding:10px}
+    .stat-num{font-size:20px}
+
+    /* Tabs */
+    .view-tabs{gap:5px}
+    .view-tab{font-size:10px;padding:6px 10px}
+
+    /* Unified diff */
+    .diff-unified{font-size:11px}
+    .line-num{min-width:30px;padding:2px 5px;font-size:10px}
+    .line-sign{min-width:16px;padding:2px 2px}
+    .line-text{padding:2px 6px;font-size:11px}
+
+    /* Split → stack */
+    .diff-split{grid-template-columns:1fr}
+    .split-col:first-child{border-right:none;border-bottom:1px solid var(--border)}
+    .split-header{font-size:9px;padding:8px 10px}
+    .split-line .line-num{min-width:26px;padding:2px 4px;font-size:10px}
+    .split-line .line-text{font-size:11px}
+
+    /* Summary grid → stack */
+    .summary-grid{grid-template-columns:1fr}
+
+    /* Extract info */
+    .extract-info{gap:10px;font-size:10px}
+
+    /* Loader */
+    .loader{padding:28px 14px}
+  }
+
+  /* ── Small phones ── */
+  @media(max-width:400px){
+    body{padding:14px 10px 50px}
+    .theme-btn{font-size:8px;letter-spacing:0.5px}
+    h1{font-size:22px}
+    .opt-btn{font-size:9px;padding:5px 8px}
+    .stats-bar{grid-template-columns:repeat(2,1fr);gap:6px}
+    .stat-num{font-size:18px}
+    .line-num{min-width:24px;padding:2px 3px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Topbar: header + theme toggle -->
+  <div class="topbar">
+    <div>
+      <div class="tag">◈ Multi-Column Aware</div>
+    </div>
+    <div class="theme-toggle" role="group" aria-label="Theme">
+      <button class="theme-btn" id="theme-auto" onclick="setTheme('auto')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        Auto
+      </button>
+      <button class="theme-btn" id="theme-light" onclick="setTheme('light')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        Light
+      </button>
+      <button class="theme-btn active" id="theme-dark" onclick="setTheme('dark')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        Dark
+      </button>
+    </div>
+  </div>
+
+  <h1>PDF <span>Compare</span> <span class="badge">● OFFLINE</span></h1>
+  <p class="subtitle">Column-aware text extraction · Handles 2-column pharmaceutical inserts, mixed layouts & tables · 100% local, no upload.</p>
+
+  <!-- Drop zones -->
+  <div class="drop-row">
+    <div class="drop-zone" id="zoneA" onclick="document.getElementById('fileA').click()"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')" ondrop="handleDrop(event,'A')">
+      <div class="drop-icon" id="iconA">📂</div>
+      <div class="drop-label">Document A — Original</div>
+      <div class="drop-text" id="textA">Drop PDF here or click to browse</div>
+      <div class="file-meta" id="metaA"></div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="drop-zone" id="zoneB" onclick="document.getElementById('fileB').click()"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')" ondrop="handleDrop(event,'B')">
+      <div class="drop-icon" id="iconB">📂</div>
+      <div class="drop-label">Document B — Revised</div>
+      <div class="drop-text" id="textB">Drop PDF here or click to browse</div>
+      <div class="file-meta" id="metaB"></div>
+    </div>
+  </div>
+  <input type="file" id="fileA" accept="application/pdf" style="display:none" onchange="setFile(event,'A')">
+  <input type="file" id="fileB" accept="application/pdf" style="display:none" onchange="setFile(event,'B')">
+
+  <!-- Layout mode -->
+  <div class="col-mode-row">
+    <span class="col-mode-title">LAYOUT</span>
+    <div class="opt-group">
+      <button class="opt-btn" id="col-auto" onclick="setColMode('auto')">AUTO-DETECT</button>
+      <button class="opt-btn active" id="col-2col" onclick="setColMode('2col')">2-COLUMN</button>
+      <button class="opt-btn" id="col-1col" onclick="setColMode('1col')">SINGLE COLUMN</button>
+    </div>
+    <span class="col-desc" id="colDesc">Left column read fully before right — best for pharma inserts</span>
+  </div>
+
+  <!-- Diff options -->
+  <div class="options-row">
+    <span class="opt-label">COMPARE BY:</span>
+    <div class="opt-group">
+      <button class="opt-btn active" id="opt-line" onclick="setMode('line')">LINE</button>
+      <button class="opt-btn" id="opt-word" onclick="setMode('word')">WORD</button>
+      <button class="opt-btn" id="opt-char" onclick="setMode('char')">CHARACTER</button>
+    </div>
+    <span class="opt-label" style="margin-left:10px">CONTEXT:</span>
+    <div class="opt-group">
+      <button class="opt-btn" id="ctx-3" onclick="setCtx(3)">3</button>
+      <button class="opt-btn active" id="ctx-5" onclick="setCtx(5)">5</button>
+      <button class="opt-btn" id="ctx-10" onclick="setCtx(10)">10</button>
+      <button class="opt-btn" id="ctx-all" onclick="setCtx(-1)">ALL</button>
+    </div>
+  </div>
+
+  <button id="compareBtn" onclick="runCompare()" disabled>⟶ Compare Documents</button>
+
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <div class="loader-text">PROCESSING…</div>
+    <div class="loader-stage" id="loaderStage"></div>
+  </div>
+  <div class="error-box" id="errorBox"></div>
+  <div id="results"></div>
+
+  <footer>100% local · <span>PDF.js</span> column-aware extraction · Myers diff · No data leaves your device</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let files={A:null,B:null}, diffMode='line', ctxLines=5, colMode='2col';
+
+// ── Theme ────────────────────────────────────────────────────────────────────
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  ['auto','light','dark'].forEach(x=>document.getElementById('theme-'+x).classList.toggle('active',x===t));
+  try{localStorage.setItem('pdf-diff-theme',t)}catch(e){}
+}
+(function initTheme(){
+  let saved='dark';
+  try{saved=localStorage.getItem('pdf-diff-theme')||'dark'}catch(e){}
+  setTheme(saved);
+})();
+
+// ── File handling ────────────────────────────────────────────────────────────
+function setFile(e,s){const f=e.target.files[0];if(f)attachFile(f,s)}
+function handleDrop(e,s){e.preventDefault();document.getElementById('zone'+s).classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')attachFile(f,s)}
+function attachFile(f,s){
+  files[s]=f;
+  document.getElementById('zone'+s).classList.add('has-file');
+  document.getElementById('icon'+s).textContent='📄';
+  document.getElementById('text'+s).textContent=f.name;
+  document.getElementById('meta'+s).textContent=(f.size/1024).toFixed(1)+' KB';
+  checkReady();
+}
+function checkReady(){document.getElementById('compareBtn').disabled=!(files.A&&files.B)}
+
+// ── Options ──────────────────────────────────────────────────────────────────
+function setMode(m){diffMode=m;['line','word','char'].forEach(x=>document.getElementById('opt-'+x).classList.toggle('active',x===m))}
+function setCtx(n){ctxLines=n;[3,5,10,'all'].forEach(x=>document.getElementById('ctx-'+x).classList.toggle('active',x===n||(x==='all'&&n===-1)))}
+function setColMode(m){
+  colMode=m;
+  ['auto','2col','1col'].forEach(x=>document.getElementById('col-'+x).classList.toggle('active',x===m));
+  const d={auto:'Detects column count per page using x-position clustering','2col':'Left column read fully before right — best for pharma inserts','1col':'Simple top-to-bottom extraction, no column reordering'};
+  document.getElementById('colDesc').textContent=d[m];
+}
+
+// ── Column-aware extraction ──────────────────────────────────────────────────
+function groupIntoLines(items,yTol=3){
+  const lines=[];
+  for(const it of items){
+    const y=Math.round(it.transform[5]/yTol)*yTol;
+    let ln=lines.find(l=>l.y===y);
+    if(!ln){ln={y,items:[]};lines.push(ln)}
+    ln.items.push(it);
+  }
+  lines.sort((a,b)=>b.y-a.y);
+  return lines;
+}
+function detectColumns(items,pageWidth){
+  if(items.length<10)return 1;
+  const xs=items.map(i=>i.transform[4]).sort((a,b)=>a-b);
+  const mid=pageWidth/2;
+  const lc=xs.filter(x=>x<mid-pageWidth*0.05).length;
+  const rc=xs.filter(x=>x>mid+pageWidth*0.05).length;
+  return(Math.min(lc,rc)/Math.max(lc,rc)>0.25)?2:1;
+}
+async function extractPageText(page,mode){
+  const vp=page.getViewport({scale:1});
+  const content=await page.getTextContent({normalizeWhitespace:true});
+  const items=content.items.filter(i=>i.str&&i.str.trim());
+  if(!items.length)return'';
+  const pageWidth=vp.width;
+  let numCols=mode==='auto'?detectColumns(items,pageWidth):mode==='2col'?2:1;
+  if(numCols===1){
+    return groupIntoLines(items).map(l=>{
+      l.items.sort((a,b)=>a.transform[4]-b.transform[4]);
+      return l.items.map(i=>i.str).join(' ').trim();
+    }).filter(t=>t).join('\n');
+  }
+  const allX=items.map(i=>i.transform[4]).sort((a,b)=>a-b);
+  const lo=pageWidth*0.3,hi=pageWidth*0.7;
+  const midXs=allX.filter(x=>x>=lo&&x<=hi);
+  let boundary=pageWidth/2;
+  if(midXs.length>2){
+    let maxGap=0;
+    for(let i=1;i<midXs.length;i++){const gap=midXs[i]-midXs[i-1];if(gap>maxGap){maxGap=gap;boundary=(midXs[i]+midXs[i-1])/2}}
+  }
+  const lines=groupIntoLines(items);
+  let result='',leftBuf=[],rightBuf=[];
+  function flushColumns(){
+    if(!leftBuf.length&&!rightBuf.length)return;
+    const lt=leftBuf.map(l=>l.items.sort((a,b)=>a.transform[4]-b.transform[4]).map(i=>i.str).join(' ').trim()).filter(t=>t).join('\n');
+    const rt=rightBuf.map(l=>l.items.sort((a,b)=>a.transform[4]-b.transform[4]).map(i=>i.str).join(' ').trim()).filter(t=>t).join('\n');
+    if(lt)result+=lt+'\n';if(rt)result+=rt+'\n';
+    leftBuf=[];rightBuf=[];
+  }
+  for(const line of lines){
+    const lineLeft=line.items.filter(i=>i.transform[4]<boundary);
+    const lineRight=line.items.filter(i=>i.transform[4]>=boundary);
+    const lineXs=line.items.map(i=>i.transform[4]);
+    const lineWidths=line.items.map(i=>i.width||0);
+    const minX=Math.min(...lineXs);
+    const maxX=Math.max(...lineXs.map((x,i)=>x+(lineWidths[i]||0)));
+    if((maxX-minX)/pageWidth>0.55){
+      flushColumns();
+      line.items.sort((a,b)=>a.transform[4]-b.transform[4]);
+      result+=line.items.map(i=>i.str).join(' ').trim()+'\n';
+    }else{
+      if(lineLeft.length)leftBuf.push({items:lineLeft,y:line.y});
+      if(lineRight.length)rightBuf.push({items:lineRight,y:line.y});
+    }
+  }
+  flushColumns();
+  return result.trim();
+}
+async function extractText(file,mode){
+  setStage('Reading PDF…');
+  const buf=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  let full='';
+  for(let p=1;p<=pdf.numPages;p++){
+    setStage(`Extracting page ${p} of ${pdf.numPages}…`);
+    const page=await pdf.getPage(p);
+    const txt=await extractPageText(page,mode);
+    if(txt)full+=txt+'\n';
+  }
+  return full.trim();
+}
+function setStage(msg){document.getElementById('loaderStage').textContent=msg}
+
+// ── Myers diff ────────────────────────────────────────────────────────────────
+function myersDiff(a,b){
+  const n=a.length,m=b.length,max=n+m;
+  const v=new Array(2*max+1).fill(0),trace=[];
+  for(let d=0;d<=max;d++){
+    trace.push([...v]);
+    for(let k=-d;k<=d;k+=2){
+      const ki=k+max;let x;
+      if(k===-d||(k!==d&&v[ki-1]<v[ki+1]))x=v[ki+1];else x=v[ki-1]+1;
+      let y=x-k;
+      while(x<n&&y<m&&a[x]===b[y]){x++;y++}
+      v[ki]=x;if(x>=n&&y>=m)return backtrack(trace,a,b,max);
+    }
+  }
+  return backtrack(trace,a,b,max);
+}
+function backtrack(trace,a,b,max){
+  const ops=[];let x=a.length,y=b.length;
+  for(let d=trace.length-1;d>=0;d--){
+    const v=trace[d],k=x-y,ki=k+max;
+    let prevK=k===-d||(k!==d&&v[ki-1]<v[ki+1])?k+1:k-1;
+    const prevX=v[prevK+max],prevY=prevX-prevK;
+    while(x>prevX&&y>prevY){x--;y--;ops.push({type:'eq',a:a[x],b:b[y]})}
+    if(d>0){if(x>prevX){x--;ops.push({type:'del',a:a[x]})}else if(y>prevY){y--;ops.push({type:'ins',b:b[y]})}}
+  }
+  return ops.reverse();
+}
+function tokenize(text){
+  if(diffMode==='line')return text.split('\n');
+  if(diffMode==='word')return text.match(/\S+|\n|\s+/g)||[];
+  return text.split('');
+}
+function buildChunks(ops){
+  const lines=[];let buf={type:null,tokens:[]};
+  function flush(){if(buf.tokens.length)lines.push({type:buf.type,text:buf.tokens.join('')});buf={type:null,tokens:[]}}
+  for(const op of ops){
+    const type=op.type==='eq'?'eq':op.type==='del'?'del':'ins';
+    const tok=op.type==='del'?op.a:(op.type==='ins'?op.b:op.a);
+    if(diffMode==='line')lines.push({type,text:tok});
+    else{if(buf.type!==type){flush();buf.type=type}buf.tokens.push(tok)}
+  }
+  flush();return lines;
+}
+function applyContext(chunks,ctx){
+  if(ctx===-1)return chunks.map(c=>({...c,show:true}));
+  const result=chunks.map(c=>({...c,show:false}));
+  const changed=result.map((c,i)=>c.type!=='eq'?i:-1).filter(i=>i>=0);
+  for(const ci of changed)for(let j=Math.max(0,ci-ctx);j<=Math.min(result.length-1,ci+ctx);j++)result[j].show=true;
+  let prev=true;
+  for(let i=0;i<result.length;i++){if(result[i].show&&!prev)result[i].gapBefore=true;prev=result[i].show}
+  return result.filter(c=>c.show);
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderUnified(chunks){
+  let aL=1,bL=1,html='';
+  for(const c of chunks){
+    if(c.gapBefore)html+=`<div class="diff-line sep"><span class="line-sign">⋯</span><span class="line-text">  …  hidden  …</span></div>`;
+    if(c.type==='eq'){html+=`<div class="diff-line ctx"><span class="line-num">${aL}</span><span class="line-num">${bL}</span><span class="line-sign"> </span><span class="line-text">${esc(c.text)}</span></div>`;aL++;bL++}
+    else if(c.type==='del'){html+=`<div class="diff-line rem"><span class="line-num">${aL}</span><span class="line-num"></span><span class="line-sign">−</span><span class="line-text">${esc(c.text)}</span></div>`;aL++}
+    else{html+=`<div class="diff-line add"><span class="line-num"></span><span class="line-num">${bL}</span><span class="line-sign">+</span><span class="line-text">${esc(c.text)}</span></div>`;bL++}
+  }
+  document.getElementById('unifiedOut').innerHTML=html||'<div style="padding:20px;text-align:center;color:var(--muted);font-family:monospace">No differences</div>';
+}
+function renderSplit(chunks){
+  let lh='',rh='',aL=1,bL=1;
+  for(const c of chunks){
+    if(c.gapBefore){const s=`<div class="split-line ctx" style="background:var(--surface);padding:4px 8px;font-size:10px;color:var(--muted);font-family:monospace">⋯</div>`;lh+=s;rh+=s}
+    if(c.type==='eq'){
+      lh+=`<div class="split-line ctx"><span class="line-num">${aL}</span><span class="line-text">${esc(c.text)}</span></div>`;
+      rh+=`<div class="split-line ctx"><span class="line-num">${bL}</span><span class="line-text">${esc(c.text)}</span></div>`;
+      aL++;bL++;
+    }else if(c.type==='del'){
+      lh+=`<div class="split-line rem"><span class="line-num">${aL}</span><span class="line-text">${esc(c.text)}</span></div>`;
+      rh+=`<div class="split-line empty"><span class="line-num"></span><span class="line-text"> </span></div>`;aL++;
+    }else{
+      lh+=`<div class="split-line empty"><span class="line-num"></span><span class="line-text"> </span></div>`;
+      rh+=`<div class="split-line add"><span class="line-num">${bL}</span><span class="line-text">${esc(c.text)}</span></div>`;bL++;
+    }
+  }
+  document.getElementById('splitLeft').innerHTML=lh;
+  document.getElementById('splitRight').innerHTML=rh;
+}
+function switchTab(n){
+  ['unified','split','summary'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===n);
+    document.getElementById('view-'+t).classList.toggle('active',t===n);
+  });
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+async function runCompare(){
+  document.getElementById('errorBox').classList.remove('active');
+  document.getElementById('loader').classList.add('active');
+  document.getElementById('compareBtn').disabled=true;
+  document.getElementById('results').innerHTML='';
+  try{
+    const [tA,tB]=await Promise.all([extractText(files.A,colMode),extractText(files.B,colMode)]);
+    setStage('Computing diff…');
+    const tokA=tokenize(tA),tokB=tokenize(tB);
+    const ops=myersDiff(tokA,tokB);
+    const allChunks=buildChunks(ops);
+    const filtered=applyContext(allChunks,ctxLines);
+    const added=allChunks.filter(c=>c.type==='ins').length;
+    const removed=allChunks.filter(c=>c.type==='del').length;
+    const total=allChunks.length,changed=added+removed;
+    const sim=total===0?100:Math.max(0,Math.round((1-changed/total)*100));
+    document.getElementById('loader').classList.remove('active');
+    document.getElementById('compareBtn').disabled=false;
+    const lA=tA.split('\n').length,lB=tB.split('\n').length;
+    let html='';
+    if(changed===0){
+      html=`<div class="identical-banner"><div class="big">✅</div><div class="msg">Documents are identical</div><div class="sub">No textual differences found</div></div>`;
+    }else{
+      html+=`<div class="extract-info"><div>Doc A: <span>${lA} lines</span></div><div>Doc B: <span>${lB} lines</span></div><div>Layout: <span>${colMode==='2col'?'2-Column':colMode==='auto'?'Auto-Detected':'Single Column'}</span></div><div>Mode: <span>${diffMode.toUpperCase()}</span></div></div>`;
+      html+=`<div class="stats-bar"><div class="stat"><span class="stat-num num-add">+${added}</span><span class="stat-lbl">Added</span></div><div class="stat"><span class="stat-num num-rem">-${removed}</span><span class="stat-lbl">Removed</span></div><div class="stat"><span class="stat-num num-tot">${changed}</span><span class="stat-lbl">Changes</span></div><div class="stat"><span class="stat-num num-sim">${sim}%</span><span class="stat-lbl">Similarity</span></div></div>`;
+      html+=`<div class="sec-label">DIFF VIEW</div>
+      <div class="view-tabs">
+        <button class="view-tab active" id="tab-unified" onclick="switchTab('unified')">Unified</button>
+        <button class="view-tab" id="tab-split" onclick="switchTab('split')">Side by Side</button>
+        <button class="view-tab" id="tab-summary" onclick="switchTab('summary')">Text Preview</button>
+      </div>
+      <div class="diff-view active" id="view-unified"><div class="diff-unified" id="unifiedOut"></div></div>
+      <div class="diff-view" id="view-split">
+        <div class="diff-split">
+          <div class="split-col"><div class="split-header">DOCUMENT A — ORIGINAL</div><div id="splitLeft"></div></div>
+          <div class="split-col"><div class="split-header">DOCUMENT B — REVISED</div><div id="splitRight"></div></div>
+        </div>
+      </div>
+      <div class="diff-view" id="view-summary">
+        <div class="summary-grid">
+          <div class="summary-card"><h3>DOCUMENT A TEXT</h3><div class="text-preview" id="previewA"></div></div>
+          <div class="summary-card"><h3>DOCUMENT B TEXT</h3><div class="text-preview" id="previewB"></div></div>
+        </div>
+      </div>`;
+    }
+    document.getElementById('results').innerHTML=html;
+    if(changed>0){
+      renderUnified(filtered);renderSplit(filtered);
+      document.getElementById('previewA').textContent=tA;
+      document.getElementById('previewB').textContent=tB;
+    }
+    document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(err){
+    document.getElementById('loader').classList.remove('active');
+    document.getElementById('compareBtn').disabled=false;
+    const box=document.getElementById('errorBox');
+    box.textContent='⚠️ '+err.message;box.classList.add('active');
+    console.error(err);
+  }
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+</script>
+</body>
+</html>
