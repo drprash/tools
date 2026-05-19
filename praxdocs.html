@@ -502,16 +502,23 @@
     /* ── Responsive ── */
     @media (max-width: 720px) {
       /* Layout: single column, contained */
-      .layout { grid-template-columns: 1fr; width: 100vw; overflow-x: hidden; }
+      .layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;  /* sidebar = content only, main = rest */
+        width: 100vw;
+        overflow-x: hidden;
+      }
 
       /* Sidebar becomes a compact sticky top bar */
       .sidebar {
         position: sticky; top: 0; z-index: 100;
         width: 100%; max-width: 100vw;
-        height: auto; flex-direction: column;
+        height: auto;
+        align-self: start;             /* never stretch to fill grid row */
+        flex-direction: column;
         padding: 12px 14px 10px;
         border-right: none; border-bottom: 1px solid var(--border);
-        overflow: hidden;           /* contain nav overflow within sidebar */
+        overflow: hidden;
         min-width: 0;
       }
 
