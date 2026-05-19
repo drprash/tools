@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF Compare — Multi-Column Aware</title>
+<title>Doc Compare — PDF & Word, Multi-Column Aware</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&display=swap');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -45,6 +45,7 @@
   body{
     background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;
     min-height:100vh;padding:40px 24px 80px;transition:background .25s,color .25s;
+    overflow-x:hidden;
   }
   body::before{
     content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -204,6 +205,7 @@
     h1{font-size:clamp(22px,7vw,36px);letter-spacing:-1px}
     .subtitle{font-size:12px;margin-bottom:20px}
     .badge{font-size:9px;padding:3px 7px}
+    .tag{font-size:9px;letter-spacing:1.5px;padding:4px 10px}
 
     /* Drop zones */
     .drop-row{grid-template-columns:1fr;gap:10px}
@@ -220,7 +222,7 @@
     .options-row{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:12px}
     .opt-label{margin-left:0!important}
     .opt-group{flex-wrap:wrap;gap:5px}
-    .opt-btn{font-size:10px;padding:6px 10px}
+    .opt-btn{font-size:10px;padding:8px 10px}  /* min ~36px tap height */
 
     /* Compare button */
     #compareBtn{padding:13px;font-size:12px;letter-spacing:2px}
@@ -293,8 +295,8 @@
     </div>
   </div>
 
-  <h1>PDF <span>Compare</span> <span class="badge">● OFFLINE</span></h1>
-  <p class="subtitle">Column-aware text extraction · Handles 2-column pharmaceutical inserts, mixed layouts & tables · 100% local, no upload.</p>
+  <h1>Doc <span>Compare</span> <span class="badge">● OFFLINE</span></h1>
+  <p class="subtitle">Column-aware text extraction · PDF & Word (.docx) support · Handles 2-column pharmaceutical inserts, mixed layouts & tables · 100% local, no upload.</p>
 
   <!-- Drop zones -->
   <div class="drop-row">
@@ -303,7 +305,7 @@
       ondragleave="this.classList.remove('drag-over')" ondrop="handleDrop(event,'A')">
       <div class="drop-icon" id="iconA">📂</div>
       <div class="drop-label">Document A — Original</div>
-      <div class="drop-text" id="textA">Drop PDF here or click to browse</div>
+      <div class="drop-text" id="textA">Drop PDF or Word (.docx) here</div>
       <div class="file-meta" id="metaA"></div>
     </div>
     <div class="vs">VS</div>
@@ -312,22 +314,23 @@
       ondragleave="this.classList.remove('drag-over')" ondrop="handleDrop(event,'B')">
       <div class="drop-icon" id="iconB">📂</div>
       <div class="drop-label">Document B — Revised</div>
-      <div class="drop-text" id="textB">Drop PDF here or click to browse</div>
+      <div class="drop-text" id="textB">Drop PDF or Word (.docx) here</div>
       <div class="file-meta" id="metaB"></div>
     </div>
   </div>
-  <input type="file" id="fileA" accept="application/pdf" style="display:none" onchange="setFile(event,'A')">
-  <input type="file" id="fileB" accept="application/pdf" style="display:none" onchange="setFile(event,'B')">
+  <input type="file" id="fileA" accept="application/pdf,.pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="setFile(event,'A')">
+  <input type="file" id="fileB" accept="application/pdf,.pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="setFile(event,'B')">
 
   <!-- Layout mode -->
-  <div class="col-mode-row">
+  <div class="col-mode-row" id="colModeRow">
     <span class="col-mode-title">LAYOUT</span>
     <div class="opt-group">
-      <button class="opt-btn" id="col-auto" onclick="setColMode('auto')">AUTO-DETECT</button>
-      <button class="opt-btn active" id="col-2col" onclick="setColMode('2col')">2-COLUMN</button>
+      <button class="opt-btn active" id="col-auto" onclick="setColMode('auto')">AUTO-DETECT</button>
+      <button class="opt-btn" id="col-2col" onclick="setColMode('2col')">2-COLUMN</button>
       <button class="opt-btn" id="col-1col" onclick="setColMode('1col')">SINGLE COLUMN</button>
     </div>
-    <span class="col-desc" id="colDesc">Left column read fully before right — best for pharma inserts</span>
+    <span class="col-desc" id="colDesc">Detects column count per page using x-position clustering</span>
+    <span class="col-desc" id="colDocxNote" style="display:none;color:var(--removed)">⚠ Layout applies to PDF only — Word docs are extracted as-is</span>
   </div>
 
   <!-- Diff options -->
@@ -357,14 +360,15 @@
   <div class="error-box" id="errorBox"></div>
   <div id="results"></div>
 
-  <footer>100% local · <span>PDF.js</span> column-aware extraction · Myers diff · No data leaves your device</footer>
+  <footer>100% local · <span>PDF.js</span> column-aware extraction · <span>Mammoth.js</span> Word extraction · Myers diff · No data leaves your device</footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-let files={A:null,B:null}, diffMode='line', ctxLines=5, colMode='2col';
+let files={A:null,B:null}, diffMode='line', ctxLines=5, colMode='auto';
 
 // ── Theme ────────────────────────────────────────────────────────────────────
 function setTheme(t){
@@ -378,18 +382,40 @@ function setTheme(t){
   setTheme(saved);
 })();
 
+// ── File type helpers ─────────────────────────────────────────────────────────
+function isDocx(f){
+  return f.name.toLowerCase().endsWith('.docx')||
+    f.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+}
+function isPdf(f){return f.type==='application/pdf'||f.name.toLowerCase().endsWith('.pdf')}
+
 // ── File handling ────────────────────────────────────────────────────────────
 function setFile(e,s){const f=e.target.files[0];if(f)attachFile(f,s)}
-function handleDrop(e,s){e.preventDefault();document.getElementById('zone'+s).classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')attachFile(f,s)}
+function handleDrop(e,s){
+  e.preventDefault();
+  document.getElementById('zone'+s).classList.remove('drag-over');
+  const f=e.dataTransfer.files[0];
+  if(f&&(isPdf(f)||isDocx(f)))attachFile(f,s);
+}
 function attachFile(f,s){
   files[s]=f;
   document.getElementById('zone'+s).classList.add('has-file');
-  document.getElementById('icon'+s).textContent='📄';
+  document.getElementById('icon'+s).textContent=isDocx(f)?'📝':'📄';
   document.getElementById('text'+s).textContent=f.name;
-  document.getElementById('meta'+s).textContent=(f.size/1024).toFixed(1)+' KB';
+  const type=isDocx(f)?'WORD':'PDF';
+  document.getElementById('meta'+s).textContent=(f.size/1024).toFixed(1)+' KB · '+type;
+  updateLayoutNote();
   checkReady();
 }
 function checkReady(){document.getElementById('compareBtn').disabled=!(files.A&&files.B)}
+function updateLayoutNote(){
+  const hasDocx=(files.A&&isDocx(files.A))||(files.B&&isDocx(files.B));
+  document.getElementById('colDesc').style.display=hasDocx?'none':'';
+  document.getElementById('colDocxNote').style.display=hasDocx?'':'none';
+  // Dim layout buttons when docx is involved (they only affect PDF extraction)
+  document.getElementById('colModeRow').style.opacity=hasDocx?'0.45':'1';
+  document.getElementById('colModeRow').style.pointerEvents=hasDocx?'none':'';
+}
 
 // ── Options ──────────────────────────────────────────────────────────────────
 function setMode(m){diffMode=m;['line','word','char'].forEach(x=>document.getElementById('opt-'+x).classList.toggle('active',x===m))}
@@ -401,7 +427,19 @@ function setColMode(m){
   document.getElementById('colDesc').textContent=d[m];
 }
 
-// ── Column-aware extraction ──────────────────────────────────────────────────
+// ── DOCX extraction ───────────────────────────────────────────────────────────
+async function extractDocxText(file){
+  setStage('Reading Word document…');
+  const buf=await file.arrayBuffer();
+  const result=await mammoth.extractRawText({arrayBuffer:buf});
+  if(result.messages&&result.messages.length){
+    const warns=result.messages.filter(m=>m.type==='warning');
+    if(warns.length)console.warn('Mammoth warnings:',warns);
+  }
+  return result.value.trim();
+}
+
+// ── Column-aware PDF extraction ──────────────────────────────────────────────
 function groupIntoLines(items,yTol=3){
   const lines=[];
   for(const it of items){
@@ -471,6 +509,7 @@ async function extractPageText(page,mode){
   return result.trim();
 }
 async function extractText(file,mode){
+  if(isDocx(file))return extractDocxText(file);
   setStage('Reading PDF…');
   const buf=await file.arrayBuffer();
   const pdf=await pdfjsLib.getDocument({data:buf}).promise;
@@ -599,7 +638,7 @@ async function runCompare(){
     if(changed===0){
       html=`<div class="identical-banner"><div class="big">✅</div><div class="msg">Documents are identical</div><div class="sub">No textual differences found</div></div>`;
     }else{
-      html+=`<div class="extract-info"><div>Doc A: <span>${lA} lines</span></div><div>Doc B: <span>${lB} lines</span></div><div>Layout: <span>${colMode==='2col'?'2-Column':colMode==='auto'?'Auto-Detected':'Single Column'}</span></div><div>Mode: <span>${diffMode.toUpperCase()}</span></div></div>`;
+      html+=`<div class="extract-info"><div>Doc A: <span>${lA} lines · ${isDocx(files.A)?'WORD':'PDF'}</span></div><div>Doc B: <span>${lB} lines · ${isDocx(files.B)?'WORD':'PDF'}</span></div><div>Layout: <span>${isDocx(files.A)&&isDocx(files.B)?'N/A (Word)':colMode==='2col'?'2-Column':colMode==='auto'?'Auto-Detected':'Single Column'}</span></div><div>Mode: <span>${diffMode.toUpperCase()}</span></div></div>`;
       html+=`<div class="stats-bar"><div class="stat"><span class="stat-num num-add">+${added}</span><span class="stat-lbl">Added</span></div><div class="stat"><span class="stat-num num-rem">-${removed}</span><span class="stat-lbl">Removed</span></div><div class="stat"><span class="stat-num num-tot">${changed}</span><span class="stat-lbl">Changes</span></div><div class="stat"><span class="stat-num num-sim">${sim}%</span><span class="stat-lbl">Similarity</span></div></div>`;
       html+=`<div class="sec-label">DIFF VIEW</div>
       <div class="view-tabs">
