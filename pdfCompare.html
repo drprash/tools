@@ -114,6 +114,8 @@
   }
   #compareBtn:hover{filter:brightness(1.08);transform:translateY(-1px)}
   #compareBtn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none;filter:none}
+  #resetBtn{display:none;width:100%;padding:9px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:12px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:-20px;margin-bottom:28px}
+  #resetBtn:hover{border-color:var(--muted);color:var(--text)}
 
   /* ── Loader ── */
   .loader{display:none;text-align:center;padding:40px}
@@ -189,6 +191,9 @@
 
   footer{margin-top:56px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
   footer span{color:var(--accent)}
+  .pp-credit{margin-top:14px;padding-top:10px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:7px}
+  .pp-li{color:var(--muted);display:inline-flex;align-items:center;text-decoration:none;transition:color .15s}
+  .pp-li:hover{color:var(--accent)}
 
   /* ── Mobile — base ── */
   @media(max-width:768px){
@@ -351,6 +356,7 @@
   </div>
 
   <button id="compareBtn" onclick="runCompare()" disabled>⟶ Compare Documents</button>
+  <button id="resetBtn" onclick="resetAll()">↺ Reset</button>
 
   <div class="loader" id="loader">
     <div class="spinner"></div>
@@ -360,7 +366,7 @@
   <div class="error-box" id="errorBox"></div>
   <div id="results"></div>
 
-  <footer>100% local · <span>PDF.js</span> column-aware extraction · <span>Mammoth.js</span> Word extraction · Myers diff · No data leaves your device</footer>
+  <footer>100% local · <span>PDF.js</span> column-aware extraction · <span>Mammoth.js</span> Word extraction · Myers diff · No data leaves your device<div class="pp-credit">Built by <a href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener" class="pp-li">Dr. Prashant Patel</a></div></footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -406,6 +412,7 @@ function attachFile(f,s){
   document.getElementById('meta'+s).textContent=(f.size/1024).toFixed(1)+' KB · '+type;
   updateLayoutNote();
   checkReady();
+  document.getElementById('resetBtn').style.display='';
 }
 function checkReady(){document.getElementById('compareBtn').disabled=!(files.A&&files.B)}
 function updateLayoutNote(){
@@ -674,6 +681,22 @@ async function runCompare(){
     box.textContent='⚠️ '+err.message;box.classList.add('active');
     console.error(err);
   }
+}
+function resetAll(){
+  files={A:null,B:null};
+  ['A','B'].forEach(s=>{
+    document.getElementById('zone'+s).classList.remove('has-file','drag-over');
+    document.getElementById('icon'+s).textContent='📂';
+    document.getElementById('text'+s).textContent='Drop PDF or Word (.docx) here';
+    document.getElementById('meta'+s).textContent='';
+    document.getElementById('file'+s).value='';
+  });
+  document.getElementById('results').innerHTML='';
+  document.getElementById('errorBox').classList.remove('active');
+  document.getElementById('loader').classList.remove('active');
+  document.getElementById('compareBtn').disabled=true;
+  document.getElementById('resetBtn').style.display='none';
+  updateLayoutNote();
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 </script>

@@ -1,0 +1,73 @@
+# .gitignore for static web project
+# Add common OS, editor, language, and build artifacts to ignore
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+*.log
+logs/
+
+# Build / output
+/dist/
+/build/
+/out/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+venv*/
+.env
+.env.*
+
+# Coverage and testing
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+
+# Byte-compiled / generated
+*.class
+*.jar
+*.war
+*.ear
+
+# Temporary and backup files
+*~
+*.swp
+*.tmp
+*.bak
+
+# Jupyter
+.ipynb_checkpoints
+
+# Archives
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+
+# Misc
+.cache/
+.pnpm-debug.log
+
+# Secrets and local config
+secrets/
+*.key

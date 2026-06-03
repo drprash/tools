@@ -474,6 +474,12 @@
     .smerge-total { font-size: 12px; color: var(--text2); margin-top: 6px; }
     .smerge-empty { font-size: 12px; color: var(--text3); font-style: italic; padding: 4px 0; }
 
+    /* ── Attribution ── */
+    .pp-credit{padding:24px 40px;border-top:1px solid var(--border);text-align:center;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text3);display:flex;align-items:center;justify-content:center;gap:7px;margin-top:8px}
+    .pp-li{color:var(--text3);display:inline-flex;align-items:center;text-decoration:none;transition:color .15s}
+    .pp-li:hover{color:var(--accent)}
+    @media(max-width:720px){.pp-credit{padding:20px 14px}}
+
     /* ── Compress PDF ── */
     .quality-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
     @media (max-width: 600px) { .quality-cards { grid-template-columns: repeat(2, 1fr); } }
@@ -975,6 +981,7 @@
       <div class="status-wrap" id="compress-status"></div>
     </div>
 
+  <footer class="pp-credit">Built by <a href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener" class="pp-li">Dr. Prashant Patel</a></footer>
 
 </div>
 
