@@ -2,7 +2,7 @@
 
 Browser-based tools for pharmaceutical professionals — built from real workflow frustration, running entirely offline, with no uploads and no accounts.
 
-**[praxdocs](https://drprash.github.io/tools/praxdocs.html)** · **[pdfCompare](https://drprash.github.io/tools/pdfCompare.html)** · **[FOCUS](https://drprash.github.io/tools/FOCUS.html)**
+**[praxdocs](https://drprash.github.io/tools/praxdocs.html)** · **[pdfCompare](https://drprash.github.io/tools/pdfCompare.html)** · **[FOCUS](https://drprash.github.io/tools/FOCUS.html)** · **[HighLit](https://drprash.github.io/tools/HighLit.html)**
 
 ---
 
@@ -72,6 +72,32 @@ A diff tool built specifically for pharmaceutical documents. Open `pdfCompare.ht
 6. Use **Reset** to start a new comparison
 
 > **Tip for SmPCs and PIL comparisons:** If your document uses a two-column layout, make sure the auto-detect is working — the column order matters for a meaningful comparison.
+
+---
+
+### HighLit — Safety Literature Highlight Tool
+
+A browser-based keyword highlighter for PubMed literature exports. Open `HighLit.html` in your browser.
+
+Built for pharmacovigilance and medical affairs workflows where you need to scan hundreds of abstracts for safety signals, mechanisms, or population characteristics — and want to see them colour-coded at a glance rather than Ctrl+F-ing the same terms repeatedly.
+
+**What it does:**
+- Upload any PubMed `.txt` export (Abstract format, MEDLINE/tagged format, or plain text)
+- Keyword categories are pre-loaded and fully editable — one term per line, one column per category
+- Each category gets a distinct highlight colour; a legend at the top identifies which colour means what
+- **Prefix stem matching** — entering `injur` catches "injury", "injured", "injuries", and "injurious" without requiring exact terms
+- Matching is case-insensitive throughout
+- Download the keyword table as an Excel file to edit offline, then re-upload the updated version
+
+**How to use:**
+
+1. Open `HighLit.html` in your browser
+2. Drag and drop your PubMed `.txt` export (or click to browse) into the upload zone
+3. Review the keyword table — edit categories directly in the browser, or download as Excel, modify, and re-upload
+4. Click **Highlight** — the preview renders all abstracts with matching terms highlighted by category colour
+5. Click **Download** to save the highlighted output
+
+No data leaves your browser. No PubMed credentials required — just export your search results as a `.txt` file and drop it in.
 
 ---
 
@@ -161,6 +187,7 @@ If you use Firefox, use **Export Backup** regularly (Settings → Export Backup)
 |------|:------:|:----:|:-------:|:------:|
 | PraxDocs | ✓ | ✓ | ✓ | ✓ |
 | PDF Compare | ✓ | ✓ | ✓ | ✓ |
+| HighLit | ✓ | ✓ | ✓ | ✓ |
 | FOCUS (file mode) | ✓ | ✓ | — | — |
 | FOCUS (browser storage) | ✓ | ✓ | ✓ | ✓ |
 
