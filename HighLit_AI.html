@@ -455,6 +455,9 @@
   /* ── Action row ── */
   .action-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .char-count { font-family: var(--mono); font-size: 10px; color: var(--ink-3); margin-top: 5px; }
+  .pp-credit { margin-top: 32px; padding: 14px 0; border-top: 1px solid var(--border); text-align: center; font-size: 11px; color: var(--ink-3); }
+  .pp-li { color: var(--ink-3); text-decoration: none; transition: color .15s; }
+  .pp-li:hover { color: var(--accent); }
 </style>
 </head>
 <body>
@@ -1162,5 +1165,6 @@ Return ONLY valid JSON, no markdown fences.`
     showOutput(html, copyText);
   }
 </script>
+<footer class="pp-credit">Built by <a href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener" class="pp-li">Dr. Prashant Patel</a></footer>
 </body>
 </html>
