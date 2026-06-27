@@ -458,6 +458,7 @@
   .pp-credit { margin-top: 32px; padding: 14px 0; border-top: 1px solid var(--border); text-align: center; font-size: 11px; color: var(--ink-3); }
   .pp-li { color: var(--ink-3); text-decoration: none; transition: color .15s; }
   .pp-li:hover { color: var(--accent); }
+  .disclaimer { background: #fffbe6; border-bottom: 1px solid #f0c040; padding: 7px 20px; font-size: 11px; color: #7a5c00; text-align: center; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -467,6 +468,7 @@
   <div class="logo-sub">Safety Literature Analyser</div>
   <div class="ai-badge">AI POWERED</div>
 </header>
+<div class="disclaimer"><strong>For research use only.</strong> This tool has not been validated under GAMP 5 or equivalent computer system validation (CSV) guidelines. Use in a regulated GxP or pharmacovigilance environment without prior formal validation may not comply with applicable quality system requirements.</div>
 
 <div class="shell">
   <!-- SIDEBAR -->
@@ -611,7 +613,7 @@ AB  - JAK inhibitor therapy (tofacitinib, baricitinib, upadacitinib) has been as
       storageKey: 'highlit_key_anthropic',
       placeholder: 'sk-ant-api03-…',
       validate: k => k.startsWith('sk-ant-'),
-      hint: 'Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>. Stored only in your browser.',
+      hint: 'Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>. Stored only in your browser. Uses <strong>claude-sonnet-4-6</strong>.',
       models: { default: 'claude-sonnet-4-6' }
     },
     openai: {
@@ -619,7 +621,7 @@ AB  - JAK inhibitor therapy (tofacitinib, baricitinib, upadacitinib) has been as
       storageKey: 'highlit_key_openai',
       placeholder: 'sk-…',
       validate: k => k.startsWith('sk-'),
-      hint: 'Get a key at <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a>. Stored only in your browser.',
+      hint: 'Get a key at <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a>. Stored only in your browser. Uses <strong>gpt-4o</strong>.',
       models: { default: 'gpt-4o' }
     },
     gemini: {
@@ -627,7 +629,7 @@ AB  - JAK inhibitor therapy (tofacitinib, baricitinib, upadacitinib) has been as
       storageKey: 'highlit_key_gemini',
       placeholder: 'AIza…',
       validate: k => k.startsWith('AIza') && k.length > 20,
-      hint: 'Get a key at <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a>. Stored only in your browser.',
+      hint: 'Get a key at <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a>. Stored only in your browser. Uses <strong>gemini-2.0-flash</strong>.',
       models: { default: 'gemini-2.0-flash' }
     },
     openrouter: {
@@ -635,7 +637,7 @@ AB  - JAK inhibitor therapy (tofacitinib, baricitinib, upadacitinib) has been as
       storageKey: 'highlit_key_openrouter',
       placeholder: 'sk-or-v1-…',
       validate: k => k.startsWith('sk-or-'),
-      hint: 'Get a key at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai</a>. Routes to Claude, GPT-4o, Gemini & more.',
+      hint: 'Get a key at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai</a>. Routes to Claude, GPT-4o, Gemini & more. Uses <strong>anthropic/claude-sonnet-4-5</strong>.',
       models: { default: 'anthropic/claude-sonnet-4-5' }
     }
   };

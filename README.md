@@ -90,13 +90,22 @@ Built for situations where keyword scanning isn't enough — when you need to un
 **How to use:**
 
 1. Open `HighLit_AI.html` in your browser
-2. Select your AI provider (Anthropic, OpenAI, Gemini, or OpenRouter) and enter your API key — stored only in your browser session, never sent anywhere except the selected provider
+2. Select your AI provider and enter your API key — stored only in your browser session, never sent anywhere except the selected provider
+
+   | Provider | Default model |
+   |---|---|
+   | Anthropic | claude-sonnet-4-6 |
+   | OpenAI | gpt-4o |
+   | Gemini | gemini-2.0-flash |
+   | OpenRouter | anthropic/claude-sonnet-4-5 |
 3. Paste your PubMed abstracts, MEDLINE export, or any safety text into the input panel — multiple abstracts are supported
 4. Optionally add product context (e.g. drug class, indication) for more targeted analysis
 5. Select an analysis mode and click **Analyse**
 6. Review the output in the results panel
 
 > **Privacy note:** Your text is sent to the AI provider you select, using your own API key. It is not stored or processed by any other server. Choose a provider consistent with your organisation's data governance policy.
+
+> **Research use only:** This tool has not been validated under GAMP 5 or equivalent computer system validation (CSV) guidelines. Use in a regulated GxP or pharmacovigilance environment without prior formal validation may not comply with applicable quality system requirements.
 
 ---
 
@@ -123,6 +132,8 @@ Built for pharmacovigilance and medical affairs workflows where you need to scan
 5. Click **Download** to save the highlighted output
 
 No data leaves your browser. No PubMed credentials required — just export your search results as a `.txt` file and drop it in.
+
+> **Research use only:** This tool has not been validated under GAMP 5 or equivalent computer system validation (CSV) guidelines. Use in a regulated GxP or pharmacovigilance environment without prior formal validation may not comply with applicable quality system requirements.
 
 ---
 
