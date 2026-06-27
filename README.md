@@ -2,7 +2,7 @@
 
 Browser-based tools for pharmaceutical professionals — built from real workflow frustration, running entirely offline, with no uploads and no accounts.
 
-**[praxdocs](https://drprash.github.io/tools/praxdocs.html)** · **[pdfCompare](https://drprash.github.io/tools/pdfCompare.html)** · **[FOCUS](https://drprash.github.io/tools/FOCUS.html)** · **[HighLit](https://drprash.github.io/tools/HighLit.html)**
+**[praxdocs](https://drprash.github.io/tools/praxdocs.html)** · **[pdfCompare](https://drprash.github.io/tools/pdfCompare.html)** · **[FOCUS](https://drprash.github.io/tools/FOCUS.html)** · **[HighLit](https://drprash.github.io/tools/HighLit.html)** · **[HighLit AI](https://drprash.github.io/tools/HighLit_AI.html)**
 
 ---
 
@@ -101,6 +101,31 @@ No data leaves your browser. No PubMed credentials required — just export your
 
 ---
 
+### HighLit AI — AI-Assisted Safety Literature Analyser
+
+An AI-powered analyser for pharmacovigilance and medical affairs literature review. Open `HighLit_AI.html` in your browser.
+
+Built for situations where keyword scanning isn't enough — when you need to understand context, extract structured safety signals, or produce PBRER-ready narratives from a stack of abstracts.
+
+**What it does:**
+- **Smart Highlight** — AI reads your abstracts and colour-codes safety signals by type without pre-defined keyword lists
+- **Signal Extraction** — returns a structured list of PV signals with severity classification (red / amber / green) and the source text
+- **PBRER Summary** — generates a narrative paragraph suitable for dropping into a PSUR or PBRER literature section
+- **Imputability** — structured causality assessment applied to the submitted text
+
+**How to use:**
+
+1. Open `HighLit_AI.html` in your browser
+2. Select your AI provider (Anthropic, OpenAI, Gemini, or OpenRouter) and enter your API key — stored only in your browser session, never sent anywhere except the selected provider
+3. Paste your PubMed abstracts, MEDLINE export, or any safety text into the input panel — multiple abstracts are supported
+4. Optionally add product context (e.g. drug class, indication) for more targeted analysis
+5. Select an analysis mode and click **Analyse**
+6. Review the output in the results panel
+
+> **Privacy note:** Your text is sent to the AI provider you select, using your own API key. It is not stored or processed by any other server. Choose a provider consistent with your organisation's data governance policy.
+
+---
+
 ### FOCUS — Strategic Time Manager
 
 A daily planning tool built around three ideas: your most important tasks for the day, a time-blocked schedule, and a priority matrix. Open `FOCUS.html` in Chrome or Edge.
@@ -188,8 +213,11 @@ If you use Firefox, use **Export Backup** regularly (Settings → Export Backup)
 | PraxDocs | ✓ | ✓ | ✓ | ✓ |
 | PDF Compare | ✓ | ✓ | ✓ | ✓ |
 | HighLit | ✓ | ✓ | ✓ | ✓ |
+| HighLit AI¹ | ✓ | ✓ | ✓ | ✓ |
 | FOCUS (file mode) | ✓ | ✓ | — | — |
 | FOCUS (browser storage) | ✓ | ✓ | ✓ | ✓ |
+
+¹ Requires an API key from your chosen provider (Anthropic, OpenAI, Gemini, or OpenRouter) and an internet connection.
 
 Chrome or Edge is recommended for FOCUS to get persistent file-based storage.
 
