@@ -55,6 +55,14 @@ mark{ border-radius:2px; padding:0 1px; }
 .pp-li{ color:var(--muted); text-decoration:none; transition:color .15s; }
 .pp-li:hover{ color:var(--accent); }
 .disclaimer{ background:#fffbe6; border-bottom:1px solid #f0c040; padding:7px 20px; font-size:11px; color:#7a5c00; text-align:center; line-height:1.5; }
+.mode-tabs{ display:flex; margin-bottom:14px; border:1px solid var(--border); border-radius:6px; overflow:hidden; width:fit-content; }
+.mode-tab{ padding:6px 16px; font-size:12px; font-weight:500; cursor:pointer; background:#f1f5f9; color:var(--muted); border:none; transition:.15s; }
+.mode-tab.active{ background:var(--accent); color:#fff; }
+.mode-tab:not(:last-child){ border-right:1px solid var(--border); }
+.embase-col-info{ margin-top:10px; font-size:12px; color:var(--muted); }
+.embase-col-info select{ font-size:12px; padding:3px 8px; border:1px solid var(--border); border-radius:4px; background:var(--surface); color:var(--text); margin-left:6px; cursor:pointer; }
+#abstract-input{ width:100%; min-height:180px; border:1px solid var(--border); border-radius:var(--r); padding:12px; font-family:monospace; font-size:12px; line-height:1.6; resize:vertical; outline:none; color:var(--text); background:var(--surface); }
+#abstract-input:focus{ border-color:var(--accent); }
 </style>
 </head>
 <body>
@@ -69,14 +77,39 @@ mark{ border-radius:2px; padding:0 1px; }
 <div class="container">
 
   <div class="card">
-    <div class="card-title"><span class="sn">1</span> Upload PubMed Literature File</div>
-    <div class="drop" id="drop-zone">
-      <div class="ic">📄</div>
-      <p><strong>Click to browse</strong> or drag &amp; drop your PubMed <code>.txt</code> export</p>
-      <p style="margin-top:5px;font-size:12px;">Any PubMed format — Abstract, MEDLINE/tagged, or plain text</p>
-      <input type="file" id="file-input" accept=".txt">
+    <div class="card-title"><span class="sn">1</span> <span id="card1-title">Enter Abstract</span></div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tab-single">Single Abstract</button>
+      <button class="mode-tab" id="tab-batch">Batch (.txt)</button>
+      <button class="mode-tab" id="tab-embase">Embase (.xlsx)</button>
     </div>
-    <div id="file-info"></div>
+    <div id="panel-single">
+      <textarea id="abstract-input" placeholder="Paste or type your abstract here…"></textarea>
+    </div>
+    <div id="panel-batch" style="display:none">
+      <div class="drop" id="drop-zone">
+        <div class="ic">📄</div>
+        <p><strong>Click to browse</strong> or drag &amp; drop your PubMed <code>.txt</code> export</p>
+        <p style="margin-top:5px;font-size:12px;">Any PubMed format — Abstract, MEDLINE/tagged, or plain text</p>
+        <input type="file" id="file-input" accept=".txt">
+      </div>
+      <div id="file-info"></div>
+    </div>
+    <div id="panel-embase" style="display:none">
+      <div class="drop" id="embase-drop-zone">
+        <div class="ic">📊</div>
+        <p><strong>Click to browse</strong> or drag &amp; drop your Embase <code>.xlsx</code> export</p>
+        <p style="margin-top:5px;font-size:12px;">Use "MS Excel — Fields by Column" format from Embase</p>
+        <input type="file" id="embase-file-input" accept=".xlsx">
+      </div>
+      <div class="embase-col-info" id="embase-col-info" style="display:none">
+        <div id="embase-col-status"></div>
+        <div id="embase-col-picker" style="display:none;margin-top:6px;">
+          <label>Select Abstract column:</label>
+          <select id="embase-abstract-col"><option value="">— choose —</option></select>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -150,9 +183,10 @@ const DEFAULTS = [
 const STEMS = new Set(["injur","overdos","suicid","abus","misus","complicat","reproduct","intoxic","worsen","interact","carcinogen","mutagen","cancerogen","toxic","pharmacotoxic","cardiotoxic","neurotoxic","nephrotoxic","hepatotoxic","immunotoxic","cytotoxic","genotoxic","poison"]);
 
 let cats    = DEFAULTS.map(c => ({ ...c, keywords: [...c.keywords] }));
-let rawText = null;
-let lastBlob = null;
-let srcName  = "output";
+let rawText    = null;
+let lastBlob   = null;
+let srcName    = "output";
+let embaseData = null;
 
 // ───────────────────────────────────────────────
 // KEYWORD TABLE UI
@@ -362,17 +396,187 @@ async function makeDocx(lines, patterns) {
   return zip.generateAsync({ type:"blob", mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document", compression:"DEFLATE" });
 }
 
+async function makeEmbaseDocx(articles, patterns) {
+  const NS = `xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"`;
+  const body = [];
+  for (const { title, abstract } of articles) {
+    if (title) {
+      const run = `<w:r><w:rPr><w:b/><w:bCs/><w:u w:val="single"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t xml:space="preserve">${xe(title)}</w:t></w:r>`;
+      body.push(`<w:p><w:pPr><w:spacing w:before="200" w:after="60"/></w:pPr>${run}</w:p>`);
+    }
+    for (const line of abstract.split(/\r?\n/))
+      body.push(oPara(line.trim() ? segRuns(segment(line, patterns)) : ""));
+    body.push(`<w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr></w:p>`);
+  }
+  const docXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${body.join("")}<w:sectPr><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720"/></w:sectPr></w:body></w:document>`;
+  const zip = new JSZip();
+  zip.file("[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`);
+  zip.file("_rels/.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`);
+  zip.file("word/document.xml", docXml);
+  zip.file("word/_rels/document.xml.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`);
+  return zip.generateAsync({ type:"blob", mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document", compression:"DEFLATE" });
+}
+
 // ───────────────────────────────────────────────
 // UI
 // ───────────────────────────────────────────────
 function setStatus(msg, cls) { const el = document.getElementById("status"); el.textContent = msg; el.className = cls||""; }
 
-const dropZone    = document.getElementById("drop-zone");
-const fileInput   = document.getElementById("file-input");
-const kwFileInput = document.getElementById("kw-file-input");
-const processBtn  = document.getElementById("process-btn");
-const downloadBtn = document.getElementById("download-btn");
-const resetBtn    = document.getElementById("reset-btn");
+const dropZone       = document.getElementById("drop-zone");
+const fileInput      = document.getElementById("file-input");
+const kwFileInput    = document.getElementById("kw-file-input");
+const processBtn     = document.getElementById("process-btn");
+const downloadBtn    = document.getElementById("download-btn");
+const resetBtn       = document.getElementById("reset-btn");
+const embaseDropZone = document.getElementById("embase-drop-zone");
+const embaseFileInput= document.getElementById("embase-file-input");
+
+// ── MODE SWITCHING ──
+let inputMode = localStorage.getItem('highlit-mode') || 'single';
+
+function applyMode(mode) {
+  inputMode = mode;
+  localStorage.setItem('highlit-mode', mode);
+  document.getElementById('tab-single').classList.toggle('active', mode === 'single');
+  document.getElementById('tab-batch').classList.toggle('active', mode === 'batch');
+  document.getElementById('tab-embase').classList.toggle('active', mode === 'embase');
+  document.getElementById('panel-single').style.display = mode === 'single' ? '' : 'none';
+  document.getElementById('panel-batch').style.display = mode === 'batch' ? '' : 'none';
+  document.getElementById('panel-embase').style.display = mode === 'embase' ? '' : 'none';
+  const titles = { single: 'Enter Abstract', batch: 'Upload PubMed Literature File', embase: 'Upload Embase Excel Export' };
+  document.getElementById('card1-title').textContent = titles[mode] || 'Input';
+  rawText = null; lastBlob = null; srcName = 'output'; embaseData = null;
+  fileInput.value = '';
+  embaseFileInput.value = '';
+  document.getElementById('abstract-input').value = '';
+  document.getElementById('file-info').textContent = '';
+  document.getElementById('embase-col-info').style.display = 'none';
+  processBtn.disabled = true;
+  downloadBtn.disabled = true;
+  resetBtn.disabled = true;
+  document.getElementById('preview-section').style.display = 'none';
+  document.getElementById('preview-box').innerHTML = '';
+  setStatus('', '');
+}
+
+document.getElementById('tab-single').addEventListener('click', () => { if (inputMode !== 'single') applyMode('single'); });
+document.getElementById('tab-batch').addEventListener('click', () => { if (inputMode !== 'batch') applyMode('batch'); });
+document.getElementById('tab-embase').addEventListener('click', () => { if (inputMode !== 'embase') applyMode('embase'); });
+
+// ── EMBASE MODE ──
+embaseDropZone.addEventListener('click', () => embaseFileInput.click());
+embaseDropZone.addEventListener('dragover', e => { e.preventDefault(); embaseDropZone.classList.add('over'); });
+embaseDropZone.addEventListener('dragleave', () => embaseDropZone.classList.remove('over'));
+embaseDropZone.addEventListener('drop', e => { e.preventDefault(); embaseDropZone.classList.remove('over'); const f = e.dataTransfer.files[0]; if (f) loadEmbaseFile(f); });
+embaseFileInput.addEventListener('change', e => { if (e.target.files[0]) loadEmbaseFile(e.target.files[0]); });
+document.getElementById('embase-abstract-col').addEventListener('change', finalizeEmbaseColumns);
+
+async function loadEmbaseFile(file) {
+  srcName = file.name.replace(/\.[^.]+$/, '');
+  setStatus('Reading Embase file…', '');
+  processBtn.disabled = true;
+  try {
+    const data = await parseEmbaseXlsx(file);
+    if (!data || !data.rows.length) { setStatus('Could not read file — check it is an Embase "Fields by Column" .xlsx export', 'err'); return; }
+    embaseData = data;
+    const headers = data.headers;
+    const abstractIdx = headers.findIndex(h => /^abstract$/i.test(h.trim()));
+    const titleIdx    = headers.findIndex(h => /^title$/i.test(h.trim()));
+    embaseData.abstractColIdx = abstractIdx;
+    embaseData.titleColIdx    = titleIdx;
+    const colInfo   = document.getElementById('embase-col-info');
+    const colStatus = document.getElementById('embase-col-status');
+    const colPicker = document.getElementById('embase-col-picker');
+    colInfo.style.display = '';
+    if (abstractIdx >= 0) {
+      colStatus.textContent = `✓ ${data.rows.length} article(s) — Abstract column detected` +
+        (titleIdx >= 0 ? ` · Title column detected` : '');
+      colPicker.style.display = 'none';
+      finalizeEmbaseColumns();
+    } else {
+      colStatus.textContent = `${data.rows.length} article(s) loaded — Abstract column not found. Select it below:`;
+      const select = document.getElementById('embase-abstract-col');
+      select.innerHTML = '<option value="">— choose —</option>' +
+        headers.map((h, i) => `<option value="${i}">${h || 'Column ' + (i + 1)}</option>`).join('');
+      colPicker.style.display = '';
+      setStatus('Select the Abstract column to continue.', '');
+    }
+  } catch(err) {
+    setStatus('Error reading file: ' + err.message, 'err');
+  }
+}
+
+function finalizeEmbaseColumns() {
+  if (!embaseData) return;
+  if (embaseData.abstractColIdx < 0) {
+    const val = parseInt(document.getElementById('embase-abstract-col').value);
+    if (isNaN(val)) return;
+    embaseData.abstractColIdx = val;
+  }
+  const articles = buildEmbaseArticles(embaseData);
+  if (!articles.length) { setStatus('No abstract text found in selected column.', 'err'); return; }
+  embaseData.articles = articles;
+  rawText = articles.flatMap(a => [a.title, ...a.abstract.split(/\r?\n/), '']).join('\n');
+  processBtn.disabled = false;
+  resetBtn.disabled = false;
+  downloadBtn.disabled = true;
+  lastBlob = null;
+  document.getElementById('preview-section').style.display = 'none';
+  setStatus(`${articles.length} article(s) ready. Click 'Process File' to highlight.`, '');
+}
+
+async function parseEmbaseXlsx(file) {
+  const ab  = await file.arrayBuffer();
+  const zip = await JSZip.loadAsync(ab);
+  const sharedStrings = [];
+  const ssFile = zip.file("xl/sharedStrings.xml");
+  if (ssFile) {
+    const doc = new DOMParser().parseFromString(await ssFile.async("string"), "text/xml");
+    doc.querySelectorAll("si").forEach(si =>
+      sharedStrings.push([...si.querySelectorAll("t")].map(t => t.textContent).join("")));
+  }
+  const sheetFile = zip.file("xl/worksheets/sheet1.xml");
+  if (!sheetFile) return null;
+  const doc = new DOMParser().parseFromString(await sheetFile.async("string"), "text/xml");
+  function colIdx(ref) {
+    const m = ref && ref.match(/^([A-Z]+)/); if (!m) return -1;
+    let ci = 0; for (let i = 0; i < m[1].length; i++) ci = ci * 26 + (m[1].charCodeAt(i) - 64); return ci - 1;
+  }
+  function cellVal(c) {
+    const t = c.getAttribute("t");
+    if (t === "inlineStr") return [...c.querySelectorAll("is t")].map(n => n.textContent).join("");
+    if (t === "s") return sharedStrings[parseInt(c.querySelector("v")?.textContent)] || "";
+    return c.querySelector("v")?.textContent || "";
+  }
+  const allRows = [...doc.querySelectorAll("row")];
+  if (!allRows.length) return null;
+  const headers = [];
+  allRows[0].querySelectorAll("c").forEach(c => { const i = colIdx(c.getAttribute("r")); if (i >= 0) headers[i] = cellVal(c).trim(); });
+  const maxCol = headers.length;
+  for (let i = 0; i < maxCol; i++) if (!headers[i]) headers[i] = '';
+  const rows = [];
+  for (let ri = 1; ri < allRows.length; ri++) {
+    const row = new Array(maxCol).fill('');
+    allRows[ri].querySelectorAll("c").forEach(c => { const i = colIdx(c.getAttribute("r")); if (i >= 0 && i < maxCol) row[i] = cellVal(c).trim(); });
+    if (row.some(v => v)) rows.push(row);
+  }
+  return { headers, rows };
+}
+
+function buildEmbaseArticles({ rows, headers, abstractColIdx, titleColIdx }) {
+  return rows.map(row => ({
+    title:    titleColIdx >= 0 ? (row[titleColIdx] || '').trim() : '',
+    abstract: (row[abstractColIdx] || '').trim()
+  })).filter(a => a.abstract);
+}
+
+document.getElementById('abstract-input').addEventListener('input', () => {
+  if (inputMode !== 'single') return;
+  const hasText = document.getElementById('abstract-input').value.trim().length > 0;
+  processBtn.disabled = !hasText;
+  resetBtn.disabled = !hasText;
+  if (!hasText) downloadBtn.disabled = true;
+});
 
 dropZone.addEventListener("click", () => fileInput.click());
 dropZone.addEventListener("dragover",  e => { e.preventDefault(); dropZone.classList.add("over"); });
@@ -419,7 +623,11 @@ function loadFile(file) {
 }
 
 processBtn.addEventListener("click", async () => {
-  if (!rawText) return;
+  if (inputMode === 'single') {
+    rawText = document.getElementById('abstract-input').value;
+    srcName = 'Abstract';
+  }
+  if (!rawText || !rawText.trim()) return;
   processBtn.disabled = true;
   setStatus("Highlighting…", "");
   try {
@@ -435,7 +643,9 @@ processBtn.addEventListener("click", async () => {
         : `— ${lines.length.toLocaleString()} lines · ${hlCount.toLocaleString()} highlight(s)`;
     sec.scrollIntoView({ behavior:"smooth", block:"start" });
     setStatus("Generating Word document…", "");
-    lastBlob = await makeDocx(lines, patterns);
+    lastBlob = (inputMode === 'embase' && embaseData?.articles)
+      ? await makeEmbaseDocx(embaseData.articles, patterns)
+      : await makeDocx(lines, patterns);
     downloadBtn.disabled = false;
     setStatus(`✓ Done — ${hlCount.toLocaleString()} highlight(s) applied. Click Download to save.`, "ok");
   } catch(err) {
@@ -453,9 +663,12 @@ downloadBtn.addEventListener("click", () => {
 });
 
 resetBtn.addEventListener("click", () => {
-  rawText = null; lastBlob = null; srcName = "output";
+  rawText = null; lastBlob = null; srcName = "output"; embaseData = null;
   fileInput.value = "";
+  embaseFileInput.value = "";
+  document.getElementById('abstract-input').value = '';
   document.getElementById("file-info").textContent = "";
+  document.getElementById('embase-col-info').style.display = 'none';
   processBtn.disabled = true;
   downloadBtn.disabled = true;
   resetBtn.disabled = true;
@@ -464,6 +677,7 @@ resetBtn.addEventListener("click", () => {
   setStatus("", "");
 });
 
+applyMode(inputMode);
 buildKwUI();
 </script>
 <div class="container">

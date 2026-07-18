@@ -111,12 +111,16 @@ Built for situations where keyword scanning isn't enough — when you need to un
 
 ### HighLit — Safety Literature Highlight Tool
 
-A browser-based keyword highlighter for PubMed literature exports. Open `HighLit.html` in your browser.
+A browser-based keyword highlighter for safety literature. Open `HighLit.html` in your browser.
 
-Built for pharmacovigilance and medical affairs workflows where you need to scan hundreds of abstracts for safety signals, mechanisms, or population characteristics — and want to see them colour-coded at a glance rather than Ctrl+F-ing the same terms repeatedly.
+Built for pharmacovigilance and medical affairs workflows where you need to scan abstracts for safety signals, mechanisms, or population characteristics — and want to see them colour-coded at a glance rather than Ctrl+F-ing the same terms repeatedly.
+
+**Three input modes — switch freely between them:**
+- **Single Abstract (default):** Paste or type one abstract directly into the text box. No file needed — open the tool and start immediately.
+- **Batch (.txt):** Upload any PubMed `.txt` export (Abstract format, MEDLINE/tagged format, or plain text) to process multiple abstracts at once.
+- **Embase (.xlsx):** Upload an Embase Excel export ("MS Excel — Fields by Column" format). The tool auto-detects the Abstract and Title columns; if the Abstract column cannot be identified automatically, a dropdown lists all column headers to pick from. Each article is output with its title as a bold underlined header above the highlighted abstract text.
 
 **What it does:**
-- Upload any PubMed `.txt` export (Abstract format, MEDLINE/tagged format, or plain text)
 - Keyword categories are pre-loaded and fully editable — one term per line, one column per category
 - Each category gets a distinct highlight colour; a legend at the top identifies which colour means what
 - **Prefix stem matching** — entering `injur` catches "injury", "injured", "injuries", and "injurious" without requiring exact terms
@@ -126,12 +130,12 @@ Built for pharmacovigilance and medical affairs workflows where you need to scan
 **How to use:**
 
 1. Open `HighLit.html` in your browser
-2. Drag and drop your PubMed `.txt` export (or click to browse) into the upload zone
+2. Select your input mode: **Single Abstract** (default) to paste text directly; **Batch (.txt)** to upload a PubMed export; or **Embase (.xlsx)** to upload an Embase Excel export — use "MS Excel — Fields by Column" format when exporting from Embase
 3. Review the keyword table — edit categories directly in the browser, or download as Excel, modify, and re-upload
-4. Click **Highlight** — the preview renders all abstracts with matching terms highlighted by category colour
-5. Click **Download** to save the highlighted output
+4. Click **Process File** — the preview renders the text with matching terms highlighted by category colour
+5. Click **Download** to save the highlighted `.docx` output
 
-No data leaves your browser. No PubMed credentials required — just export your search results as a `.txt` file and drop it in.
+No data leaves your browser. Works with PubMed and Embase exports — no database credentials required beyond your institution's normal access.
 
 > **Research use only:** This tool has not been validated under GAMP 5 or equivalent computer system validation (CSV) guidelines. Use in a regulated GxP or pharmacovigilance environment without prior formal validation may not comply with applicable quality system requirements.
 
