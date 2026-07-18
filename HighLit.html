@@ -61,6 +61,8 @@ mark{ border-radius:2px; padding:0 1px; }
 .mode-tab:not(:last-child){ border-right:1px solid var(--border); }
 .embase-col-info{ margin-top:10px; font-size:12px; color:var(--muted); }
 .embase-col-info select{ font-size:12px; padding:3px 8px; border:1px solid var(--border); border-radius:4px; background:var(--surface); color:var(--text); margin-left:6px; cursor:pointer; }
+.pdf-range{ margin-top:8px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:12px; color:var(--muted); }
+.pdf-range input[type=number]{ width:58px; padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:12px; text-align:center; background:var(--surface); color:var(--text); }
 #abstract-input{ width:100%; min-height:180px; border:1px solid var(--border); border-radius:var(--r); padding:12px; font-family:monospace; font-size:12px; line-height:1.6; resize:vertical; outline:none; color:var(--text); background:var(--surface); }
 #abstract-input:focus{ border-color:var(--accent); }
 </style>
@@ -82,6 +84,7 @@ mark{ border-radius:2px; padding:0 1px; }
       <button class="mode-tab active" id="tab-single">Single Abstract</button>
       <button class="mode-tab" id="tab-batch">Batch (.txt)</button>
       <button class="mode-tab" id="tab-embase">Embase (.xlsx)</button>
+      <button class="mode-tab" id="tab-pdf">PDF (.pdf)</button>
     </div>
     <div id="panel-single">
       <textarea id="abstract-input" placeholder="Paste or type your abstract here…"></textarea>
@@ -107,6 +110,21 @@ mark{ border-radius:2px; padding:0 1px; }
         <div id="embase-col-picker" style="display:none;margin-top:6px;">
           <label>Select Abstract column:</label>
           <select id="embase-abstract-col"><option value="">— choose —</option></select>
+        </div>
+      </div>
+    </div>
+    <div id="panel-pdf" style="display:none">
+      <div class="drop" id="pdf-drop-zone">
+        <div class="ic">📑</div>
+        <p><strong>Click to browse</strong> or drag &amp; drop a PDF article</p>
+        <p style="margin-top:5px;font-size:12px;">Any PDF with selectable text — full-text articles, clinical reports</p>
+        <input type="file" id="pdf-file-input" accept=".pdf">
+      </div>
+      <div class="embase-col-info" id="pdf-page-info" style="display:none">
+        <div id="pdf-page-status"></div>
+        <div class="pdf-range">
+          Pages: From&nbsp;<input type="number" id="pdf-from" min="1" value="1">&nbsp;to&nbsp;<input type="number" id="pdf-to" min="1" value="1">
+          &nbsp;<span style="color:var(--muted);font-size:11px;">(adjust to skip journal headers or reference list)</span>
         </div>
       </div>
     </div>
@@ -187,6 +205,7 @@ let rawText    = null;
 let lastBlob   = null;
 let srcName    = "output";
 let embaseData = null;
+let pdfData    = null;
 
 // ───────────────────────────────────────────────
 // KEYWORD TABLE UI
@@ -430,6 +449,8 @@ const downloadBtn    = document.getElementById("download-btn");
 const resetBtn       = document.getElementById("reset-btn");
 const embaseDropZone = document.getElementById("embase-drop-zone");
 const embaseFileInput= document.getElementById("embase-file-input");
+const pdfDropZone    = document.getElementById("pdf-drop-zone");
+const pdfFileInput   = document.getElementById("pdf-file-input");
 
 // ── MODE SWITCHING ──
 let inputMode = localStorage.getItem('highlit-mode') || 'single';
@@ -440,17 +461,21 @@ function applyMode(mode) {
   document.getElementById('tab-single').classList.toggle('active', mode === 'single');
   document.getElementById('tab-batch').classList.toggle('active', mode === 'batch');
   document.getElementById('tab-embase').classList.toggle('active', mode === 'embase');
+  document.getElementById('tab-pdf').classList.toggle('active', mode === 'pdf');
   document.getElementById('panel-single').style.display = mode === 'single' ? '' : 'none';
   document.getElementById('panel-batch').style.display = mode === 'batch' ? '' : 'none';
   document.getElementById('panel-embase').style.display = mode === 'embase' ? '' : 'none';
-  const titles = { single: 'Enter Abstract', batch: 'Upload PubMed Literature File', embase: 'Upload Embase Excel Export' };
+  document.getElementById('panel-pdf').style.display = mode === 'pdf' ? '' : 'none';
+  const titles = { single: 'Enter Abstract', batch: 'Upload PubMed Literature File', embase: 'Upload Embase Excel Export', pdf: 'Upload PDF Article' };
   document.getElementById('card1-title').textContent = titles[mode] || 'Input';
-  rawText = null; lastBlob = null; srcName = 'output'; embaseData = null;
+  rawText = null; lastBlob = null; srcName = 'output'; embaseData = null; pdfData = null;
   fileInput.value = '';
   embaseFileInput.value = '';
+  pdfFileInput.value = '';
   document.getElementById('abstract-input').value = '';
   document.getElementById('file-info').textContent = '';
   document.getElementById('embase-col-info').style.display = 'none';
+  document.getElementById('pdf-page-info').style.display = 'none';
   processBtn.disabled = true;
   downloadBtn.disabled = true;
   resetBtn.disabled = true;
@@ -462,6 +487,112 @@ function applyMode(mode) {
 document.getElementById('tab-single').addEventListener('click', () => { if (inputMode !== 'single') applyMode('single'); });
 document.getElementById('tab-batch').addEventListener('click', () => { if (inputMode !== 'batch') applyMode('batch'); });
 document.getElementById('tab-embase').addEventListener('click', () => { if (inputMode !== 'embase') applyMode('embase'); });
+document.getElementById('tab-pdf').addEventListener('click', () => { if (inputMode !== 'pdf') applyMode('pdf'); });
+
+// ── PDF MODE ──
+let _pdfjs = null;
+async function ensurePdfjs() {
+  if (_pdfjs) return _pdfjs;
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = res; s.onerror = rej; document.head.appendChild(s);
+  });
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  _pdfjs = pdfjsLib;
+  return _pdfjs;
+}
+
+function findColumnBoundary(items, pageWidth) {
+  const xs = items.map(i => i.transform[4]).sort((a, b) => a - b);
+  const lo = pageWidth * 0.3, hi = pageWidth * 0.7;
+  let maxGap = 0, boundary = pageWidth / 2;
+  for (let i = 1; i < xs.length; i++) {
+    const gap = xs[i] - xs[i - 1];
+    if (xs[i - 1] >= lo && xs[i] <= hi && gap > maxGap) { maxGap = gap; boundary = (xs[i - 1] + xs[i]) / 2; }
+  }
+  return { boundary, is2col: maxGap > pageWidth * 0.05 };
+}
+
+function groupPdfLines(items) {
+  if (!items.length) return [];
+  const sorted = [...items].sort((a, b) => b.transform[5] - a.transform[5]);
+  const lines = []; let cur = [sorted[0]];
+  const thr = (sorted[0].height || 10) * 0.6;
+  for (let i = 1; i < sorted.length; i++) {
+    if (Math.abs(sorted[i].transform[5] - cur[0].transform[5]) <= thr) { cur.push(sorted[i]); }
+    else {
+      cur.sort((a, b) => a.transform[4] - b.transform[4]);
+      const ln = cur.map(it => it.str).join(' ').replace(/\s+/g, ' ').trim();
+      if (ln) lines.push(ln);
+      cur = [sorted[i]];
+    }
+  }
+  if (cur.length) {
+    cur.sort((a, b) => a.transform[4] - b.transform[4]);
+    const ln = cur.map(it => it.str).join(' ').replace(/\s+/g, ' ').trim();
+    if (ln) lines.push(ln);
+  }
+  return lines;
+}
+
+async function extractPdfPages() {
+  const lib = await ensurePdfjs();
+  const ab  = await pdfData.file.arrayBuffer();
+  const pdf = await lib.getDocument({ data: ab }).promise;
+  const from = Math.max(1, parseInt(document.getElementById('pdf-from').value) || 1);
+  const to   = Math.min(pdf.numPages, parseInt(document.getElementById('pdf-to').value) || pdf.numPages);
+  const allLines = [];
+  for (let p = from; p <= to; p++) {
+    const page    = await pdf.getPage(p);
+    const vp      = page.getViewport({ scale: 1 });
+    const content = await page.getTextContent();
+    const items   = content.items.filter(it => it.str && it.str.trim());
+    if (!items.length) continue;
+    const { boundary, is2col } = findColumnBoundary(items, vp.width);
+    if (is2col) {
+      const left  = items.filter(i => i.transform[4] <  boundary);
+      const right = items.filter(i => i.transform[4] >= boundary);
+      allLines.push(...groupPdfLines(left), ...groupPdfLines(right));
+    } else {
+      allLines.push(...groupPdfLines(items));
+    }
+    allLines.push('');
+  }
+  return allLines;
+}
+
+pdfDropZone.addEventListener('click', () => pdfFileInput.click());
+pdfDropZone.addEventListener('dragover',  e => { e.preventDefault(); pdfDropZone.classList.add('over'); });
+pdfDropZone.addEventListener('dragleave', () => pdfDropZone.classList.remove('over'));
+pdfDropZone.addEventListener('drop', e => { e.preventDefault(); pdfDropZone.classList.remove('over'); const f = e.dataTransfer.files[0]; if (f) loadPdfFile(f); });
+pdfFileInput.addEventListener('change', e => { if (e.target.files[0]) loadPdfFile(e.target.files[0]); });
+
+async function loadPdfFile(file) {
+  setStatus('Reading PDF…', '');
+  processBtn.disabled = true;
+  try {
+    const lib = await ensurePdfjs();
+    const ab  = await file.arrayBuffer();
+    const pdf = await lib.getDocument({ data: ab }).promise;
+    const n   = pdf.numPages;
+    pdfData   = { file, name: file.name.replace(/\.[^.]+$/, ''), totalPages: n };
+    document.getElementById('pdf-from').value = 1;
+    document.getElementById('pdf-from').max   = n;
+    document.getElementById('pdf-to').value   = n;
+    document.getElementById('pdf-to').max     = n;
+    document.getElementById('pdf-page-status').textContent = `✓ ${n} page(s) — adjust range below to skip journal headers or reference list`;
+    document.getElementById('pdf-page-info').style.display = '';
+    processBtn.disabled = false;
+    resetBtn.disabled   = false;
+    lastBlob = null;
+    document.getElementById('preview-section').style.display = 'none';
+    setStatus(`PDF loaded. Click 'Process File' to extract and highlight.`, '');
+  } catch(err) {
+    setStatus('Error reading PDF: ' + err.message, 'err');
+  }
+}
 
 // ── EMBASE MODE ──
 embaseDropZone.addEventListener('click', () => embaseFileInput.click());
@@ -627,6 +758,20 @@ processBtn.addEventListener("click", async () => {
     rawText = document.getElementById('abstract-input').value;
     srcName = 'Abstract';
   }
+  if (inputMode === 'pdf') {
+    if (!pdfData) return;
+    processBtn.disabled = true;
+    setStatus('Extracting text from PDF…', '');
+    try {
+      const lines = await extractPdfPages();
+      rawText  = lines.join('\n');
+      srcName  = pdfData.name;
+    } catch(err) {
+      setStatus('Error extracting PDF: ' + err.message, 'err');
+      processBtn.disabled = false;
+      return;
+    }
+  }
   if (!rawText || !rawText.trim()) return;
   processBtn.disabled = true;
   setStatus("Highlighting…", "");
@@ -663,12 +808,14 @@ downloadBtn.addEventListener("click", () => {
 });
 
 resetBtn.addEventListener("click", () => {
-  rawText = null; lastBlob = null; srcName = "output"; embaseData = null;
+  rawText = null; lastBlob = null; srcName = "output"; embaseData = null; pdfData = null;
   fileInput.value = "";
   embaseFileInput.value = "";
+  pdfFileInput.value = "";
   document.getElementById('abstract-input').value = '';
   document.getElementById("file-info").textContent = "";
   document.getElementById('embase-col-info').style.display = 'none';
+  document.getElementById('pdf-page-info').style.display = 'none';
   processBtn.disabled = true;
   downloadBtn.disabled = true;
   resetBtn.disabled = true;
