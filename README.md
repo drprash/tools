@@ -1,28 +1,26 @@
 # Tools by Dr. Prashant Patel
 
-Browser-based tools for pharmaceutical professionals — built from real workflow frustration, running entirely offline, with no uploads and no accounts.
+Secure, browser-based tools for pharmacovigilance, regulatory and medical affairs. All processing runs locally in the browser: no uploads, no accounts, no servers.
 
-**[praxdocs](https://drprash.github.io/tools/praxdocs.html)** · **[pdfCompare](https://drprash.github.io/tools/pdfCompare.html)** · **[HighLit AI](https://drprash.github.io/tools/HighLit_AI.html)** · **[HighLit](https://drprash.github.io/tools/HighLit.html)** · **[PatentCliff](https://drprash.github.io/tools/PatentCliff.html)** · **[FOCUS](https://drprash.github.io/tools/FOCUS.html)**
+**[PraxDocs](https://drprash.github.io/tools/praxdocs.html)** · **[PDF Compare](https://drprash.github.io/tools/pdfCompare.html)** · **[HighLit AI](https://drprash.github.io/tools/HighLit_AI.html)** · **[HighLit](https://drprash.github.io/tools/HighLit.html)** · **[PatentCliff](https://drprash.github.io/tools/PatentCliff.html)** · **[FOCUS](https://drprash.github.io/tools/FOCUS.html)**
 
 ---
 
 ## Why these exist
 
-I spent 9+ years in pharmacovigilance, regulatory affairs, and medical affairs working with dense PDFs every day — clinical study reports, SmPCs, patient information leaflets, regulatory submissions. The tools I needed either didn't exist, cost too much to justify, or required uploading confidential documents to a third-party server.
+Work in pharmacovigilance, regulatory affairs and medical affairs depends on dense documents: clinical study reports, SmPCs, patient information leaflets and regulatory submissions. Available tools are often costly, generic, or require confidential material to be uploaded to external servers.
 
-So I taught myself to build them.
-
-These are not products. They are solutions to specific frustrations I had at work, released publicly on the chance they solve the same frustrations for someone else.
+These tools were developed by Dr. Prashant Patel, MBBS, MD, to address specific gaps encountered in practice. Each one is a single web page that runs entirely in the browser, with no installation and no data leaving the user's device.
 
 ---
 
 ## Philosophy
 
-**Privacy by default.** Regulatory and clinical documents are sensitive. A tool that uploads your files to process them is a liability, not a tool. Everything here runs locally in your browser tab. Nothing leaves your device.
+**Privacy by default.** Regulatory and clinical documents are confidential. Tools that require uploading them create avoidable risk, so everything here is processed locally within the browser.
 
-**No install friction.** The best tool is the one people actually use. A URL you can bookmark beats software that needs IT approval, a licence key, or a two-hour onboarding session.
+**No installation.** No software installation, licences or IT onboarding. Each tool is a single page that can be bookmarked and used immediately.
 
-**Domain expertise first.** The features aren't invented — they're extracted from real work. PDF Compare reads two-column layouts because I've compared hundreds of SmPCs. FOCUS has a priority matrix because pharma demands you know, before 9am, exactly what must ship today.
+**Built from practice.** Features reflect real working requirements, such as column-aware comparison for multi-column SmPCs, and prioritisation shaped by how medical and regulatory deliverables are managed.
 
 ---
 
@@ -272,7 +270,7 @@ Chrome or Edge is recommended for FOCUS to get persistent file-based storage.
 No frameworks. No build step. No backend.
 
 - **JavaScript** — all logic
-- **HTML5 / CSS3** — structure and theming (dark/light mode)
+- **HTML5 / CSS3** — structure and a shared design system with light, dark and system-matched themes
 - **PDF.js** — PDF rendering and text extraction
 - **pdf-lib** — PDF creation and manipulation
 - **Myers diff algorithm** — document comparison
@@ -284,9 +282,9 @@ No frameworks. No build step. No backend.
 
 ## About
 
-I'm a Medical Doctor with a specialisation in Pharmacology. The tools here are a direct result of problems I ran into doing real work in the pharmaceutical industry. I am not a software engineer by training — I built these to scratch my own itch, and I share them in case they scratch yours too.
+Developed by Dr. Prashant Patel, MBBS, MD, a medical doctor with more than nine years in the pharmaceutical industry across pharmacovigilance, regulatory affairs and medical affairs.
 
-If something is broken or you have a suggestion, open an issue on this repository.
+Feedback and issue reports are welcome via this repository's issue tracker.
 
 **Dr. Prashant Patel** · [LinkedIn](https://linkedin.com/in/drprashantpatel) · [GitHub](https://github.com/drprash)
 
