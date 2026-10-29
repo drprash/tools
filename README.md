@@ -2,7 +2,7 @@
 
 Browser-based tools for pharmaceutical professionals — built from real workflow frustration, running entirely offline, with no uploads and no accounts.
 
-**[praxdocs](https://drprash.github.io/tools/praxdocs.html)** · **[pdfCompare](https://drprash.github.io/tools/pdfCompare.html)** · **[HighLit AI](https://drprash.github.io/tools/HighLit_AI.html)** · **[HighLit](https://drprash.github.io/tools/HighLit.html)** · **[FOCUS](https://drprash.github.io/tools/FOCUS.html)**
+**[praxdocs](https://drprash.github.io/tools/praxdocs.html)** · **[pdfCompare](https://drprash.github.io/tools/pdfCompare.html)** · **[HighLit AI](https://drprash.github.io/tools/HighLit_AI.html)** · **[HighLit](https://drprash.github.io/tools/HighLit.html)** · **[PatentCliff](https://drprash.github.io/tools/PatentCliff.html)** · **[FOCUS](https://drprash.github.io/tools/FOCUS.html)**
 
 ---
 
@@ -142,6 +142,33 @@ No data leaves your browser. Works with PubMed, Embase, and PDF inputs — no da
 
 ---
 
+### PatentCliff — FDA Orange Book Patent Expiry Finder
+
+Find which Orange Book–listed patents expire in a given date window. Open `PatentCliff.html` in your browser.
+
+Built for portfolio, business development, and generic-entry planning, where the question is "which products lose patent protection in the next 12–36 months?" and the Orange Book data files are the starting point.
+
+**What it does:**
+- Reads the FDA Orange Book `products.txt` and `patent.txt` files and joins them on Appl_Type + Appl_No + Product_No
+- **Date window** — quick presets (next 6 / 12 / 24 / 36 months) or a custom from/to range
+- **Filters** — RX, OTC, discontinued, RLD only, include delisted patents, and "only products whose last patent expires in range"
+- **Search** by ingredient, brand name, or applicant
+- **Two views** — product level (earliest and last expiry, patent count) and patent level (one row per patent, with substance/product flags and use codes); click any column header to sort
+- **Export** — Excel workbook with Products, Patents, and Filters sheets, or CSV of the current view
+
+**How to use:**
+
+1. Download the Orange Book data files from [open.fda.gov](https://open.fda.gov/apis/drug/orangebook/) or the [FDA Orange Book page](https://www.fda.gov/drugs/drug-approvals-and-databases/approved-drug-products-therapeutic-equivalence-evaluations-orange-book) and unzip them
+2. Open `PatentCliff.html` and drop in `products.txt` and `patent.txt` (any order)
+3. Pick a date window and filters — results update instantly
+4. Switch between product and patent views, then download Excel or CSV
+
+Download fresh files each time — FDA updates the Orange Book regularly. Excel export uses [SheetJS](https://sheetjs.com/), bundled in the page, so the tool works fully offline.
+
+> **Research use only:** Results reflect FDA Orange Book patent listings only. They do not account for regulatory exclusivities, patent term extensions, pediatric exclusivity, litigation, or unlisted patents. Not legal advice — verify before making business or regulatory decisions.
+
+---
+
 ### FOCUS — Strategic Time Manager
 
 A daily planning tool built around three ideas: your most important tasks for the day, a time-blocked schedule, and a priority matrix. Open `FOCUS.html` in Chrome or Edge.
@@ -230,6 +257,7 @@ If you use Firefox, use **Export Backup** regularly (Settings → Export Backup)
 | PDF Compare | ✓ | ✓ | ✓ | ✓ |
 | HighLit | ✓ | ✓ | ✓ | ✓ |
 | HighLit AI¹ | ✓ | ✓ | ✓ | ✓ |
+| PatentCliff | ✓ | ✓ | ✓ | ✓ |
 | FOCUS (file mode) | ✓ | ✓ | — | — |
 | FOCUS (browser storage) | ✓ | ✓ | ✓ | ✓ |
 
@@ -248,6 +276,7 @@ No frameworks. No build step. No backend.
 - **PDF.js** — PDF rendering and text extraction
 - **pdf-lib** — PDF creation and manipulation
 - **Myers diff algorithm** — document comparison
+- **SheetJS** — Excel export in PatentCliff
 - **File System Access API** — persistent local file storage in FOCUS
 - **GitHub Pages** — hosting
 

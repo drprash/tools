@@ -1,162 +1,420 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HighLit – Safety Literature Highlight Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root { --bg:#f0f4f8; --surface:#fff; --border:#dde1e7; --text:#1a202c; --muted:#6b7280; --accent:#2563eb; --r:8px; }
-*{ box-sizing:border-box; margin:0; padding:0; }
-body{ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.6; }
-header{ background:linear-gradient(135deg,#1e3a5f,#2563eb); color:#fff; padding:18px 32px; display:flex; align-items:center; gap:14px; }
-header h1{ font-size:20px; font-weight:700; }
-.badge{ background:rgba(255,255,255,.25); border-radius:4px; padding:1px 7px; font-size:11px; font-weight:600; margin-left:6px; }
-header .sub{ font-size:12px; opacity:.75; margin-top:2px; }
-.container{ max-width:1280px; margin:0 auto; padding:22px 28px; }
-.card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:20px 24px; margin-bottom:16px; }
-.card-title{ font-size:14px; font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
-.sn{ background:var(--accent); color:#fff; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
-.drop{ border:2px dashed #cbd5e1; border-radius:var(--r); padding:30px; text-align:center; cursor:pointer; transition:.18s; background:#f8faff; }
-.drop:hover,.drop.over{ border-color:var(--accent); background:#eff6ff; }
-.drop .ic{ font-size:34px; margin-bottom:8px; }
-.drop p{ color:var(--muted); font-size:13px; }
-.drop strong{ color:var(--accent); }
-#file-input,#kw-file-input{ display:none; }
-#file-info{ margin-top:10px; font-size:12px; color:var(--muted); min-height:18px; }
-.legend{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
-.li{ display:flex; align-items:center; gap:5px; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid rgba(0,0,0,.1); white-space:nowrap; }
-.sw{ width:12px; height:12px; border-radius:2px; flex-shrink:0; }
-.kw-wrap{ overflow-x:auto; border:1px solid var(--border); border-radius:6px; }
-table{ border-collapse:collapse; width:100%; font-size:11px; }
-th{ padding:7px 10px; text-align:left; border:1px solid var(--border); font-weight:600; white-space:nowrap; font-size:11px; }
-td{ padding:4px 6px; border:1px solid var(--border); vertical-align:top; min-width:130px; }
-textarea.kw{ width:100%; min-height:160px; border:none; outline:none; background:transparent; font-family:monospace; font-size:11px; resize:vertical; padding:2px; line-height:1.5; }
-.actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-.btn{ display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; border:1px solid transparent; transition:.15s; }
-.btn-primary{ background:var(--accent); color:#fff; }
-.btn-primary:hover:not(:disabled){ background:#1d4ed8; }
-.btn-primary:disabled{ background:#93c5fd; cursor:not-allowed; }
-.btn-success{ background:#059669; color:#fff; }
-.btn-success:hover:not(:disabled){ background:#047857; }
-.btn-success:disabled{ background:#6ee7b7; cursor:not-allowed; }
-.btn-ghost{ background:#f1f5f9; color:var(--text); border-color:var(--border); }
-.btn-ghost:hover:not(:disabled){ background:#e2e8f0; }
-.btn-ghost:disabled{ opacity:.4; cursor:not-allowed; }
-#status{ font-size:12px; color:var(--muted); }
-#status.err{ color:#dc2626; }
-#status.ok{ color:#059669; }
-#preview-section{ display:none; }
-#preview-box{ max-height:640px; overflow-y:auto; border:1px solid var(--border); border-radius:6px; padding:16px 20px; background:#fff; font-family:'Courier New',Courier,monospace; font-size:12px; line-height:1.7; white-space:pre-wrap; word-break:break-word; }
-.blank{ display:block; height:.7em; }
-mark{ border-radius:2px; padding:0 1px; }
-.kw-hint{ font-size:11px; color:var(--muted); margin-top:10px; line-height:1.6; }
-.kw-hint a{ color:var(--accent); cursor:pointer; }
-.pp-credit{ margin-top:32px; padding:14px 0; border-top:1px solid var(--border); text-align:center; font-size:11px; color:var(--muted); }
-.pp-li{ color:var(--muted); text-decoration:none; transition:color .15s; }
-.pp-li:hover{ color:var(--accent); }
-.disclaimer{ background:#fffbe6; border-bottom:1px solid #f0c040; padding:7px 20px; font-size:11px; color:#7a5c00; text-align:center; line-height:1.5; }
-.mode-tabs{ display:flex; margin-bottom:14px; border:1px solid var(--border); border-radius:6px; overflow:hidden; width:fit-content; }
-.mode-tab{ padding:6px 16px; font-size:12px; font-weight:500; cursor:pointer; background:#f1f5f9; color:var(--muted); border:none; transition:.15s; }
-.mode-tab.active{ background:var(--accent); color:#fff; }
-.mode-tab:not(:last-child){ border-right:1px solid var(--border); }
-.embase-col-info{ margin-top:10px; font-size:12px; color:var(--muted); }
-.embase-col-info select{ font-size:12px; padding:3px 8px; border:1px solid var(--border); border-radius:4px; background:var(--surface); color:var(--text); margin-left:6px; cursor:pointer; }
-.pdf-range{ margin-top:8px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:12px; color:var(--muted); }
-.pdf-range input[type=number]{ width:58px; padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:12px; text-align:center; background:var(--surface); color:var(--text); }
-#abstract-input{ width:100%; min-height:180px; border:1px solid var(--border); border-radius:var(--r); padding:12px; font-family:monospace; font-size:12px; line-height:1.6; resize:vertical; outline:none; color:var(--text); background:var(--surface); }
-#abstract-input:focus{ border-color:var(--accent); }
+/* ── drprash/tools · design system base (Swiss) ───────────────────────────── */
+:root,[data-theme="light"]{
+  color-scheme:light;
+  --font-sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --bg:#f8fafc;--surface:#ffffff;--surface-2:#f1f5f9;--surface-3:#e2e8f0;
+  --border:#e2e8f0;--border-strong:#cbd5e1;
+  --text:#0f172a;--text-2:#475569;--text-3:#64748b;
+  --accent:#0f766e;--accent-hover:#115e59;--accent-soft:#f0fdfa;--accent-border:#99f6e4;--on-accent:#ffffff;
+  --success:#15803d;--success-soft:#f0fdf4;--success-border:#bbf7d0;
+  --warning:#b45309;--warning-soft:#fffbeb;--warning-border:#fde68a;
+  --danger:#b91c1c;--danger-soft:#fef2f2;--danger-border:#fecaca;
+  --info:#1d4ed8;--info-soft:#eff6ff;--info-border:#bfdbfe;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
+  --shadow-lg:0 10px 30px -10px rgba(15,23,42,.18);
+  --ring:0 0 0 2px var(--surface),0 0 0 4px var(--accent);
+  --r-sm:6px;--r:8px;--r-lg:12px;
+  --appbar-h:56px;
+}
+[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0b1220;--surface:#111a2e;--surface-2:#172036;--surface-3:#1f2a44;
+  --border:#243049;--border-strong:#334155;
+  --text:#e2e8f0;--text-2:#a3b0c2;--text-3:#8391a7;
+  --accent:#2dd4bf;--accent-hover:#5eead4;--accent-soft:rgba(45,212,191,.12);--accent-border:rgba(45,212,191,.35);--on-accent:#042f2e;
+  --success:#4ade80;--success-soft:rgba(74,222,128,.10);--success-border:rgba(74,222,128,.30);
+  --warning:#fbbf24;--warning-soft:rgba(251,191,36,.10);--warning-border:rgba(251,191,36,.30);
+  --danger:#f87171;--danger-soft:rgba(248,113,113,.10);--danger-border:rgba(248,113,113,.30);
+  --info:#60a5fa;--info-soft:rgba(96,165,250,.10);--info-border:rgba(96,165,250,.30);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+  --shadow:0 1px 3px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25);
+  --shadow-lg:0 12px 32px -12px rgba(0,0,0,.6);
+}
+@media (prefers-color-scheme:dark){
+  [data-theme="auto"]{
+    color-scheme:dark;
+    --bg:#0b1220;--surface:#111a2e;--surface-2:#172036;--surface-3:#1f2a44;
+    --border:#243049;--border-strong:#334155;
+    --text:#e2e8f0;--text-2:#a3b0c2;--text-3:#8391a7;
+    --accent:#2dd4bf;--accent-hover:#5eead4;--accent-soft:rgba(45,212,191,.12);--accent-border:rgba(45,212,191,.35);--on-accent:#042f2e;
+    --success:#4ade80;--success-soft:rgba(74,222,128,.10);--success-border:rgba(74,222,128,.30);
+    --warning:#fbbf24;--warning-soft:rgba(251,191,36,.10);--warning-border:rgba(251,191,36,.30);
+    --danger:#f87171;--danger-soft:rgba(248,113,113,.10);--danger-border:rgba(248,113,113,.30);
+    --info:#60a5fa;--info-soft:rgba(96,165,250,.10);--info-border:rgba(96,165,250,.30);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+    --shadow:0 1px 3px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25);
+    --shadow-lg:0 12px 32px -12px rgba(0,0,0,.6);
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.55 var(--font-sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100vh;display:flex;flex-direction:column}
+h1,h2,h3,h4{margin:0;color:var(--text);font-weight:600;letter-spacing:-.01em}
+h1{font-size:28px;line-height:1.2;letter-spacing:-.02em}
+h2{font-size:18px;line-height:1.35}
+h3{font-size:15px;line-height:1.4}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:2px}
+a:hover{color:var(--accent-hover)}
+code,kbd,.mono{font-family:var(--font-mono);font-size:.92em}
+code{background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+:focus-visible{outline:none;box-shadow:var(--ring);border-radius:var(--r-sm)}
+::selection{background:var(--accent-soft)}
+.icon{width:18px;height:18px;flex-shrink:0;display:inline-block;vertical-align:middle}
+.icon-sm{width:16px;height:16px}.icon-lg{width:24px;height:24px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.muted{color:var(--text-2)}.subtle{color:var(--text-3)}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
+
+/* ── App bar ── */
+.appbar{position:sticky;top:0;z-index:50;height:var(--appbar-h);display:flex;align-items:center;gap:12px;
+  padding:0 24px;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:saturate(1.4) blur(8px);
+  -webkit-backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--border)}
+.brand{display:inline-flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:600;font-size:15px;white-space:nowrap}
+.brand:hover{color:var(--text)}
+.brand-mark{width:28px;height:28px;border-radius:7px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;flex-shrink:0}
+.brand-mark svg{width:16px;height:16px}
+.brand-sub{color:var(--text-3);font-weight:500}
+.crumb-sep{color:var(--border-strong);font-weight:400}
+.crumb{color:var(--text);font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar .spacer{flex:1}
+.appbar-nav{display:flex;gap:4px}
+.appbar-nav a{color:var(--text-2);text-decoration:none;font-size:14px;font-weight:500;padding:8px 10px;border-radius:var(--r-sm)}
+.appbar-nav a:hover{color:var(--text);background:var(--surface-2)}
+
+/* ── Theme toggle ── */
+.theme-toggle{display:inline-flex;gap:2px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r)}
+.theme-toggle button{width:32px;height:28px;display:grid;place-items:center;border:0;border-radius:6px;background:transparent;
+  color:var(--text-3);cursor:pointer;transition:color .15s,background .15s}
+.theme-toggle button:hover{color:var(--text)}
+.theme-toggle button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+.theme-toggle svg{width:16px;height:16px}
+
+/* ── Layout ── */
+.container{width:100%;max-width:1120px;margin:0 auto;padding:32px 24px 48px;flex:1}
+.container.wide{max-width:1360px}
+.page-head{margin-bottom:24px;display:flex;flex-direction:column;gap:8px}
+.page-head .lead{color:var(--text-2);font-size:15px;max-width:72ch}
+.page-head .alert{margin-top:8px}
+.section{margin-bottom:24px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+
+/* ── Card ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-desc{color:var(--text-2);font-size:13px;margin-top:2px}
+.card-body{padding:20px}
+.card-foot{padding:14px 20px;border-top:1px solid var(--border);background:var(--surface-2);border-radius:0 0 var(--r-lg) var(--r-lg)}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;
+  border-radius:var(--r);border:1px solid transparent;font:500 14px/1 var(--font-sans);cursor:pointer;white-space:nowrap;
+  text-decoration:none;transition:background .15s,border-color .15s,color .15s,box-shadow .15s;user-select:none}
+.btn .icon{width:16px;height:16px}
+.btn-primary{background:var(--accent);color:var(--on-accent)}
+.btn-primary:hover{background:var(--accent-hover);color:var(--on-accent)}
+.btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
+.btn-secondary:hover{background:var(--surface-2);color:var(--text)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-ghost:hover{background:var(--surface-2);color:var(--text)}
+.btn-danger{background:#b91c1c;color:#fff}
+.btn-danger:hover{filter:brightness(.95)}
+.btn-sm{min-height:32px;padding:0 12px;font-size:13px}
+.btn-block{width:100%}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed;box-shadow:none}
+.btn-primary:disabled{background:var(--surface-3);color:var(--text-3);opacity:1}
+
+/* ── Segmented control / tabs ── */
+.seg{display:inline-flex;gap:2px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);flex-wrap:wrap}
+.seg button{min-height:32px;padding:0 12px;border:0;border-radius:6px;background:transparent;color:var(--text-2);
+  font:500 13px/1 var(--font-sans);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.seg button:hover{color:var(--text)}
+.seg button.active,.seg button[aria-pressed="true"],.seg button[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+
+/* ── Forms ── */
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:var(--text)}
+.help{font-size:13px;color:var(--text-3);font-weight:400}
+.input,.select,.textarea{width:100%;min-height:40px;padding:8px 12px;background:var(--surface);color:var(--text);
+  border:1px solid var(--border-strong);border-radius:var(--r);font:400 14px/1.4 var(--font-sans);transition:border-color .15s,box-shadow .15s}
+.textarea{min-height:120px;resize:vertical;line-height:1.55}
+.input::placeholder,.textarea::placeholder{color:var(--text-3)}
+.input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--text);cursor:pointer;min-height:32px}
+.check input{width:16px;height:16px;accent-color:var(--accent);margin:0;cursor:pointer}
+
+/* ── Drop zone ── */
+.dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;
+  min-height:150px;padding:24px;background:var(--surface);border:1.5px dashed var(--border-strong);border-radius:var(--r-lg);
+  cursor:pointer;transition:border-color .15s,background .15s}
+.dropzone:hover,.dropzone.is-dragover{border-color:var(--accent);background:var(--accent-soft)}
+.dropzone.has-file{border-style:solid;border-color:var(--accent-border);background:var(--accent-soft)}
+.dz-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);color:var(--text-2);margin-bottom:4px}
+.dz-icon svg{width:20px;height:20px}
+.dropzone.has-file .dz-icon{background:var(--accent);color:var(--on-accent)}
+.dz-title{font-size:14px;font-weight:600;color:var(--text)}
+.dz-hint{font-size:13px;color:var(--text-2)}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:999px;font:500 12px/1 var(--font-sans);
+  white-space:nowrap;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2)}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge-success{background:var(--success-soft);border-color:var(--success-border);color:var(--success)}
+.badge-warning{background:var(--warning-soft);border-color:var(--warning-border);color:var(--warning)}
+.badge-danger{background:var(--danger-soft);border-color:var(--danger-border);color:var(--danger)}
+.badge-info{background:var(--info-soft);border-color:var(--info-border);color:var(--info)}
+.badge-accent{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent)}
+
+/* ── Alerts ── */
+.alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text);font-size:13.5px;line-height:1.55}
+.alert .icon{margin-top:1px}
+.alert strong{font-weight:600}
+.alert-info{background:var(--info-soft);border-color:var(--info-border)}.alert-info .icon{color:var(--info)}
+.alert-warning{background:var(--warning-soft);border-color:var(--warning-border)}.alert-warning .icon{color:var(--warning)}
+.alert-danger{background:var(--danger-soft);border-color:var(--danger-border)}.alert-danger .icon{color:var(--danger)}
+.alert-success{background:var(--success-soft);border-color:var(--success-border)}.alert-success .icon{color:var(--success)}
+
+/* ── Tables ── */
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface)}
+table.table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.table th{position:sticky;top:0;z-index:1;background:var(--surface-2);color:var(--text-2);font-weight:600;font-size:12px;
+  text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap}
+.table tr:last-child td{border-bottom:0}
+.table tbody tr:hover td,.table tr:hover td{background:var(--surface-2)}
+.table .num,.table td.mono{font-family:var(--font-mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px}
+.stat-value{display:block;font-size:24px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat-label{display:block;font-size:13px;color:var(--text-2);margin-top:2px}
+
+/* ── Spinner ── */
+.spinner{width:24px;height:24px;border:2.5px solid var(--border-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Footer ── */
+.site-footer{border-top:1px solid var(--border);background:var(--surface);margin-top:auto}
+.site-footer .inner{max-width:1120px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;font-size:13px;color:var(--text-3)}
+.site-footer a{color:var(--text-2);text-decoration:none;font-weight:500}
+.site-footer a:hover{color:var(--accent)}
+.site-footer .privacy{display:inline-flex;align-items:center;gap:6px}
+.site-footer .links{display:flex;gap:16px;align-items:center}
+
+/* ── Responsive ── */
+@media (max-width:1024px){.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:768px){
+  .appbar{padding:0 16px;gap:8px}
+  .brand-sub,.appbar .badge,.appbar-nav{display:none}
+  .container{padding:24px 16px 40px}
+  h1{font-size:24px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .btn{min-height:44px}
+  .seg button{min-height:40px}
+  .card-head,.card-body{padding:16px}
+  .site-footer .inner{padding:18px 16px;flex-direction:column;align-items:flex-start}
+}
+@media (max-width:480px){
+  .crumb-sep,.brand .brand-name{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* ── Page: HighLit ── */
+:root{--hl-ink:#0f172a}
+.card.section{margin-bottom:16px}
+.sn{width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);
+  display:inline-grid;place-items:center;font:600 12px/1 var(--font-sans);flex-shrink:0}
+.title-note{font-weight:400;color:var(--text-2);font-size:13px}
+.mode-tabs{margin-bottom:16px}
+#abstract-input{min-height:200px}
+#file-info{margin-top:12px;font-size:13px;color:var(--text-2);font-family:var(--font-mono);word-break:break-word}
+#file-info:empty{display:none}
+.dropzone.over{border-color:var(--accent);background:var(--accent-soft)}
+.dz-title strong{color:var(--accent);font-weight:600}
+.embase-col-info{margin-top:12px;font-size:13px;color:var(--text-2);display:flex;flex-direction:column;gap:10px}
+#embase-col-picker{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#embase-col-picker label{font-weight:500;color:var(--text)}
+#embase-col-picker .select{width:auto;min-width:220px;max-width:100%}
+.pdf-range{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--text)}
+.pdf-range .input{width:84px;text-align:center;font-family:var(--font-mono)}
+.pdf-range .help{flex-basis:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.li{display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 10px;border-radius:999px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);font-size:12px;font-weight:500;white-space:nowrap}
+.sw{width:12px;height:12px;border-radius:3px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(15,23,42,.18)}
+.kw-table th{color:var(--hl-ink);border-right:1px solid rgba(15,23,42,.08)}
+.kw-table td{padding:8px;vertical-align:top;min-width:180px;border-right:1px solid var(--border)}
+.kw-table th:last-child,.kw-table td:last-child{border-right:0}
+textarea.kw{display:block;width:100%;min-height:200px;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);
+  background:var(--surface);color:var(--text);font:400 12px/1.6 var(--font-mono);resize:vertical;transition:border-color .15s,box-shadow .15s}
+textarea.kw:hover{border-color:var(--text-3)}
+textarea.kw:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+[data-theme="dark"] .kw-table td{background:var(--surface-2)!important}
+@media (prefers-color-scheme:dark){[data-theme="auto"] .kw-table td{background:var(--surface-2)!important}}
+.kw-hint{margin-top:12px;font-size:13px;color:var(--text-2);line-height:1.6}
+.link-btn{background:none;border:0;padding:0;font:inherit;color:var(--accent);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.link-btn:hover{color:var(--accent-hover)}
+.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#status{font-size:13px;color:var(--text-2);margin-left:4px}
+#status.err{color:var(--danger)}
+#status.ok{color:var(--success)}
+#preview-section{display:none;scroll-margin-top:calc(var(--appbar-h) + 16px)}
+#preview-count{font-weight:400;color:var(--text-2);font-size:13px}
+#preview-box{max-height:640px;overflow-y:auto;padding:16px 20px;background:var(--surface);color:var(--text);border-radius:0 0 var(--r-lg) var(--r-lg);
+  font:400 12.5px/1.75 var(--font-mono);white-space:pre-wrap;word-break:break-word}
+.blank{display:block;height:.7em}
+mark{color:var(--hl-ink);border-radius:3px;padding:0 2px}
+#preview-box > span[style]{color:var(--text-3)!important;font-family:var(--font-sans)!important}
+@media (max-width:768px){
+  .mode-tabs{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  .actions .btn{flex:1 1 auto}
+  #status{flex-basis:100%;margin-left:0}
+  #preview-box{padding:14px 16px}
+  .kw-table td{min-width:160px}
+  .card-title{flex-wrap:wrap}
+  .title-note{flex-basis:100%;padding-left:32px;margin-top:-4px}
+}
 </style>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('highlit-theme')||'light')}catch(e){}</script>
 </head>
 <body>
-<header>
-  <div style="font-size:28px">🔬</div>
-  <div>
-    <h1>HighLit</h1>
-    <div class="sub">Safety Literature Highlight Tool</div>
+<header class="appbar">
+  <a class="brand" href="index.html" aria-label="All tools by Dr. Prashant Patel">
+    <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg></span>
+    <span class="brand-name">drprash<span class="brand-sub">/tools</span></span>
+  </a>
+  <span class="crumb-sep" aria-hidden="true">/</span>
+  <span class="crumb">HighLit</span>
+  <span class="spacer"></span>
+  <span class="badge badge-success"><span class="dot"></span>100% offline</span>
+  <div class="theme-toggle" role="group" aria-label="Colour theme">
+    <button type="button" data-theme-set="auto" aria-label="Match system theme" title="System"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>
+    <button type="button" data-theme-set="light" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
+    <button type="button" data-theme-set="dark" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
   </div>
 </header>
-<div class="disclaimer"><strong>For research use only.</strong> This tool has not been validated under GAMP 5 or equivalent computer system validation (CSV) guidelines. Use in a regulated GxP or pharmacovigilance environment without prior formal validation may not comply with applicable quality system requirements.</div>
-<div class="container">
 
-  <div class="card">
-    <div class="card-title"><span class="sn">1</span> <span id="card1-title">Enter Abstract</span></div>
-    <div class="mode-tabs">
-      <button class="mode-tab active" id="tab-single">Single Abstract</button>
-      <button class="mode-tab" id="tab-batch">Batch (.txt)</button>
-      <button class="mode-tab" id="tab-embase">Embase (.xlsx)</button>
-      <button class="mode-tab" id="tab-pdf">PDF (.pdf)</button>
-    </div>
-    <div id="panel-single">
-      <textarea id="abstract-input" placeholder="Paste or type your abstract here…"></textarea>
-    </div>
-    <div id="panel-batch" style="display:none">
-      <div class="drop" id="drop-zone">
-        <div class="ic">📄</div>
-        <p><strong>Click to browse</strong> or drag &amp; drop your PubMed <code>.txt</code> export</p>
-        <p style="margin-top:5px;font-size:12px;">Any PubMed format — Abstract, MEDLINE/tagged, or plain text</p>
-        <input type="file" id="file-input" accept=".txt">
+<main class="container">
+  <div class="page-head">
+    <span class="eyebrow">Pharmacovigilance</span>
+    <h1>HighLit</h1>
+    <p class="lead">Safety Literature Highlight Tool</p>
+    <div class="alert alert-warning" role="note"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div><strong>For research use only.</strong> This tool has not been validated under GAMP 5 or equivalent computer system validation (CSV) guidelines. Use in a regulated GxP or pharmacovigilance environment without prior formal validation may not comply with applicable quality system requirements.</div></div>
+  </div>
+
+  <section class="card section">
+    <div class="card-head"><h2 class="card-title"><span class="sn">1</span><span id="card1-title">Enter Abstract</span></h2></div>
+    <div class="card-body">
+      <div class="seg mode-tabs" role="group" aria-label="Input mode">
+        <button type="button" class="mode-tab active" id="tab-single">Single Abstract</button>
+        <button type="button" class="mode-tab" id="tab-batch">Batch (.txt)</button>
+        <button type="button" class="mode-tab" id="tab-embase">Embase (.xlsx)</button>
+        <button type="button" class="mode-tab" id="tab-pdf">PDF (.pdf)</button>
       </div>
-      <div id="file-info"></div>
-    </div>
-    <div id="panel-embase" style="display:none">
-      <div class="drop" id="embase-drop-zone">
-        <div class="ic">📊</div>
-        <p><strong>Click to browse</strong> or drag &amp; drop your Embase <code>.xlsx</code> export</p>
-        <p style="margin-top:5px;font-size:12px;">Use "MS Excel — Fields by Column" format from Embase</p>
-        <input type="file" id="embase-file-input" accept=".xlsx">
+      <div id="panel-single">
+        <textarea class="textarea" id="abstract-input" aria-label="Abstract text" placeholder="Paste or type your abstract here…"></textarea>
       </div>
-      <div class="embase-col-info" id="embase-col-info" style="display:none">
-        <div id="embase-col-status"></div>
-        <div id="embase-col-picker" style="display:none;margin-top:6px;">
-          <label>Select Abstract column:</label>
-          <select id="embase-abstract-col"><option value="">— choose —</option></select>
+      <div id="panel-batch" style="display:none">
+        <div class="dropzone" id="drop-zone" role="button" tabindex="0" aria-label="Select a PubMed .txt export">
+          <span class="dz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+          <span class="dz-title"><strong>Click to browse</strong> or drag &amp; drop your PubMed <code>.txt</code> export</span>
+          <span class="dz-hint">Any PubMed format — Abstract, MEDLINE/tagged, or plain text</span>
+          <input type="file" id="file-input" accept=".txt" hidden>
+        </div>
+        <div id="file-info"></div>
+      </div>
+      <div id="panel-embase" style="display:none">
+        <div class="dropzone" id="embase-drop-zone" role="button" tabindex="0" aria-label="Select an Embase .xlsx export">
+          <span class="dz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h8M8 17h8M12 13v4"/></svg></span>
+          <span class="dz-title"><strong>Click to browse</strong> or drag &amp; drop your Embase <code>.xlsx</code> export</span>
+          <span class="dz-hint">Use "MS Excel — Fields by Column" format from Embase</span>
+          <input type="file" id="embase-file-input" accept=".xlsx" hidden>
+        </div>
+        <div class="embase-col-info" id="embase-col-info" style="display:none">
+          <div id="embase-col-status"></div>
+          <div id="embase-col-picker" style="display:none;">
+            <label for="embase-abstract-col">Select Abstract column:</label>
+            <select class="select" id="embase-abstract-col"><option value="">— choose —</option></select>
+          </div>
+        </div>
+      </div>
+      <div id="panel-pdf" style="display:none">
+        <div class="dropzone" id="pdf-drop-zone" role="button" tabindex="0" aria-label="Select a PDF article">
+          <span class="dz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+          <span class="dz-title"><strong>Click to browse</strong> or drag &amp; drop a PDF article</span>
+          <span class="dz-hint">Any PDF with selectable text — full-text articles, clinical reports</span>
+          <input type="file" id="pdf-file-input" accept=".pdf" hidden>
+        </div>
+        <div class="embase-col-info" id="pdf-page-info" style="display:none">
+          <div id="pdf-page-status"></div>
+          <div class="pdf-range">
+            Pages: From&nbsp;<input class="input" type="number" id="pdf-from" min="1" value="1" aria-label="From page">&nbsp;to&nbsp;<input class="input" type="number" id="pdf-to" min="1" value="1" aria-label="To page">
+            <span class="help">(adjust to skip journal headers or reference list)</span>
+          </div>
         </div>
       </div>
     </div>
-    <div id="panel-pdf" style="display:none">
-      <div class="drop" id="pdf-drop-zone">
-        <div class="ic">📑</div>
-        <p><strong>Click to browse</strong> or drag &amp; drop a PDF article</p>
-        <p style="margin-top:5px;font-size:12px;">Any PDF with selectable text — full-text articles, clinical reports</p>
-        <input type="file" id="pdf-file-input" accept=".pdf">
-      </div>
-      <div class="embase-col-info" id="pdf-page-info" style="display:none">
-        <div id="pdf-page-status"></div>
-        <div class="pdf-range">
-          Pages: From&nbsp;<input type="number" id="pdf-from" min="1" value="1">&nbsp;to&nbsp;<input type="number" id="pdf-to" min="1" value="1">
-          &nbsp;<span style="color:var(--muted);font-size:11px;">(adjust to skip journal headers or reference list)</span>
-        </div>
+  </section>
+
+  <section class="card section">
+    <div class="card-head"><h2 class="card-title"><span class="sn">2</span>Keyword Categories <span class="title-note">— one term per line, editable</span></h2></div>
+    <div class="card-body">
+      <div class="legend" id="legend"></div>
+      <div class="table-wrap kw-wrap"><table class="table kw-table" id="kw-table"><thead><tr id="kw-head"></tr></thead><tbody><tr id="kw-body"></tr></tbody></table></div>
+      <div class="kw-hint">
+        Truncated stems (e.g. <code>injur</code>, <code>suicid</code>) match as prefixes. Matching is case-insensitive.
+        &nbsp;&bull;&nbsp;<button type="button" class="link-btn" id="kw-download-link">Download as Excel</button> to edit, then <button type="button" class="link-btn" id="kw-upload-link">re-upload</button>.
+        <input type="file" id="kw-file-input" accept=".xlsx" hidden>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="card">
-    <div class="card-title"><span class="sn">2</span> Keyword Categories <span style="font-weight:400;color:var(--muted);font-size:12px;margin-left:4px;">— one term per line, editable</span></div>
-    <div class="legend" id="legend"></div>
-    <div class="kw-wrap"><table id="kw-table"><thead><tr id="kw-head"></tr></thead><tbody><tr id="kw-body"></tr></tbody></table></div>
-    <div class="kw-hint">
-      Truncated stems (e.g. <code>injur</code>, <code>suicid</code>) match as prefixes. Matching is case-insensitive.
-      &nbsp;&bull;&nbsp;<a id="kw-download-link">Download as Excel</a> to edit, then <a id="kw-upload-link">re-upload</a>.
-      <input type="file" id="kw-file-input" accept=".xlsx">
+  <section class="card section">
+    <div class="card-head"><h2 class="card-title"><span class="sn">3</span>Process &amp; Export</h2></div>
+    <div class="card-body">
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="process-btn" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>Process File</button>
+        <button type="button" class="btn btn-secondary" id="download-btn" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download .docx</button>
+        <button type="button" class="btn btn-ghost" id="reset-btn" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Reset</button>
+        <div id="status" role="status" aria-live="polite"></div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="card">
-    <div class="card-title"><span class="sn">3</span> Process &amp; Export</div>
-    <div class="actions">
-      <button class="btn btn-primary" id="process-btn" disabled>&#9654; Process File</button>
-      <button class="btn btn-success" id="download-btn" disabled>&#11015; Download .docx</button>
-      <button class="btn btn-ghost" id="reset-btn" disabled>&#10005; Reset</button>
-      <div id="status"></div>
-    </div>
-  </div>
-
-  <div class="card" id="preview-section">
-    <div class="card-title">Preview <span id="preview-count" style="font-weight:400;color:var(--muted);font-size:12px;"></span></div>
+  <section class="card section" id="preview-section">
+    <div class="card-head"><h2 class="card-title">Preview <span id="preview-count"></span></h2></div>
     <div id="preview-box"></div>
-  </div>
+  </section>
+</main>
 
-</div>
+<footer class="site-footer">
+  <div class="inner">
+    <span class="privacy"><svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Runs entirely in your browser · No data leaves your device</span>
+    <span class="links"><a href="index.html">All tools</a><span>Built by <a href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener" class="pp-li">Dr. Prashant Patel</a></span></span>
+  </div>
+</footer>
+
 <script>
 // ── JSZip v3.10.1 (embedded — fully offline) ──
 /*!
@@ -439,6 +697,17 @@ async function makeEmbaseDocx(articles, patterns) {
 // ───────────────────────────────────────────────
 // UI
 // ───────────────────────────────────────────────
+// ── Theme ──
+const THEME_KEY='highlit-theme';
+function setTheme(t){
+  if(!['auto','light','dark'].includes(t))t='light';
+  document.documentElement.setAttribute('data-theme',t);
+  document.querySelectorAll('[data-theme-set]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.themeSet===t)));
+  try{localStorage.setItem(THEME_KEY,t)}catch(e){}
+}
+document.querySelectorAll('[data-theme-set]').forEach(b=>b.addEventListener('click',()=>setTheme(b.dataset.themeSet)));
+(function(){let s='light';try{s=localStorage.getItem(THEME_KEY)||'light'}catch(e){}setTheme(s)})();
+
 function setStatus(msg, cls) { const el = document.getElementById("status"); el.textContent = msg; el.className = cls||""; }
 
 const dropZone       = document.getElementById("drop-zone");
@@ -462,6 +731,7 @@ function applyMode(mode) {
   document.getElementById('tab-batch').classList.toggle('active', mode === 'batch');
   document.getElementById('tab-embase').classList.toggle('active', mode === 'embase');
   document.getElementById('tab-pdf').classList.toggle('active', mode === 'pdf');
+  ['single','batch','embase','pdf'].forEach(m => document.getElementById('tab-' + m).setAttribute('aria-pressed', String(m === mode)));
   document.getElementById('panel-single').style.display = mode === 'single' ? '' : 'none';
   document.getElementById('panel-batch').style.display = mode === 'batch' ? '' : 'none';
   document.getElementById('panel-embase').style.display = mode === 'embase' ? '' : 'none';
@@ -582,7 +852,7 @@ async function loadPdfFile(file) {
     document.getElementById('pdf-from').max   = n;
     document.getElementById('pdf-to').value   = n;
     document.getElementById('pdf-to').max     = n;
-    document.getElementById('pdf-page-status').textContent = `✓ ${n} page(s) — adjust range below to skip journal headers or reference list`;
+    document.getElementById('pdf-page-status').textContent = `${n} page(s) — adjust range below to skip journal headers or reference list`;
     document.getElementById('pdf-page-info').style.display = '';
     processBtn.disabled = false;
     resetBtn.disabled   = false;
@@ -620,7 +890,7 @@ async function loadEmbaseFile(file) {
     const colPicker = document.getElementById('embase-col-picker');
     colInfo.style.display = '';
     if (abstractIdx >= 0) {
-      colStatus.textContent = `✓ ${data.rows.length} article(s) — Abstract column detected` +
+      colStatus.textContent = `${data.rows.length} article(s) — Abstract column detected` +
         (titleIdx >= 0 ? ` · Title column detected` : '');
       colPicker.style.display = 'none';
       finalizeEmbaseColumns();
@@ -792,7 +1062,7 @@ processBtn.addEventListener("click", async () => {
       ? await makeEmbaseDocx(embaseData.articles, patterns)
       : await makeDocx(lines, patterns);
     downloadBtn.disabled = false;
-    setStatus(`✓ Done — ${hlCount.toLocaleString()} highlight(s) applied. Click Download to save.`, "ok");
+    setStatus(`Done — ${hlCount.toLocaleString()} highlight(s) applied. Click Download to save.`, "ok");
   } catch(err) {
     setStatus("Error: " + err.message, "err");
     console.error(err);
@@ -824,11 +1094,13 @@ resetBtn.addEventListener("click", () => {
   setStatus("", "");
 });
 
+// Keyboard access for drop zones (Enter / Space opens the file picker)
+[dropZone, embaseDropZone, pdfDropZone].forEach(z => z.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); z.click(); }
+}));
+
 applyMode(inputMode);
 buildKwUI();
 </script>
-<div class="container">
-  <footer class="pp-credit">Built by <a href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener" class="pp-li">Dr. Prashant Patel</a></footer>
-</div>
 </body>
 </html>

@@ -1,989 +1,704 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PraxDocs</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<style>
+/* ── drprash/tools · design system base (Swiss) ───────────────────────────── */
+:root,[data-theme="light"]{
+  color-scheme:light;
+  --font-sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --bg:#f8fafc;--surface:#ffffff;--surface-2:#f1f5f9;--surface-3:#e2e8f0;
+  --border:#e2e8f0;--border-strong:#cbd5e1;
+  --text:#0f172a;--text-2:#475569;--text-3:#64748b;
+  --accent:#0f766e;--accent-hover:#115e59;--accent-soft:#f0fdfa;--accent-border:#99f6e4;--on-accent:#ffffff;
+  --success:#15803d;--success-soft:#f0fdf4;--success-border:#bbf7d0;
+  --warning:#b45309;--warning-soft:#fffbeb;--warning-border:#fde68a;
+  --danger:#b91c1c;--danger-soft:#fef2f2;--danger-border:#fecaca;
+  --info:#1d4ed8;--info-soft:#eff6ff;--info-border:#bfdbfe;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
+  --shadow-lg:0 10px 30px -10px rgba(15,23,42,.18);
+  --ring:0 0 0 2px var(--surface),0 0 0 4px var(--accent);
+  --r-sm:6px;--r:8px;--r-lg:12px;
+  --appbar-h:56px;
+}
+[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0b1220;--surface:#111a2e;--surface-2:#172036;--surface-3:#1f2a44;
+  --border:#243049;--border-strong:#334155;
+  --text:#e2e8f0;--text-2:#a3b0c2;--text-3:#8391a7;
+  --accent:#2dd4bf;--accent-hover:#5eead4;--accent-soft:rgba(45,212,191,.12);--accent-border:rgba(45,212,191,.35);--on-accent:#042f2e;
+  --success:#4ade80;--success-soft:rgba(74,222,128,.10);--success-border:rgba(74,222,128,.30);
+  --warning:#fbbf24;--warning-soft:rgba(251,191,36,.10);--warning-border:rgba(251,191,36,.30);
+  --danger:#f87171;--danger-soft:rgba(248,113,113,.10);--danger-border:rgba(248,113,113,.30);
+  --info:#60a5fa;--info-soft:rgba(96,165,250,.10);--info-border:rgba(96,165,250,.30);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+  --shadow:0 1px 3px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25);
+  --shadow-lg:0 12px 32px -12px rgba(0,0,0,.6);
+}
+@media (prefers-color-scheme:dark){
+  [data-theme="auto"]{
+    color-scheme:dark;
+    --bg:#0b1220;--surface:#111a2e;--surface-2:#172036;--surface-3:#1f2a44;
+    --border:#243049;--border-strong:#334155;
+    --text:#e2e8f0;--text-2:#a3b0c2;--text-3:#8391a7;
+    --accent:#2dd4bf;--accent-hover:#5eead4;--accent-soft:rgba(45,212,191,.12);--accent-border:rgba(45,212,191,.35);--on-accent:#042f2e;
+    --success:#4ade80;--success-soft:rgba(74,222,128,.10);--success-border:rgba(74,222,128,.30);
+    --warning:#fbbf24;--warning-soft:rgba(251,191,36,.10);--warning-border:rgba(251,191,36,.30);
+    --danger:#f87171;--danger-soft:rgba(248,113,113,.10);--danger-border:rgba(248,113,113,.30);
+    --info:#60a5fa;--info-soft:rgba(96,165,250,.10);--info-border:rgba(96,165,250,.30);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+    --shadow:0 1px 3px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25);
+    --shadow-lg:0 12px 32px -12px rgba(0,0,0,.6);
+  }
+}
 
-    :root {
-      --radius: 8px;
-      --radius-lg: 12px;
-    }
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.55 var(--font-sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100vh;display:flex;flex-direction:column}
+h1,h2,h3,h4{margin:0;color:var(--text);font-weight:600;letter-spacing:-.01em}
+h1{font-size:28px;line-height:1.2;letter-spacing:-.02em}
+h2{font-size:18px;line-height:1.35}
+h3{font-size:15px;line-height:1.4}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:2px}
+a:hover{color:var(--accent-hover)}
+code,kbd,.mono{font-family:var(--font-mono);font-size:.92em}
+code{background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+:focus-visible{outline:none;box-shadow:var(--ring);border-radius:var(--r-sm)}
+::selection{background:var(--accent-soft)}
+.icon{width:18px;height:18px;flex-shrink:0;display:inline-block;vertical-align:middle}
+.icon-sm{width:16px;height:16px}.icon-lg{width:24px;height:24px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.muted{color:var(--text-2)}.subtle{color:var(--text-3)}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
 
-    /* ── Dark theme (default) ── */
-    html[data-theme="dark"] {
-      --bg: #0f0f0f;
-      --surface: #181818;
-      --surface2: #222222;
-      --surface3: #2a2a2a;
-      --border: rgba(255,255,255,0.08);
-      --border2: rgba(255,255,255,0.14);
-      --border3: rgba(255,255,255,0.22);
-      --text: #f0ede8;
-      --text2: #999690;
-      --text3: #636058;
-      --accent: #e8d5a0;
-      --accent-bg: rgba(232,213,160,0.10);
-      --accent-border: rgba(232,213,160,0.25);
-      --success: #7ecf9a;
-      --success-bg: rgba(126,207,154,0.10);
-      --success-border: rgba(126,207,154,0.25);
-      --danger: #e07575;
-      --danger-bg: rgba(224,117,117,0.10);
-      --danger-border: rgba(224,117,117,0.25);
-      --info-bg: rgba(120,160,220,0.10);
-      --info-border: rgba(120,160,220,0.25);
-    }
+/* ── App bar ── */
+.appbar{position:sticky;top:0;z-index:50;height:var(--appbar-h);display:flex;align-items:center;gap:12px;
+  padding:0 24px;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:saturate(1.4) blur(8px);
+  -webkit-backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--border)}
+.brand{display:inline-flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:600;font-size:15px;white-space:nowrap}
+.brand:hover{color:var(--text)}
+.brand-mark{width:28px;height:28px;border-radius:7px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;flex-shrink:0}
+.brand-mark svg{width:16px;height:16px}
+.brand-sub{color:var(--text-3);font-weight:500}
+.crumb-sep{color:var(--border-strong);font-weight:400}
+.crumb{color:var(--text);font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar .spacer{flex:1}
+.appbar-nav{display:flex;gap:4px}
+.appbar-nav a{color:var(--text-2);text-decoration:none;font-size:14px;font-weight:500;padding:8px 10px;border-radius:var(--r-sm)}
+.appbar-nav a:hover{color:var(--text);background:var(--surface-2)}
 
-    /* ── Light theme ── */
-    html[data-theme="light"] {
-      --bg: #f5f3ef;
-      --surface: #ffffff;
-      --surface2: #f0ede8;
-      --surface3: #e8e4de;
-      --border: rgba(0,0,0,0.08);
-      --border2: rgba(0,0,0,0.13);
-      --border3: rgba(0,0,0,0.20);
-      --text: #1a1916;
-      --text2: #6b6760;
-      --text3: #9e9a93;
-      --accent: #8a6e2f;
-      --accent-bg: rgba(138,110,47,0.08);
-      --accent-border: rgba(138,110,47,0.22);
-      --success: #2a7a4a;
-      --success-bg: rgba(42,122,74,0.08);
-      --success-border: rgba(42,122,74,0.22);
-      --danger: #b83232;
-      --danger-bg: rgba(184,50,50,0.08);
-      --danger-border: rgba(184,50,50,0.22);
-      --info-bg: rgba(50,100,180,0.07);
-      --info-border: rgba(50,100,180,0.20);
-    }
+/* ── Theme toggle ── */
+.theme-toggle{display:inline-flex;gap:2px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r)}
+.theme-toggle button{width:32px;height:28px;display:grid;place-items:center;border:0;border-radius:6px;background:transparent;
+  color:var(--text-3);cursor:pointer;transition:color .15s,background .15s}
+.theme-toggle button:hover{color:var(--text)}
+.theme-toggle button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+.theme-toggle svg{width:16px;height:16px}
 
-    html { background: var(--bg); }
+/* ── Layout ── */
+.container{width:100%;max-width:1120px;margin:0 auto;padding:32px 24px 48px;flex:1}
+.container.wide{max-width:1360px}
+.page-head{margin-bottom:24px;display:flex;flex-direction:column;gap:8px}
+.page-head .lead{color:var(--text-2);font-size:15px;max-width:72ch}
+.page-head .alert{margin-top:8px}
+.section{margin-bottom:24px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 
-    body {
-      font-family: 'Syne', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 0;
-      overflow-x: hidden;
-    }
+/* ── Card ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-desc{color:var(--text-2);font-size:13px;margin-top:2px}
+.card-body{padding:20px}
+.card-foot{padding:14px 20px;border-top:1px solid var(--border);background:var(--surface-2);border-radius:0 0 var(--r-lg) var(--r-lg)}
 
-    /* ── Layout ── */
-    .layout {
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      min-height: 100vh;
-      width: 100%;
-    }
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;
+  border-radius:var(--r);border:1px solid transparent;font:500 14px/1 var(--font-sans);cursor:pointer;white-space:nowrap;
+  text-decoration:none;transition:background .15s,border-color .15s,color .15s,box-shadow .15s;user-select:none}
+.btn .icon{width:16px;height:16px}
+.btn-primary{background:var(--accent);color:var(--on-accent)}
+.btn-primary:hover{background:var(--accent-hover);color:var(--on-accent)}
+.btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
+.btn-secondary:hover{background:var(--surface-2);color:var(--text)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-ghost:hover{background:var(--surface-2);color:var(--text)}
+.btn-danger{background:#b91c1c;color:#fff}
+.btn-danger:hover{filter:brightness(.95)}
+.btn-sm{min-height:32px;padding:0 12px;font-size:13px}
+.btn-block{width:100%}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed;box-shadow:none}
+.btn-primary:disabled{background:var(--surface-3);color:var(--text-3);opacity:1}
 
-    /* ── Sidebar ── */
-    .sidebar {
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      padding: 28px 0 28px;
-      display: flex;
-      flex-direction: column;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-      min-width: 0;   /* prevent grid child from overflowing */
-    }
+/* ── Segmented control / tabs ── */
+.seg{display:inline-flex;gap:2px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);flex-wrap:wrap}
+.seg button{min-height:32px;padding:0 12px;border:0;border-radius:6px;background:transparent;color:var(--text-2);
+  font:500 13px/1 var(--font-sans);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.seg button:hover{color:var(--text)}
+.seg button.active,.seg button[aria-pressed="true"],.seg button[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
 
-    .logo {
-      padding: 0 20px 24px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 16px;
-    }
-    .logo-icon {
-      width: 36px; height: 36px;
-      background: var(--accent);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 10px;
-    }
-    .logo-icon svg { width: 20px; height: 20px; }
-    .logo h1 {
-      font-size: 15px; font-weight: 600;
-      color: var(--text);
-      letter-spacing: 0.02em;
-    }
-    .logo p {
-      font-size: 11px;
-      color: var(--text3);
-      margin-top: 2px;
-      font-family: 'IBM Plex Mono', monospace;
-    }
+/* ── Forms ── */
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:var(--text)}
+.help{font-size:13px;color:var(--text-3);font-weight:400}
+.input,.select,.textarea{width:100%;min-height:40px;padding:8px 12px;background:var(--surface);color:var(--text);
+  border:1px solid var(--border-strong);border-radius:var(--r);font:400 14px/1.4 var(--font-sans);transition:border-color .15s,box-shadow .15s}
+.textarea{min-height:120px;resize:vertical;line-height:1.55}
+.input::placeholder,.textarea::placeholder{color:var(--text-3)}
+.input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--text);cursor:pointer;min-height:32px}
+.check input{width:16px;height:16px;accent-color:var(--accent);margin:0;cursor:pointer}
 
-    .nav { flex: 1; padding: 0 10px; }
-    .nav-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 12px;
-      border-radius: var(--radius);
-      cursor: pointer;
-      color: var(--text2);
-      font-size: 13px;
-      font-weight: 500;
-      transition: all 0.15s;
-      margin-bottom: 2px;
-      border: none; background: none; width: 100%; text-align: left;
-    }
-    .nav-item:hover { background: var(--surface2); color: var(--text); }
-    .nav-item.active { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
-    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.8; }
-    .nav-item .badge {
-      margin-left: auto;
-      font-size: 10px;
-      font-family: 'IBM Plex Mono', monospace;
-      background: var(--surface3);
-      padding: 2px 6px;
-      border-radius: 4px;
-      color: var(--text3);
-    }
-    .nav-item.active .badge { background: var(--accent-bg); color: var(--accent); }
+/* ── Drop zone ── */
+.dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;
+  min-height:150px;padding:24px;background:var(--surface);border:1.5px dashed var(--border-strong);border-radius:var(--r-lg);
+  cursor:pointer;transition:border-color .15s,background .15s}
+.dropzone:hover,.dropzone.is-dragover{border-color:var(--accent);background:var(--accent-soft)}
+.dropzone.has-file{border-style:solid;border-color:var(--accent-border);background:var(--accent-soft)}
+.dz-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);color:var(--text-2);margin-bottom:4px}
+.dz-icon svg{width:20px;height:20px}
+.dropzone.has-file .dz-icon{background:var(--accent);color:var(--on-accent)}
+.dz-title{font-size:14px;font-weight:600;color:var(--text)}
+.dz-hint{font-size:13px;color:var(--text-2)}
 
-    .sidebar-footer {
-      padding: 16px 20px 0;
-      border-top: 1px solid var(--border);
-      margin-top: 12px;
-    }
-    .sidebar-footer p {
-      font-size: 11px;
-      color: var(--text3);
-      line-height: 1.6;
-      font-family: 'IBM Plex Mono', monospace;
-    }
-    .sidebar-footer span { color: var(--success); }
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:999px;font:500 12px/1 var(--font-sans);
+  white-space:nowrap;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2)}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge-success{background:var(--success-soft);border-color:var(--success-border);color:var(--success)}
+.badge-warning{background:var(--warning-soft);border-color:var(--warning-border);color:var(--warning)}
+.badge-danger{background:var(--danger-soft);border-color:var(--danger-border);color:var(--danger)}
+.badge-info{background:var(--info-soft);border-color:var(--info-border);color:var(--info)}
+.badge-accent{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent)}
 
-    /* ── Main ── */
-    .main { padding: 36px 40px; overflow-y: auto; min-width: 0; }
+/* ── Alerts ── */
+.alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text);font-size:13.5px;line-height:1.55}
+.alert .icon{margin-top:1px}
+.alert strong{font-weight:600}
+.alert-info{background:var(--info-soft);border-color:var(--info-border)}.alert-info .icon{color:var(--info)}
+.alert-warning{background:var(--warning-soft);border-color:var(--warning-border)}.alert-warning .icon{color:var(--warning)}
+.alert-danger{background:var(--danger-soft);border-color:var(--danger-border)}.alert-danger .icon{color:var(--danger)}
+.alert-success{background:var(--success-soft);border-color:var(--success-border)}.alert-success .icon{color:var(--success)}
 
-    .page { display: none; }
-    .page.active { display: block; }
+/* ── Tables ── */
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface)}
+table.table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.table th{position:sticky;top:0;z-index:1;background:var(--surface-2);color:var(--text-2);font-weight:600;font-size:12px;
+  text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap}
+.table tr:last-child td{border-bottom:0}
+.table tbody tr:hover td,.table tr:hover td{background:var(--surface-2)}
+.table .num,.table td.mono{font-family:var(--font-mono);font-size:12.5px;font-variant-numeric:tabular-nums}
 
-    .page-header { margin-bottom: 28px; }
-    .page-header h2 {
-      font-size: 22px; font-weight: 600;
-      color: var(--text);
-      letter-spacing: -0.01em;
-    }
-    .page-header p {
-      font-size: 13px; color: var(--text2);
-      margin-top: 6px; line-height: 1.6;
-      max-width: 540px;
-    }
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px}
+.stat-value{display:block;font-size:24px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat-label{display:block;font-size:13px;color:var(--text-2);margin-top:2px}
 
-    .tag {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 11px; font-family: 'IBM Plex Mono', monospace;
-      padding: 3px 8px; border-radius: 4px;
-      background: var(--surface2); color: var(--text3);
-      border: 1px solid var(--border); margin-left: 8px;
-      vertical-align: middle;
-    }
-    .tag.green { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+/* ── Spinner ── */
+.spinner{width:24px;height:24px;border:2.5px solid var(--border-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-    /* ── Upload zones ── */
-    .section-label {
-      font-size: 11px; font-weight: 600;
-      color: var(--text3);
-      text-transform: uppercase; letter-spacing: 0.08em;
-      margin-bottom: 10px;
-    }
+/* ── Footer ── */
+.site-footer{border-top:1px solid var(--border);background:var(--surface);margin-top:auto}
+.site-footer .inner{max-width:1120px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;font-size:13px;color:var(--text-3)}
+.site-footer a{color:var(--text-2);text-decoration:none;font-weight:500}
+.site-footer a:hover{color:var(--accent)}
+.site-footer .privacy{display:inline-flex;align-items:center;gap:6px}
+.site-footer .links{display:flex;gap:16px;align-items:center}
 
-    .upload-zone {
-      border: 1px dashed var(--border2);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.15s;
-      background: var(--surface);
-      margin-bottom: 12px;
-    }
-    .upload-zone:hover { border-color: var(--border3); background: var(--surface2); }
-    .upload-zone.dragging { border-color: var(--accent); background: var(--accent-bg); }
-    .upload-zone .uz-icon {
-      width: 40px; height: 40px;
-      background: var(--surface2);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 12px;
-    }
-    .upload-zone .uz-icon svg { width: 20px; height: 20px; color: var(--text2); }
-    .upload-zone .uz-label { font-size: 14px; font-weight: 500; color: var(--text); }
-    .upload-zone .uz-sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
-    .upload-zone input { display: none; }
+/* ── Responsive ── */
+@media (max-width:1024px){.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:768px){
+  .appbar{padding:0 16px;gap:8px}
+  .brand-sub,.appbar .badge,.appbar-nav{display:none}
+  .container{padding:24px 16px 40px}
+  h1{font-size:24px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .btn{min-height:44px}
+  .seg button{min-height:40px}
+  .card-head,.card-body{padding:16px}
+  .site-footer .inner{padding:18px 16px;flex-direction:column;align-items:flex-start}
+}
+@media (max-width:480px){
+  .crumb-sep,.brand .brand-name{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
 
-    /* ── File list ── */
-    .file-list { margin-bottom: 16px; display: flex; flex-direction: column; gap: 4px; }
-    .file-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 13px;
-    }
-    .file-item svg { width: 15px; height: 15px; color: var(--accent); flex-shrink: 0; }
-    .file-item .fname { flex: 1; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .file-item .fsize { color: var(--text3); font-size: 11px; font-family: 'IBM Plex Mono', monospace; flex-shrink: 0; }
-    .file-item .rm {
-      background: none; border: none; cursor: pointer;
-      color: var(--text3); padding: 2px; display: flex;
-      border-radius: 4px; transition: all 0.12s;
-    }
-    .file-item .rm:hover { color: var(--danger); background: var(--danger-bg); }
-    .file-item .rm svg { width: 14px; height: 14px; }
+/* ── Page: PraxDocs ── */
+.layout{flex:1;display:grid;grid-template-columns:240px minmax(0,1fr);width:100%;min-width:0}
 
-    /* ── Drag-to-reorder (merge list) ── */
-    .file-item .drag-handle {
-      display: flex; align-items: center; justify-content: center;
-      padding: 2px 4px; margin-left: -4px;
-      cursor: grab; color: var(--text3);
-      border-radius: 4px; transition: color 0.12s;
-      flex-shrink: 0;
-    }
-    .file-item .drag-handle:active { cursor: grabbing; }
-    .file-item .drag-handle:hover { color: var(--text2); }
-    .file-item .drag-handle svg { width: 14px; height: 14px; }
-    .file-item.dragging-item {
-      opacity: 0.35;
-      border-style: dashed;
-    }
-    .file-item.drag-over {
-      border-color: var(--accent);
-      background: var(--accent-bg);
-    }
-    .file-item[draggable="true"] { transition: opacity 0.15s, background 0.15s, border-color 0.15s; }
-    .file-item .order-badge {
-      font-size: 10px; font-family: 'IBM Plex Mono', monospace;
-      color: var(--text3); min-width: 16px; text-align: right;
-      flex-shrink: 0;
-    }
-    /* ── Options ── */
-    .option-row {
-      display: flex; align-items: center; gap: 12px;
-      margin-bottom: 18px; flex-wrap: wrap;
-    }
-    .option-label { font-size: 13px; color: var(--text2); min-width: 90px; }
-    .btn-group { display: flex; gap: 4px; }
-    .opt-btn {
-      font-size: 12px; padding: 7px 14px;
-      border: 1px solid var(--border2);
-      border-radius: var(--radius);
-      background: var(--surface);
-      cursor: pointer; color: var(--text2);
-      font-family: 'Syne', sans-serif;
-      font-weight: 500;
-      transition: all 0.12s;
-    }
-    .opt-btn:hover { border-color: var(--border3); color: var(--text); }
-    .opt-btn.sel { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); }
+/* Sidebar */
+.sidebar{position:sticky;top:var(--appbar-h);align-self:start;height:calc(100vh - var(--appbar-h));overflow-y:auto;
+  background:var(--surface);border-right:1px solid var(--border);padding:24px 12px;min-width:0}
+.sidebar-head{padding:0 12px 12px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.sidebar-head .ver{font-family:var(--font-mono);font-size:12px;color:var(--text-3)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 12px;border:0;border-radius:var(--r);
+  background:transparent;color:var(--text-2);font:500 14px/1.2 var(--font-sans);text-align:left;cursor:pointer;
+  transition:background .15s,color .15s}
+.nav-item:hover{background:var(--surface-2);color:var(--text)}
+.nav-item.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav-item .icon{width:18px;height:18px}
+.nav-item .nav-num{margin-left:auto;font-family:var(--font-mono);font-size:12px;color:var(--text-3);font-weight:400}
+.nav-item.active .nav-num{color:var(--accent)}
 
-    /* ── Divider ── */
-    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+/* Main pane */
+.main{padding:32px 40px 48px;min-width:0}
+.page{display:none;max-width:880px}
+.page.active{display:block}
+.page .page-head .alert{margin-top:8px}
+.group-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px}
+.group + .group{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.opt-field{margin-bottom:20px}
+.opt-field .seg{align-self:flex-start}
+.upload-zone{min-height:132px}
+.action-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-    /* ── Action button ── */
-    .action-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .action-btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      font-size: 13px; padding: 9px 20px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border2);
-      background: var(--surface2);
-      cursor: pointer; color: var(--text);
-      font-family: 'Syne', sans-serif;
-      font-weight: 600; letter-spacing: 0.01em;
-      transition: all 0.15s;
-    }
-    .action-btn:hover { border-color: var(--border3); background: var(--surface3); }
-    .action-btn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
-    .action-btn.primary {
-      background: var(--accent); color: #0f0f0f;
-      border-color: var(--accent);
-    }
-    .action-btn.primary:hover { opacity: 0.88; }
-    .action-btn svg { width: 16px; height: 16px; }
+/* File list */
+.file-list{display:flex;flex-direction:column;gap:6px}
+.file-list:not(:empty){margin-top:12px}
+.file-item{display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 6px 4px 12px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r);font-size:14px;min-width:0}
+.file-item .fi-icon{color:var(--accent);width:18px;height:18px}
+.file-item .fname{flex:1;min-width:0;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-item .fsize{color:var(--text-2);font-family:var(--font-mono);font-size:12.5px;flex-shrink:0;font-variant-numeric:tabular-nums}
+.icon-btn,.file-item .rm,.smerge-file-header .sf-rm{width:32px;height:32px;display:grid;place-items:center;flex-shrink:0;padding:0;
+  border:0;border-radius:var(--r-sm);background:transparent;color:var(--text-3);cursor:pointer;transition:background .15s,color .15s}
+.file-item .rm:hover,.smerge-file-header .sf-rm:hover{color:var(--danger);background:var(--danger-soft)}
+.file-item .rm svg,.smerge-file-header .sf-rm svg{width:16px;height:16px}
+.file-item .drag-handle{display:grid;place-items:center;width:24px;height:32px;margin-left:-6px;flex-shrink:0;color:var(--text-3);
+  cursor:grab;border-radius:var(--r-sm);transition:color .15s,background .15s}
+.file-item .drag-handle:hover{color:var(--text);background:var(--surface-2)}
+.file-item .drag-handle:active{cursor:grabbing}
+.file-item .drag-handle svg{width:16px;height:16px}
+.file-item[draggable="true"]{transition:background .15s,border-color .15s}
+.file-item.dragging-item{opacity:.4;border-style:dashed}
+.file-item.drag-over{border-color:var(--accent);background:var(--accent-soft)}
+.file-item .order-badge{font-family:var(--font-mono);font-size:12px;color:var(--text-3);min-width:18px;text-align:right;flex-shrink:0}
+.file-item > span:not([class]){display:flex;flex-shrink:0}
+.inline-grip{display:inline-flex;vertical-align:-3px}
+.inline-grip svg{width:16px;height:16px}
 
-    /* ── Status ── */
-    .status-wrap { margin-top: 14px; }
-    .status {
-      font-size: 13px; padding: 10px 14px;
-      border-radius: var(--radius);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .status svg { width: 16px; height: 16px; flex-shrink: 0; }
-    .status.processing { background: var(--info-bg); border: 1px solid var(--info-border); color: #88b0e0; }
-    .status.error { background: var(--danger-bg); border: 1px solid var(--danger-border); color: var(--danger); }
+/* Option seg (JS toggles .sel) */
+.seg button.sel{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
 
-    .progress-bar {
-      height: 2px; background: var(--surface3);
-      border-radius: 99px; overflow: hidden; margin-top: 8px;
-    }
-    .progress-fill {
-      height: 100%; background: #88b0e0;
-      border-radius: 99px;
-      animation: prog 1.4s ease-in-out infinite;
-    }
-    @keyframes prog { 0%,100%{width:15%;margin-left:0} 50%{width:60%;margin-left:25%} }
+/* Status + progress */
+.status-wrap{margin-top:16px}
+.status-wrap:empty{display:none}
+.status .icon{width:16px;height:16px}
+.progress-bar{height:3px;background:var(--surface-3);border-radius:99px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:var(--accent);border-radius:99px;animation:prog 1.4s ease-in-out infinite}
+@keyframes prog{0%,100%{width:15%;margin-left:0}50%{width:60%;margin-left:25%}}
 
-    /* ── Results ── */
-    .result-box {
-      margin-top: 14px;
-      border: 1px solid var(--success-border);
-      border-radius: var(--radius-lg);
-      background: var(--success-bg);
-      overflow: hidden;
-    }
-    .result-header {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--success-border);
-      display: flex; align-items: center; gap: 8px;
-      font-size: 12px; font-weight: 600; color: var(--success);
-      font-family: 'IBM Plex Mono', monospace;
-    }
-    .result-header svg { width: 14px; height: 14px; }
-    .result-files { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
-    .result-file {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 10px;
-      background: var(--surface);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-    }
-    .result-file svg { width: 15px; height: 15px; color: var(--text2); flex-shrink: 0; }
-    .result-file .rf-name { flex: 1; font-size: 13px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .dl-btn {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 11px; padding: 5px 10px;
-      border-radius: 6px;
-      background: var(--success);
-      color: #0a1a0f;
-      border: none; cursor: pointer;
-      font-family: 'Syne', sans-serif;
-      font-weight: 600;
-      flex-shrink: 0;
-      transition: opacity 0.12s;
-    }
-    .dl-btn:hover { opacity: 0.85; }
-    .dl-btn svg { width: 13px; height: 13px; }
+/* Results */
+.result-box{border:1px solid var(--success-border);border-radius:var(--r-lg);background:var(--success-soft);overflow:hidden}
+.result-header{padding:10px 14px;border-bottom:1px solid var(--success-border);display:flex;align-items:center;gap:8px;
+  font-size:14px;font-weight:600;color:var(--success)}
+.result-header svg{width:16px;height:16px}
+.result-files{padding:8px;display:flex;flex-direction:column;gap:6px}
+.result-file{display:flex;align-items:center;gap:10px;padding:6px 6px 6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);min-width:0}
+.result-file > svg{width:18px;height:18px;color:var(--text-2);flex-shrink:0}
+.result-file .rf-name{flex:1;min-width:0;font-size:14px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dl-btn{flex-shrink:0}
 
-    /* ── Info note ── */
-    .info-note {
-      font-size: 12px; color: var(--text3);
-      padding: 10px 14px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-    .info-note strong { color: var(--text2); font-weight: 500; }
+/* Selective merge */
+.smerge-blocks{display:flex;flex-direction:column;gap:10px}
+.smerge-blocks:not(:empty){margin-top:12px}
+.smerge-file-block{border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface);overflow:hidden}
+.smerge-file-header{display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 6px 4px 12px;background:var(--surface-2);
+  border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.smerge-file-header.collapsed{border-bottom-color:transparent}
+.smerge-file-header .fi-icon{color:var(--accent)}
+.smerge-file-header .sf-name{flex:1;min-width:0;font-size:14px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.smerge-file-header .sf-pages{font-family:var(--font-mono);font-size:12.5px;color:var(--text-2);flex-shrink:0}
+.smerge-file-header .sf-chevron{display:grid;place-items:center;color:var(--text-3);transition:transform .2s;flex-shrink:0}
+.smerge-file-header .sf-chevron svg{width:16px;height:16px}
+.smerge-file-header.collapsed .sf-chevron{transform:rotate(-90deg)}
+.smerge-file-body{padding:14px}
+.smerge-range-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.smerge-range-row label{font-size:13px;font-weight:500;color:var(--text)}
+.smerge-range-input{width:200px;min-height:36px;padding:6px 10px;background:var(--surface);color:var(--text);border:1px solid var(--border-strong);
+  border-radius:var(--r);font:400 13px/1.4 var(--font-mono);transition:border-color .15s,box-shadow .15s}
+.smerge-range-input::placeholder{color:var(--text-3)}
+.smerge-range-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.smerge-range-input.invalid{border-color:var(--danger)}
+.smerge-range-hint{font-family:var(--font-mono);font-size:12px;color:var(--text-3)}
+.smerge-preview-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;min-height:24px}
+.smerge-pill{font-family:var(--font-mono);font-size:12px;line-height:1;padding:4px 8px;border-radius:99px;background:var(--accent-soft);
+  color:var(--accent);border:1px solid var(--accent-border)}
+.smerge-total{font-size:13px;color:var(--text-2);margin-top:8px}
+.smerge-empty{font-size:13px;color:var(--text-3);font-style:italic;padding:4px 0}
 
-    /* ── Theme toggle ── */
-    .theme-toggle {
-      display: flex; align-items: center; gap: 3px;
-      padding: 3px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 12px;
-    }
-    .theme-btn {
-      flex: 0 0 auto;
-      display: flex; align-items: center; justify-content: center;
-      width: 32px; height: 28px;
-      padding: 0;
-      border: none; border-radius: 6px;
-      background: none; cursor: pointer;
-      color: var(--text3); transition: all 0.13s;
-      white-space: nowrap; overflow: hidden;
-    }
-    .theme-btn:hover { color: var(--text2); background: var(--surface3); }
-    .theme-btn.active {
-      flex: 1;
-      width: auto;
-      gap: 5px;
-      padding: 0 10px;
-      background: var(--surface); color: var(--text);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-    }
-    .theme-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
-    .theme-label { display: none; font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 600; }
-    .theme-btn.active .theme-label { display: inline; }
-    html[data-theme="light"] .action-btn.primary { color: #fff; }
+/* Compress quality cards */
+.quality-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.quality-card{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 10px;text-align:center;cursor:pointer;
+  background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-lg);font:inherit;color:var(--text);
+  transition:border-color .15s,background .15s,box-shadow .15s}
+.quality-card:hover{border-color:var(--accent-border);background:var(--surface-2)}
+.quality-card.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.quality-card .qc-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:var(--r);background:var(--surface-2);color:var(--text-2);margin-bottom:4px}
+.quality-card.sel .qc-icon{background:var(--accent);color:var(--on-accent)}
+.quality-card .qc-icon svg{width:18px;height:18px}
+.quality-card .qc-label{font-size:14px;font-weight:600;color:var(--text)}
+.quality-card .qc-desc{font-size:13px;color:var(--text-2);line-height:1.4}
+.quality-card .qc-ratio{font-family:var(--font-mono);font-size:12px;color:var(--text-3);margin-top:4px}
+.quality-card.sel .qc-ratio{color:var(--accent)}
+.compress-result-meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:2px}
+.compress-stat{font-family:var(--font-mono);font-size:12.5px}
+.compress-stat .cs-label{color:var(--text-2)}
+.compress-stat .cs-val{color:var(--text);font-weight:500}
 
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
-
-    /* ── Selective Merge ── */
-    .smerge-file-block {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      background: var(--surface);
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-    .smerge-file-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px;
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-      cursor: pointer; user-select: none;
-    }
-    .smerge-file-header svg { width: 15px; height: 15px; color: var(--accent); flex-shrink: 0; }
-    .smerge-file-header .sf-name { flex: 1; font-size: 13px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
-    .smerge-file-header .sf-pages { font-size: 11px; color: var(--text3); font-family: 'IBM Plex Mono', monospace; flex-shrink: 0; }
-    .smerge-file-header .sf-chevron { color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
-    .smerge-file-header .sf-chevron svg { width: 14px; height: 14px; }
-    .smerge-file-header.collapsed .sf-chevron { transform: rotate(-90deg); }
-    .smerge-file-header .sf-rm { background: none; border: none; cursor: pointer; color: var(--text3); display: flex; padding: 2px; border-radius: 4px; transition: all 0.12s; flex-shrink: 0; }
-    .smerge-file-header .sf-rm:hover { color: var(--danger); background: var(--danger-bg); }
-    .smerge-file-header .sf-rm svg { width: 14px; height: 14px; }
-    .smerge-file-body { padding: 12px 14px; }
-    .smerge-range-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .smerge-range-row label { font-size: 12px; color: var(--text2); }
-    .smerge-range-input {
-      font-family: 'IBM Plex Mono', monospace; font-size: 12px;
-      padding: 5px 10px; border-radius: var(--radius);
-      border: 1px solid var(--border2); background: var(--surface2);
-      color: var(--text); width: 160px; outline: none;
-      transition: border-color 0.12s;
-    }
-    .smerge-range-input:focus { border-color: var(--accent); }
-    .smerge-range-input.invalid { border-color: var(--danger); }
-    .smerge-range-hint { font-size: 11px; color: var(--text3); font-family: 'IBM Plex Mono', monospace; }
-    .smerge-preview-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; min-height: 24px; }
-    .smerge-pill {
-      font-size: 10px; font-family: 'IBM Plex Mono', monospace;
-      padding: 2px 7px; border-radius: 99px;
-      background: var(--accent-bg); color: var(--accent);
-      border: 1px solid var(--accent-border);
-    }
-    .smerge-total { font-size: 12px; color: var(--text2); margin-top: 6px; }
-    .smerge-empty { font-size: 12px; color: var(--text3); font-style: italic; padding: 4px 0; }
-
-    /* ── Attribution ── */
-    .pp-credit{padding:24px 40px;border-top:1px solid var(--border);text-align:center;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text3);display:flex;align-items:center;justify-content:center;gap:7px;margin-top:8px}
-    .pp-li{color:var(--text3);display:inline-flex;align-items:center;text-decoration:none;transition:color .15s}
-    .pp-li:hover{color:var(--accent)}
-    @media(max-width:720px){.pp-credit{padding:20px 14px}}
-
-    /* ── Compress PDF ── */
-    .quality-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
-    @media (max-width: 600px) { .quality-cards { grid-template-columns: repeat(2, 1fr); } }
-    .quality-card {
-      border: 1px solid var(--border2);
-      border-radius: var(--radius-lg);
-      padding: 12px 10px;
-      cursor: pointer; text-align: center;
-      background: var(--surface);
-      transition: all 0.15s;
-      position: relative;
-    }
-    .quality-card:hover { border-color: var(--border3); background: var(--surface2); }
-    .quality-card.sel { border-color: var(--accent); background: var(--accent-bg); }
-    .quality-card .qc-icon { font-size: 22px; margin-bottom: 6px; line-height: 1; }
-    .quality-card .qc-label { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-    .quality-card .qc-desc { font-size: 11px; color: var(--text3); line-height: 1.4; }
-    .quality-card .qc-ratio { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--accent); margin-top: 5px; opacity: 0; transition: opacity 0.15s; }
-    .quality-card.sel .qc-ratio { opacity: 1; }
-    .compress-result-meta { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
-    .compress-stat { font-size: 12px; font-family: 'IBM Plex Mono', monospace; }
-    .compress-stat .cs-label { color: var(--text3); }
-    .compress-stat .cs-val { color: var(--text); font-weight: 500; }
-    .compress-stat .cs-saving { color: var(--success); }
-
-    /* ── Responsive ── */
-    @media (max-width: 720px) {
-      /* Layout: single column, contained */
-      .layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;  /* sidebar = content only, main = rest */
-        width: 100vw;
-        overflow-x: hidden;
-      }
-
-      /* Sidebar becomes a compact sticky top bar */
-      .sidebar {
-        position: sticky; top: 0; z-index: 100;
-        width: 100%; max-width: 100vw;
-        height: auto;
-        align-self: start;             /* never stretch to fill grid row */
-        flex-direction: column;
-        padding: 12px 14px 10px;
-        border-right: none; border-bottom: 1px solid var(--border);
-        overflow: hidden;
-        min-width: 0;
-      }
-
-      /* Logo row */
-      .logo {
-        border: none; padding: 0; margin-bottom: 10px;
-        display: flex; align-items: center; gap: 10px; flex: unset; width: 100%;
-        justify-content: space-between;
-      }
-      .logo-icon { margin: 0; width: 30px; height: 30px; flex-shrink: 0; }
-      .logo > div:last-child { flex-shrink: 0; } /* theme toggle — stay compact */
-      .logo h1 { font-size: 14px; }
-      .logo p { display: none; }
-
-      /* Inline theme toggle next to logo */
-      .logo-theme { display: flex; }
-      .theme-toggle { margin-bottom: 0; flex-shrink: 0; }
-
-      /* Nav: horizontal scrollable strip, fully contained */
-      .nav {
-        display: flex; flex-wrap: nowrap;
-        overflow-x: auto; -webkit-overflow-scrolling: touch;
-        gap: 4px; padding: 0; width: 100%;
-        scrollbar-width: none;
-      }
-      .nav::-webkit-scrollbar { display: none; }
-      .nav-item {
-        flex-shrink: 0; width: auto;
-        padding: 8px 12px; font-size: 12px;
-        white-space: nowrap;
-      }
-      .nav-item .badge { display: none; }
-
-      /* Hide sidebar footer */
-      .sidebar-footer { display: none; }
-
-      /* Main content — fully contained */
-      .main { padding: 18px 14px 40px; min-width: 0; width: 100%; overflow-x: hidden; }
-
-      /* Page header */
-      .page-header { margin-bottom: 18px; }
-      .page-header h2 { font-size: 18px; }
-      .page-header p { font-size: 12px; }
-
-      /* Upload zones */
-      .upload-zone { padding: 18px 14px; }
-      .upload-zone .uz-label { font-size: 13px; }
-      .upload-zone .uz-sub { font-size: 11px; }
-
-      /* Options */
-      .option-row { gap: 8px; flex-wrap: wrap; }
-      .option-label { min-width: unset; font-size: 12px; }
-      .btn-group { flex-wrap: wrap; }
-      .opt-btn { font-size: 11px; padding: 8px 12px; }
-
-      /* Action buttons — full width, easy tap */
-      .action-row { flex-direction: column; align-items: stretch; gap: 8px; }
-      .action-btn { width: 100%; justify-content: center; padding: 12px 16px; font-size: 13px; }
-
-      /* File items */
-      .file-item { padding: 8px 10px; }
-      .file-item .fname { font-size: 12px; }
-      .file-item .fsize { font-size: 10px; }
-
-      /* Results */
-      .result-file { flex-wrap: wrap; gap: 6px; }
-      .result-file .rf-name { font-size: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-      .dl-btn { width: 100%; justify-content: center; }
-      .compress-result-meta { gap: 10px; }
-
-      /* Selective merge */
-      .smerge-range-row { flex-direction: column; align-items: flex-start; gap: 6px; }
-      .smerge-range-input { width: 100%; box-sizing: border-box; }
-      .smerge-file-header { padding: 8px 10px; }
-      .smerge-file-header .sf-name { font-size: 12px; }
-
-      /* Quality cards: 2 col */
-      .quality-cards { grid-template-columns: repeat(2, 1fr); }
-
-      /* Info note */
-      .info-note { font-size: 11px; }
-    }
-
-    /* ── Small phones ── */
-    @media (max-width: 400px) {
-      .sidebar { padding: 10px 10px 8px; }
-      .main { padding: 14px 10px 30px; }
-      .logo h1 { font-size: 13px; }
-      .nav-item { padding: 6px 8px; font-size: 11px; }
-      .opt-btn { font-size: 10px; padding: 7px 8px; }
-      .action-btn { font-size: 12px; padding: 10px 12px; }
-      .quality-cards { grid-template-columns: 1fr 1fr; gap: 6px; }
-      .quality-card { padding: 10px 6px; }
-      .quality-card .qc-icon { font-size: 18px; }
-      .quality-card .qc-label { font-size: 11px; }
-      .quality-card .qc-desc { font-size: 10px; }
-    }
-  </style>
+@media (max-width:1024px){
+  .layout{grid-template-columns:200px minmax(0,1fr)}
+  .main{padding:28px 28px 40px}
+}
+@media (max-width:768px){
+  .layout{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}
+  .opt-field .seg{align-self:stretch}
+  .sidebar{top:var(--appbar-h);z-index:40;height:auto;overflow:hidden;padding:8px 0;border-right:0;border-bottom:1px solid var(--border)}
+  .sidebar-head{display:none}
+  .nav{flex-direction:row;flex-wrap:nowrap;overflow-x:auto;gap:4px;padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .nav::-webkit-scrollbar{display:none}
+  .nav-item{width:auto;flex-shrink:0;white-space:nowrap;min-height:40px;font-size:13px}
+  .nav-item .nav-num{display:none}
+  .main{padding:24px 16px 40px}
+  .action-row{flex-direction:column;align-items:stretch}
+  .action-row .btn{width:100%}
+  .file-item .rm,.smerge-file-header .sf-rm{width:40px;height:40px}
+  .quality-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .seg.opt-seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}
+  .seg.opt-seg button{padding:0 6px}
+  .smerge-range-row{flex-direction:column;align-items:stretch;gap:6px}
+  .smerge-range-input{width:100%}
+  .result-file{flex-wrap:wrap}
+  .result-file .dl-btn{width:100%}
+  .result-file .rf-name{flex-basis:calc(100% - 40px)}
+}
+</style>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('modpdf-theme')||'light')}catch(e){}</script>
 </head>
 <body>
+<header class="appbar">
+  <a class="brand" href="index.html" aria-label="All tools by Dr. Prashant Patel">
+    <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg></span>
+    <span class="brand-name">drprash<span class="brand-sub">/tools</span></span>
+  </a>
+  <span class="crumb-sep" aria-hidden="true">/</span>
+  <span class="crumb">PraxDocs</span>
+  <span class="spacer"></span>
+  <span class="badge badge-success"><span class="dot"></span>100% offline</span>
+  <div class="theme-toggle" role="group" aria-label="Colour theme">
+    <button type="button" data-theme-set="auto" aria-label="Match system theme" title="System"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>
+    <button type="button" data-theme-set="light" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
+    <button type="button" data-theme-set="dark" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+  </div>
+</header>
 
 <div class="layout">
 
   <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="logo">
-      <div style="display:flex;align-items:center;gap:10px;flex:1;">
-        <div class="logo-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#0f0f0f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-          </svg>
-        </div>
-        <div>
-          <h1>PraxDocs</h1>
-          <p>v1.0</p>
-        </div>
-      </div>
-      <!-- Theme toggle visible on mobile (sidebar-footer is hidden on mobile) -->
-      <div class="theme-toggle logo-theme" id="theme-toggle-mobile" style="display:none;">
-        <button class="theme-btn" data-theme="auto" title="Auto">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-          <span class="theme-label">Auto</span>
-        </button>
-        <button class="theme-btn" data-theme="light" title="Light">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <span class="theme-label">Light</span>
-        </button>
-        <button class="theme-btn" data-theme="dark" title="Dark">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          <span class="theme-label">Dark</span>
-        </button>
-      </div>
-    </div>
-
+  <aside class="sidebar" aria-label="PDF tools">
+    <div class="sidebar-head"><span class="eyebrow">PDF tools</span><span class="ver">v1.0</span></div>
     <nav class="nav" id="nav">
-      <button class="nav-item active" data-page="merge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/><path d="M18 2h-6l-2 4h8l-2-4z"/><line x1="12" y1="10" x2="12" y2="18"/></svg>
-        Merge PDF
-        <span class="badge">1</span>
-      </button>
-      <button class="nav-item" data-page="smerge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M17.5 17.5h.01M14 17.5h3.5v-3.5"/></svg>
-        Selective Merge
-        <span class="badge">2</span>
-      </button>
-      <button class="nav-item" data-page="stamp">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V7a3 3 0 0 1 6 0v4"/><rect x="5" y="11" width="14" height="10" rx="2"/><line x1="12" y1="15" x2="12" y2="17"/></svg>
-        Stamp PDF
-        <span class="badge">3</span>
-      </button>
-      <button class="nav-item" data-page="watermark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-        Watermark PDF
-        <span class="badge">4</span>
-      </button>
-      <button class="nav-item" data-page="rotate">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
-        Rotate PDF
-        <span class="badge">5</span>
-      </button>
-      <button class="nav-item" data-page="jpeg">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        PDF → JPG
-        <span class="badge">6</span>
-      </button>
-      <button class="nav-item" data-page="compress">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="15"/><line x1="5" y1="19" x2="19" y2="19"/></svg>
-        Compress PDF
-        <span class="badge">7</span>
-      </button>
-
+      <button type="button" class="nav-item active" data-page="merge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>Merge PDF<span class="nav-num">1</span></button>
+      <button type="button" class="nav-item" data-page="smerge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Selective Merge<span class="nav-num">2</span></button>
+      <button type="button" class="nav-item" data-page="stamp"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22h14"/><path d="M19.27 13.73A2.5 2.5 0 0 0 17.5 13h-11A2.5 2.5 0 0 0 4 15.5V17a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1.5c0-.66-.26-1.3-.73-1.77Z"/><path d="M14 13V8.5C14 7 15 7 15 5a3 3 0 0 0-6 0c0 2 1 2 1 3.5V13"/></svg>Stamp PDF<span class="nav-num">3</span></button>
+      <button type="button" class="nav-item" data-page="watermark"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>Watermark PDF<span class="nav-num">4</span></button>
+      <button type="button" class="nav-item" data-page="rotate"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Rotate PDF<span class="nav-num">5</span></button>
+      <button type="button" class="nav-item" data-page="jpeg"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg>PDF → JPG<span class="nav-num">6</span></button>
+      <button type="button" class="nav-item" data-page="compress"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>Compress PDF<span class="nav-num">7</span></button>
     </nav>
-
-    <div class="sidebar-footer">
-      <div class="theme-toggle" id="theme-toggle">
-        <button class="theme-btn" data-theme="auto" title="Follow system preference">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-          <span class="theme-label">Auto</span>
-        </button>
-        <button class="theme-btn" data-theme="light" title="Light theme">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <span class="theme-label">Light</span>
-        </button>
-        <button class="theme-btn" data-theme="dark" title="Dark theme">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          <span class="theme-label">Dark</span>
-        </button>
-      </div>
-      <p><span>●</span> Runs entirely in your browser. No files leave your device.</p>
-    </div>
   </aside>
 
   <!-- Main -->
   <main class="main">
 
     <!-- ── MERGE ── -->
-    <div class="page active" id="page-merge">
-      <div class="page-header">
-        <h2>Merge PDF</h2>
-        <p>Combine multiple PDF files into a single document. Files are merged in the order they appear in the list.</p>
+    <section class="page active" id="page-merge">
+      <div class="page-head">
+        <h1>Merge PDF</h1>
+        <p class="lead">Combine multiple PDF files into a single document. Files are merged in the order they appear in the list.</p>
+        <div class="alert alert-info" role="note"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div>Add 2 or more PDF files. Drag the <span class="inline-grip" role="img" aria-label="grip"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></svg></span> handle to reorder before merging.</div></div>
       </div>
-      <div class="info-note">Add 2 or more PDF files. Drag the <strong>⠿</strong> handle to reorder before merging.</div>
-      <div class="section-label">PDF Files to Merge</div>
-      <div class="upload-zone" id="merge-zone">
-        <div class="uz-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <div class="card">
+        <div class="card-body">
+          <div class="group">
+            <div class="group-label">PDF files to merge</div>
+            <div class="dropzone upload-zone" id="merge-zone" role="button" tabindex="0" aria-label="Select PDF files to merge">
+              <span class="dz-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <span class="dz-title">Drop PDF files here or click to browse</span>
+              <span class="dz-hint">Multiple files — drag the handle to reorder after uploading</span>
+              <input type="file" accept=".pdf" multiple id="merge-input" hidden>
+            </div>
+            <div class="file-list" id="merge-files"></div>
+          </div>
         </div>
-        <div class="uz-label">Drop PDF files here or click to browse</div>
-        <div class="uz-sub">Multiple files — drag the handle to reorder after uploading</div>
-        <input type="file" accept=".pdf" multiple id="merge-input">
-      </div>
-      <div class="file-list" id="merge-files"></div>
-      <div class="action-row">
-        <button class="action-btn primary" id="merge-btn" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/><path d="M18 2h-6l-2 4h8l-2-4z"/></svg>
-          Merge PDFs
-        </button>
-        <button class="action-btn" id="merge-clear" style="display:none">Clear</button>
+        <div class="card-foot action-row">
+          <button class="btn btn-primary" id="merge-btn" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>Merge PDFs</button>
+          <button class="btn btn-secondary" id="merge-clear" style="display:none">Clear</button>
+        </div>
       </div>
       <div class="status-wrap" id="merge-status"></div>
-    </div>
+    </section>
 
     <!-- ── STAMP ── -->
-    <div class="page" id="page-stamp">
-      <div class="page-header">
-        <h2>Stamp PDF</h2>
-        <p>Overlay a stamp PDF on top of each source PDF page. Used for "APPROVED" markings, signatures, logos, and similar foreground overlays.</p>
+    <section class="page" id="page-stamp">
+      <div class="page-head">
+        <h1>Stamp PDF</h1>
+        <p class="lead">Overlay a stamp PDF on top of each source PDF page. Used for "APPROVED" markings, signatures, logos, and similar foreground overlays.</p>
+        <div class="alert alert-info" role="note"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div><strong>Stamp file:</strong> a single-page or multi-page PDF that gets drawn <strong>on top of</strong> each source page. If the stamp has fewer pages than the source, the last stamp page repeats.</div></div>
       </div>
-      <div class="info-note"><strong>Stamp file:</strong> a single-page or multi-page PDF that gets drawn <strong>on top of</strong> each source page. If the stamp has fewer pages than the source, the last stamp page repeats.</div>
-      <div class="section-label">Stamp File (stamp.pdf)</div>
-      <div class="upload-zone" id="stamp-overlay-zone">
-        <div class="uz-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V7a3 3 0 0 1 6 0v4"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg>
+      <div class="card">
+        <div class="card-body">
+          <div class="group">
+            <div class="group-label">Stamp file (stamp.pdf)</div>
+            <div class="dropzone upload-zone" id="stamp-overlay-zone" role="button" tabindex="0" aria-label="Select stamp PDF">
+              <span class="dz-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22h14"/><path d="M19.27 13.73A2.5 2.5 0 0 0 17.5 13h-11A2.5 2.5 0 0 0 4 15.5V17a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1.5c0-.66-.26-1.3-.73-1.77Z"/><path d="M14 13V8.5C14 7 15 7 15 5a3 3 0 0 0-6 0c0 2 1 2 1 3.5V13"/></svg></span>
+              <span class="dz-title">Drop stamp.pdf here</span>
+              <span class="dz-hint">Single file only</span>
+              <input type="file" accept=".pdf" id="stamp-overlay-input" hidden>
+            </div>
+            <div class="file-list" id="stamp-overlay-files"></div>
+          </div>
+          <div class="group">
+            <div class="group-label">Source PDFs to stamp</div>
+            <div class="dropzone upload-zone" id="stamp-zone" role="button" tabindex="0" aria-label="Select source PDF files to stamp">
+              <span class="dz-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <span class="dz-title">Drop source PDF files</span>
+              <span class="dz-hint">Multiple files supported</span>
+              <input type="file" accept=".pdf" multiple id="stamp-input" hidden>
+            </div>
+            <div class="file-list" id="stamp-files"></div>
+          </div>
         </div>
-        <div class="uz-label">Drop stamp.pdf here</div>
-        <div class="uz-sub">Single file only</div>
-        <input type="file" accept=".pdf" id="stamp-overlay-input">
-      </div>
-      <div class="file-list" id="stamp-overlay-files"></div>
-      <hr class="divider">
-      <div class="section-label">Source PDFs to Stamp</div>
-      <div class="upload-zone" id="stamp-zone">
-        <div class="uz-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div class="card-foot action-row">
+          <button class="btn btn-primary" id="stamp-btn" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 22h14"/><path d="M19.27 13.73A2.5 2.5 0 0 0 17.5 13h-11A2.5 2.5 0 0 0 4 15.5V17a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1.5c0-.66-.26-1.3-.73-1.77Z"/><path d="M14 13V8.5C14 7 15 7 15 5a3 3 0 0 0-6 0c0 2 1 2 1 3.5V13"/></svg>Stamp PDFs</button>
+          <button class="btn btn-secondary" id="stamp-clear" style="display:none">Clear</button>
         </div>
-        <div class="uz-label">Drop source PDF files</div>
-        <div class="uz-sub">Multiple files supported</div>
-        <input type="file" accept=".pdf" multiple id="stamp-input">
-      </div>
-      <div class="file-list" id="stamp-files"></div>
-      <div class="action-row">
-        <button class="action-btn primary" id="stamp-btn" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V7a3 3 0 0 1 6 0v4"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg>
-          Stamp PDFs
-        </button>
-        <button class="action-btn" id="stamp-clear" style="display:none">Clear</button>
       </div>
       <div class="status-wrap" id="stamp-status"></div>
-    </div>
+    </section>
 
     <!-- ── WATERMARK ── -->
-    <div class="page" id="page-watermark">
-      <div class="page-header">
-        <h2>Watermark PDF</h2>
-        <p>Place a watermark PDF behind each source PDF page. Used for "CONFIDENTIAL" text, background logos, and similar behind-content overlays.</p>
+    <section class="page" id="page-watermark">
+      <div class="page-head">
+        <h1>Watermark PDF</h1>
+        <p class="lead">Place a watermark PDF behind each source PDF page. Used for "CONFIDENTIAL" text, background logos, and similar behind-content overlays.</p>
+        <div class="alert alert-info" role="note"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div><strong>Watermark file:</strong> drawn <strong>behind</strong> each source page. Transparent areas in the watermark PDF will show through correctly.</div></div>
       </div>
-      <div class="info-note"><strong>Watermark file:</strong> drawn <strong>behind</strong> each source page. Transparent areas in the watermark PDF will show through correctly.</div>
-      <div class="section-label">Watermark File (watermark.pdf)</div>
-      <div class="upload-zone" id="wm-overlay-zone">
-        <div class="uz-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+      <div class="card">
+        <div class="card-body">
+          <div class="group">
+            <div class="group-label">Watermark file (watermark.pdf)</div>
+            <div class="dropzone upload-zone" id="wm-overlay-zone" role="button" tabindex="0" aria-label="Select watermark PDF">
+              <span class="dz-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg></span>
+              <span class="dz-title">Drop watermark.pdf here</span>
+              <span class="dz-hint">Single file only</span>
+              <input type="file" accept=".pdf" id="wm-overlay-input" hidden>
+            </div>
+            <div class="file-list" id="wm-overlay-files"></div>
+          </div>
+          <div class="group">
+            <div class="group-label">Source PDFs</div>
+            <div class="dropzone upload-zone" id="wm-zone" role="button" tabindex="0" aria-label="Select source PDF files to watermark">
+              <span class="dz-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <span class="dz-title">Drop source PDF files</span>
+              <span class="dz-hint">Multiple files supported</span>
+              <input type="file" accept=".pdf" multiple id="wm-input" hidden>
+            </div>
+            <div class="file-list" id="wm-files"></div>
+          </div>
         </div>
-        <div class="uz-label">Drop watermark.pdf here</div>
-        <div class="uz-sub">Single file only</div>
-        <input type="file" accept=".pdf" id="wm-overlay-input">
-      </div>
-      <div class="file-list" id="wm-overlay-files"></div>
-      <hr class="divider">
-      <div class="section-label">Source PDFs</div>
-      <div class="upload-zone" id="wm-zone">
-        <div class="uz-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div class="card-foot action-row">
+          <button class="btn btn-primary" id="wm-btn" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>Apply watermark</button>
+          <button class="btn btn-secondary" id="wm-clear" style="display:none">Clear</button>
         </div>
-        <div class="uz-label">Drop source PDF files</div>
-        <div class="uz-sub">Multiple files supported</div>
-        <input type="file" accept=".pdf" multiple id="wm-input">
-      </div>
-      <div class="file-list" id="wm-files"></div>
-      <div class="action-row">
-        <button class="action-btn primary" id="wm-btn" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-          Apply Watermark
-        </button>
-        <button class="action-btn" id="wm-clear" style="display:none">Clear</button>
       </div>
       <div class="status-wrap" id="wm-status"></div>
-    </div>
+    </section>
 
     <!-- ── ROTATE ── -->
-    <div class="page" id="page-rotate">
-      <div class="page-header">
-        <h2>Rotate PDF</h2>
-        <p>Rotate all pages in each PDF by the chosen angle. Output files keep their original filenames.</p>
+    <section class="page" id="page-rotate">
+      <div class="page-head">
+        <h1>Rotate PDF</h1>
+        <p class="lead">Rotate all pages in each PDF by the chosen angle. Output files keep their original filenames.</p>
       </div>
-      <div class="option-row">
-        <span class="option-label">Rotation</span>
-        <div class="btn-group" id="rotate-dir">
-          <button class="opt-btn" data-val="-90">−90° (left)</button>
-          <button class="opt-btn sel" data-val="90">+90° (right)</button>
-          <button class="opt-btn" data-val="180">180°</button>
+      <div class="card">
+        <div class="card-body">
+          <div class="field opt-field">
+            <span>Rotation</span>
+            <div class="seg opt-seg" id="rotate-dir" role="group" aria-label="Rotation">
+              <button type="button" class="opt-btn" data-val="-90" aria-pressed="false">−90° (left)</button>
+              <button type="button" class="opt-btn sel" data-val="90" aria-pressed="true">+90° (right)</button>
+              <button type="button" class="opt-btn" data-val="180" aria-pressed="false">180°</button>
+            </div>
+          </div>
+          <div class="group">
+            <div class="group-label">PDF files to rotate</div>
+            <div class="dropzone upload-zone" id="rotate-zone" role="button" tabindex="0" aria-label="Select PDF files to rotate">
+              <span class="dz-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></span>
+              <span class="dz-title">Drop PDF files to rotate</span>
+              <span class="dz-hint">Multiple files supported</span>
+              <input type="file" accept=".pdf" multiple id="rotate-input" hidden>
+            </div>
+            <div class="file-list" id="rotate-files"></div>
+          </div>
         </div>
-      </div>
-      <div class="section-label">PDF Files to Rotate</div>
-      <div class="upload-zone" id="rotate-zone">
-        <div class="uz-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
+        <div class="card-foot action-row">
+          <button class="btn btn-primary" id="rotate-btn" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>Rotate PDFs</button>
+          <button class="btn btn-secondary" id="rotate-clear" style="display:none">Clear</button>
         </div>
-        <div class="uz-label">Drop PDF files to rotate</div>
-        <div class="uz-sub">Multiple files supported</div>
-        <input type="file" accept=".pdf" multiple id="rotate-input">
-      </div>
-      <div class="file-list" id="rotate-files"></div>
-      <div class="action-row">
-        <button class="action-btn primary" id="rotate-btn" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
-          Rotate PDFs
-        </button>
-        <button class="action-btn" id="rotate-clear" style="display:none">Clear</button>
       </div>
       <div class="status-wrap" id="rotate-status"></div>
-    </div>
+    </section>
 
     <!-- ── JPEG ── -->
-    <div class="page" id="page-jpeg">
-      <div class="page-header">
-        <h2>PDF → JPG</h2>
-        <p>Render every page of each PDF to a high-quality JPEG. Output files are named <code style="font-family:monospace;font-size:12px">filename_p1.jpg</code>, <code style="font-family:monospace;font-size:12px">filename_p2.jpg</code>, etc.</p>
+    <section class="page" id="page-jpeg">
+      <div class="page-head">
+        <h1>PDF → JPG</h1>
+        <p class="lead">Render every page of each PDF to a high-quality JPEG. Output files are named <code>filename_p1.jpg</code>, <code>filename_p2.jpg</code>, etc.</p>
+        <div class="alert alert-info" role="note"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div>Rendered at <strong>150 DPI</strong> using PDF.js (loaded on demand). For large documents, processing may take a moment. Single-page PDFs produce one JPG file.</div></div>
       </div>
-      <div class="info-note">Rendered at <strong>150 DPI</strong> using PDF.js (loaded on demand). For large documents, processing may take a moment. Single-page PDFs produce one JPG file.</div>
-      <div class="option-row">
-        <span class="option-label">Quality</span>
-        <div class="btn-group" id="jpeg-quality">
-          <button class="opt-btn" data-val="0.75">Good (75%)</button>
-          <button class="opt-btn sel" data-val="0.92">High (92%)</button>
-          <button class="opt-btn" data-val="1.0">Max (100%)</button>
+      <div class="card">
+        <div class="card-body">
+          <div class="field opt-field">
+            <span>Quality</span>
+            <div class="seg opt-seg" id="jpeg-quality" role="group" aria-label="JPEG quality">
+              <button type="button" class="opt-btn" data-val="0.75" aria-pressed="false">Good (75%)</button>
+              <button type="button" class="opt-btn sel" data-val="0.92" aria-pressed="true">High (92%)</button>
+              <button type="button" class="opt-btn" data-val="1.0" aria-pressed="false">Max (100%)</button>
+            </div>
+          </div>
+          <div class="group">
+            <div class="group-label">PDF files to convert</div>
+            <div class="dropzone upload-zone" id="jpeg-zone" role="button" tabindex="0" aria-label="Select PDF files to convert to JPG">
+              <span class="dz-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg></span>
+              <span class="dz-title">Drop PDF files to convert</span>
+              <span class="dz-hint">Each page becomes a separate JPG</span>
+              <input type="file" accept=".pdf" multiple id="jpeg-input" hidden>
+            </div>
+            <div class="file-list" id="jpeg-files"></div>
+          </div>
         </div>
-      </div>
-      <div class="section-label">PDF Files to Convert</div>
-      <div class="upload-zone" id="jpeg-zone">
-        <div class="uz-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <div class="card-foot action-row">
+          <button class="btn btn-primary" id="jpeg-btn" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg>Convert to JPG</button>
+          <button class="btn btn-secondary" id="jpeg-clear" style="display:none">Clear</button>
         </div>
-        <div class="uz-label">Drop PDF files to convert</div>
-        <div class="uz-sub">Each page becomes a separate JPG</div>
-        <input type="file" accept=".pdf" multiple id="jpeg-input">
-      </div>
-      <div class="file-list" id="jpeg-files"></div>
-      <div class="action-row">
-        <button class="action-btn primary" id="jpeg-btn" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          Convert to JPG
-        </button>
-        <button class="action-btn" id="jpeg-clear" style="display:none">Clear</button>
       </div>
       <div class="status-wrap" id="jpeg-status"></div>
-    </div>
+    </section>
+
     <!-- ── SELECTIVE MERGE ── -->
-    <div class="page" id="page-smerge">
-      <div class="page-header">
-        <h2>Selective Merge</h2>
-        <p>Upload PDFs, define a page range or individual pages for each file, then merge only the selected pages into one document.</p>
+    <section class="page" id="page-smerge">
+      <div class="page-head">
+        <h1>Selective Merge</h1>
+        <p class="lead">Upload PDFs, define a page range or individual pages for each file, then merge only the selected pages into one document.</p>
+        <div class="alert alert-info" role="note"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div>Enter pages as a range (<strong>1-3</strong>), individual pages (<strong>1,3,5</strong>), or a mix (<strong>1-3,5,7-9</strong>). Leave blank to include all pages. Pages are added in file order.</div></div>
       </div>
-      <div class="info-note">
-        Enter pages as a range (<strong>1-3</strong>), individual pages (<strong>1,3,5</strong>), or a mix (<strong>1-3,5,7-9</strong>). Leave blank to include all pages. Pages are added in file order.
-      </div>
-      <div class="section-label">PDF Files</div>
-      <div class="upload-zone" id="smerge-zone">
-        <div class="uz-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <div class="card">
+        <div class="card-body">
+          <div class="group">
+            <div class="group-label">PDF files</div>
+            <div class="dropzone upload-zone" id="smerge-zone" role="button" tabindex="0" aria-label="Select PDF files for selective merge">
+              <span class="dz-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <span class="dz-title">Drop PDF files here or click to browse</span>
+              <span class="dz-hint">Each file gets its own page selection</span>
+              <input type="file" accept=".pdf" multiple id="smerge-input" hidden>
+            </div>
+            <div class="smerge-blocks" id="smerge-blocks"></div>
+          </div>
         </div>
-        <div class="uz-label">Drop PDF files here or click to browse</div>
-        <div class="uz-sub">Each file gets its own page selection</div>
-        <input type="file" accept=".pdf" multiple id="smerge-input">
-      </div>
-      <div id="smerge-blocks"></div>
-      <div class="action-row" style="margin-top:4px">
-        <button class="action-btn primary" id="smerge-btn" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M17.5 17.5h.01M14 17.5h3.5v-3.5"/></svg>
-          Merge Selected Pages
-        </button>
-        <button class="action-btn" id="smerge-clear" style="display:none">Clear</button>
+        <div class="card-foot action-row">
+          <button class="btn btn-primary" id="smerge-btn" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Merge selected pages</button>
+          <button class="btn btn-secondary" id="smerge-clear" style="display:none">Clear</button>
+        </div>
       </div>
       <div class="status-wrap" id="smerge-status"></div>
-    </div>
+    </section>
+
     <!-- ── COMPRESS ── -->
-    <div class="page" id="page-compress">
-      <div class="page-header">
-        <h2>Compress PDF</h2>
-        <p>Reduce PDF file size by re-rendering pages at a lower resolution. Choose a quality preset to balance file size against visual fidelity.</p>
+    <section class="page" id="page-compress">
+      <div class="page-head">
+        <h1>Compress PDF</h1>
+        <p class="lead">Reduce PDF file size by re-rendering pages at a lower resolution. Choose a quality preset to balance file size against visual fidelity.</p>
+        <div class="alert alert-info" role="note"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div>Pages are re-rendered via PDF.js and re-embedded as compressed images. Text-only PDFs may not shrink significantly — this works best on PDFs containing images or scans.</div></div>
       </div>
-
-      <div class="section-label">Compression Quality</div>
-      <div class="quality-cards" id="compress-quality-cards">
-        <div class="quality-card" data-mode="screen">
-          <div class="qc-icon">📱</div>
-          <div class="qc-label">Screen</div>
-          <div class="qc-desc">Smallest file. Good for email &amp; web sharing.</div>
-          <div class="qc-ratio">~72 DPI · JPEG 40%</div>
+      <div class="card">
+        <div class="card-body">
+          <div class="field opt-field">
+            <span>Compression quality</span>
+            <div class="quality-cards" id="compress-quality-cards" role="group" aria-label="Compression quality">
+              <button type="button" class="quality-card" data-mode="screen" aria-pressed="false">
+                <span class="qc-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+                <span class="qc-label">Screen</span>
+                <span class="qc-desc">Smallest file. Good for email &amp; web sharing.</span>
+                <span class="qc-ratio">~72 DPI · JPEG 40%</span>
+              </button>
+              <button type="button" class="quality-card sel" data-mode="ebook" aria-pressed="true">
+                <span class="qc-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+                <span class="qc-label">eBook</span>
+                <span class="qc-desc">Balanced. Readable on screen, much smaller.</span>
+                <span class="qc-ratio">~96 DPI · JPEG 60%</span>
+              </button>
+              <button type="button" class="quality-card" data-mode="printer" aria-pressed="false">
+                <span class="qc-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>
+                <span class="qc-label">Printer</span>
+                <span class="qc-desc">Good print quality with moderate compression.</span>
+                <span class="qc-ratio">~150 DPI · JPEG 80%</span>
+              </button>
+              <button type="button" class="quality-card" data-mode="prepress" aria-pressed="false">
+                <span class="qc-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg></span>
+                <span class="qc-label">Prepress</span>
+                <span class="qc-desc">Near-lossless. Light compression, highest quality.</span>
+                <span class="qc-ratio">~200 DPI · JPEG 92%</span>
+              </button>
+            </div>
+          </div>
+          <div class="group">
+            <div class="group-label">PDF files to compress</div>
+            <div class="dropzone upload-zone" id="compress-zone" role="button" tabindex="0" aria-label="Select PDF files to compress">
+              <span class="dz-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <span class="dz-title">Drop PDF files here or click to browse</span>
+              <span class="dz-hint">Multiple files supported — each compressed separately</span>
+              <input type="file" accept=".pdf" multiple id="compress-input" hidden>
+            </div>
+            <div class="file-list" id="compress-files"></div>
+          </div>
         </div>
-        <div class="quality-card sel" data-mode="ebook">
-          <div class="qc-icon">📖</div>
-          <div class="qc-label">eBook</div>
-          <div class="qc-desc">Balanced. Readable on screen, much smaller.</div>
-          <div class="qc-ratio">~96 DPI · JPEG 60%</div>
+        <div class="card-foot action-row">
+          <button class="btn btn-primary" id="compress-btn" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>Compress PDFs</button>
+          <button class="btn btn-secondary" id="compress-clear" style="display:none">Clear</button>
         </div>
-        <div class="quality-card" data-mode="printer">
-          <div class="qc-icon">🖨️</div>
-          <div class="qc-label">Printer</div>
-          <div class="qc-desc">Good print quality with moderate compression.</div>
-          <div class="qc-ratio">~150 DPI · JPEG 80%</div>
-        </div>
-        <div class="quality-card" data-mode="prepress">
-          <div class="qc-icon">🎨</div>
-          <div class="qc-label">Prepress</div>
-          <div class="qc-desc">Near-lossless. Light compression, highest quality.</div>
-          <div class="qc-ratio">~200 DPI · JPEG 92%</div>
-        </div>
-      </div>
-
-      <div class="info-note">
-        Pages are re-rendered via PDF.js and re-embedded as compressed images. Text-only PDFs may not shrink significantly — this works best on PDFs containing images or scans.
-      </div>
-
-      <div class="section-label">PDF Files to Compress</div>
-      <div class="upload-zone" id="compress-zone">
-        <div class="uz-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        </div>
-        <div class="uz-label">Drop PDF files here or click to browse</div>
-        <div class="uz-sub">Multiple files supported — each compressed separately</div>
-        <input type="file" accept=".pdf" multiple id="compress-input">
-      </div>
-      <div class="file-list" id="compress-files"></div>
-      <div class="action-row">
-        <button class="action-btn primary" id="compress-btn" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="15"/></svg>
-          Compress PDFs
-        </button>
-        <button class="action-btn" id="compress-clear" style="display:none">Clear</button>
       </div>
       <div class="status-wrap" id="compress-status"></div>
-    </div>
+    </section>
 
-  <footer class="pp-credit">Built by <a href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener" class="pp-li">Dr. Prashant Patel</a></footer>
-
+  </main>
 </div>
+
+<footer class="site-footer">
+  <div class="inner">
+    <span class="privacy"><svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Runs entirely in your browser · No data leaves your device</span>
+    <span class="links"><a href="index.html">All tools</a><span>Built by <a href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener" class="pp-li">Dr. Prashant Patel</a></span></span>
+  </div>
+</footer>
 
 <script>
 const PDFLib = window.PDFLib;
@@ -1003,22 +718,25 @@ function baseName(f) { return f.name.replace(/\.pdf$/i, ''); }
 async function readFile(f) { return new Uint8Array(await f.arrayBuffer()); }
 
 function pdfIcon() {
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+  return `<svg class="icon fi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
 }
 function imgIcon() {
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
 }
 function xIcon() {
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 }
 function dlIcon() {
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+}
+function alertIcon() {
+  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
 }
 function checkIcon() {
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
 }
 function warnIcon() {
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
 }
 
 /* ── File list rendering ── */
@@ -1031,6 +749,8 @@ function renderFiles(listId, files, onRemove) {
     d.innerHTML = pdfIcon() + `<span class="fname">${f.name}</span><span class="fsize">${fmt(f.size)}</span>`;
     const rm = document.createElement('button');
     rm.className = 'rm';
+    rm.type = 'button';
+    rm.title = 'Remove';
     rm.setAttribute('aria-label', 'Remove ' + f.name);
     rm.innerHTML = xIcon();
     rm.onclick = () => { onRemove(i); };
@@ -1046,9 +766,10 @@ function setupZone(zoneId, inputId, multi, onFiles) {
   if (multi) inp.setAttribute('multiple', '');
   zone.addEventListener('click', () => inp.click());
   inp.addEventListener('change', e => { handle(e.target.files); inp.value = ''; });
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragging'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('dragging'));
-  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragging'); handle(e.dataTransfer.files); });
+  zone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inp.click(); } });
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('is-dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('is-dragover'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('is-dragover'); handle(e.dataTransfer.files); });
   function handle(files) {
     onFiles(Array.from(files).filter(f => f.name.toLowerCase().endsWith('.pdf')));
   }
@@ -1059,10 +780,10 @@ function setStatus(id, html) {
   document.getElementById(id).innerHTML = html;
 }
 function processingStatus(id, msg) {
-  setStatus(id, `<div class="status processing">${warnIcon()}<span>${msg}</span></div><div class="progress-bar"><div class="progress-fill"></div></div>`);
+  setStatus(id, `<div class="alert alert-info status processing" role="status">${warnIcon()}<span>${msg}</span></div><div class="progress-bar"><div class="progress-fill"></div></div>`);
 }
 function errorStatus(id, msg) {
-  setStatus(id, `<div class="status error">${warnIcon()}<span>${msg}</span></div>`);
+  setStatus(id, `<div class="alert alert-danger status error" role="alert">${alertIcon()}<span>${msg}</span></div>`);
 }
 function clearStatus(id) { setStatus(id, ''); }
 
@@ -1081,8 +802,8 @@ function makeResultBox(statusId, results, useImg) {
     row.className = 'result-file';
     row.innerHTML = (useImg ? imgIcon() : pdfIcon()) + `<span class="rf-name">${name}</span>`;
     const dl = document.createElement('button');
-    dl.className = 'dl-btn';
-    dl.innerHTML = dlIcon() + ' Download';
+    dl.className = 'btn btn-sm btn-primary dl-btn'; dl.type = 'button'; dl.setAttribute('aria-label', 'Download ' + name);
+    dl.innerHTML = dlIcon() + 'Download';
     dl.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = name; a.click(); };
     row.appendChild(dl);
     list.appendChild(row);
@@ -1095,7 +816,7 @@ function showClear(btnId) { document.getElementById(btnId).style.display = ''; }
    MERGE
 ══════════════════════════════ */
 function gripIcon() {
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/></svg>`;
+  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></svg>`;
 }
 
 let mergeDragSrc = null;
@@ -1113,6 +834,8 @@ function renderMergeFiles() {
     const handle = document.createElement('span');
     handle.className = 'drag-handle';
     handle.title = 'Drag to reorder';
+    handle.setAttribute('role', 'img');
+    handle.setAttribute('aria-label', 'Drag to reorder');
     handle.innerHTML = gripIcon();
     // Only initiate drag from handle
     handle.addEventListener('mousedown', () => { d.draggable = true; });
@@ -1140,6 +863,8 @@ function renderMergeFiles() {
     // Remove button
     const rm = document.createElement('button');
     rm.className = 'rm';
+    rm.type = 'button';
+    rm.title = 'Remove';
     rm.setAttribute('aria-label', 'Remove ' + f.name);
     rm.innerHTML = xIcon();
     rm.onclick = () => { state.merge.splice(i, 1); renderMergeFiles(); updateMergeBtn(); };
@@ -1216,7 +941,7 @@ setupZone('stamp-overlay-zone', 'stamp-overlay-input', false, files => {
 });
 setupZone('stamp-zone', 'stamp-input', true, files => {
   state.stamp.push(...files);
-  renderFiles('stamp-files', state.stamp, i => { state.stamp.splice(i, 1); renderFiles('stamp-files', state.stamp, arguments.callee); updateStampBtn(); });
+  renderFiles('stamp-files', state.stamp, function rm(i) { state.stamp.splice(i, 1); renderFiles('stamp-files', state.stamp, rm); updateStampBtn(); });
   updateStampBtn();
 });
 function updateStampBtn() { document.getElementById('stamp-btn').disabled = !(state.stampOverlay && state.stamp.length > 0); }
@@ -1256,7 +981,7 @@ setupZone('wm-overlay-zone', 'wm-overlay-input', false, files => {
 });
 setupZone('wm-zone', 'wm-input', true, files => {
   state.wm.push(...files);
-  renderFiles('wm-files', state.wm, i => { state.wm.splice(i, 1); renderFiles('wm-files', state.wm, arguments.callee); updateWmBtn(); });
+  renderFiles('wm-files', state.wm, function rm(i) { state.wm.splice(i, 1); renderFiles('wm-files', state.wm, rm); updateWmBtn(); });
   updateWmBtn();
 });
 function updateWmBtn() { document.getElementById('wm-btn').disabled = !(state.wmOverlay && state.wm.length > 0); }
@@ -1298,14 +1023,14 @@ document.getElementById('wm-btn').onclick = async () => {
 ══════════════════════════════ */
 document.getElementById('rotate-dir').querySelectorAll('.opt-btn').forEach(btn => {
   btn.onclick = () => {
-    document.getElementById('rotate-dir').querySelectorAll('.opt-btn').forEach(b => b.classList.remove('sel'));
-    btn.classList.add('sel');
+    document.getElementById('rotate-dir').querySelectorAll('.opt-btn').forEach(b => { b.classList.remove('sel'); b.setAttribute('aria-pressed', 'false'); });
+    btn.classList.add('sel'); btn.setAttribute('aria-pressed', 'true');
     state.rotateDir = parseInt(btn.dataset.val);
   };
 });
 setupZone('rotate-zone', 'rotate-input', true, files => {
   state.rotate.push(...files);
-  renderFiles('rotate-files', state.rotate, i => { state.rotate.splice(i, 1); renderFiles('rotate-files', state.rotate, arguments.callee); updateRotateBtn(); });
+  renderFiles('rotate-files', state.rotate, function rm(i) { state.rotate.splice(i, 1); renderFiles('rotate-files', state.rotate, rm); updateRotateBtn(); });
   updateRotateBtn();
 });
 function updateRotateBtn() { document.getElementById('rotate-btn').disabled = state.rotate.length === 0; }
@@ -1336,14 +1061,14 @@ document.getElementById('rotate-btn').onclick = async () => {
 ══════════════════════════════ */
 document.getElementById('jpeg-quality').querySelectorAll('.opt-btn').forEach(btn => {
   btn.onclick = () => {
-    document.getElementById('jpeg-quality').querySelectorAll('.opt-btn').forEach(b => b.classList.remove('sel'));
-    btn.classList.add('sel');
+    document.getElementById('jpeg-quality').querySelectorAll('.opt-btn').forEach(b => { b.classList.remove('sel'); b.setAttribute('aria-pressed', 'false'); });
+    btn.classList.add('sel'); btn.setAttribute('aria-pressed', 'true');
     state.jpegQuality = parseFloat(btn.dataset.val);
   };
 });
 setupZone('jpeg-zone', 'jpeg-input', true, files => {
   state.jpeg.push(...files);
-  renderFiles('jpeg-files', state.jpeg, i => { state.jpeg.splice(i, 1); renderFiles('jpeg-files', state.jpeg, arguments.callee); updateJpegBtn(); });
+  renderFiles('jpeg-files', state.jpeg, function rm(i) { state.jpeg.splice(i, 1); renderFiles('jpeg-files', state.jpeg, rm); updateJpegBtn(); });
   updateJpegBtn();
 });
 function updateJpegBtn() { document.getElementById('jpeg-btn').disabled = state.jpeg.length === 0; }
@@ -1433,7 +1158,7 @@ function resolvedPages(str, pageCount) {
 }
 
 function chevronIcon() {
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>`;
 }
 
 function renderSmergeBlock(entry, idx) {
@@ -1449,7 +1174,7 @@ function renderSmergeBlock(entry, idx) {
     <span class="sf-name">${entry.file.name}</span>
     <span class="sf-pages">${entry.pageCount} page${entry.pageCount !== 1 ? 's' : ''}</span>
     <span class="sf-chevron">${chevronIcon()}</span>
-    <button class="sf-rm" title="Remove" aria-label="Remove ${entry.file.name}">${xIcon()}</button>
+    <button type="button" class="sf-rm" title="Remove" aria-label="Remove ${entry.file.name}">${xIcon()}</button>
   `;
   header.querySelector('.sf-rm').onclick = e => {
     e.stopPropagation();
@@ -1472,11 +1197,12 @@ function renderSmergeBlock(entry, idx) {
 
   const lbl = document.createElement('label');
   lbl.textContent = 'Pages:';
-  lbl.style.cssText = 'font-size:12px;color:var(--text2);';
+  lbl.htmlFor = 'smerge-range-' + idx;
 
   const inp = document.createElement('input');
   inp.type = 'text';
   inp.className = 'smerge-range-input';
+  inp.id = 'smerge-range-' + idx;
   inp.placeholder = `e.g. 1-3, 5, 7-9`;
   inp.value = entry.rangeStr;
   inp.title = `Enter page numbers or ranges (1–${entry.pageCount})`;
@@ -1523,12 +1249,12 @@ function renderSmergeBlock(entry, idx) {
         if (pages.length > 20) {
           const more = document.createElement('span');
           more.className = 'smerge-pill';
-          more.style.cssText = 'background:var(--surface2);color:var(--text3);border-color:var(--border2);';
+          more.style.cssText = 'background:var(--surface-2);color:var(--text-2);border-color:var(--border-strong);';
           more.textContent = `+${pages.length - 20} more`;
           pills.appendChild(more);
         }
         total.textContent = `${pages.length} page${pages.length !== 1 ? 's' : ''} selected`;
-        total.style.color = 'var(--text2)';
+        total.style.color = 'var(--text-2)';
       }
     }
     entry.rangeStr = val;
@@ -1619,17 +1345,17 @@ const COMPRESS_MODES = {
 // Quality card selection
 document.getElementById('compress-quality-cards').querySelectorAll('.quality-card').forEach(card => {
   card.onclick = () => {
-    document.getElementById('compress-quality-cards').querySelectorAll('.quality-card').forEach(c => c.classList.remove('sel'));
-    card.classList.add('sel');
+    document.getElementById('compress-quality-cards').querySelectorAll('.quality-card').forEach(c => { c.classList.remove('sel'); c.setAttribute('aria-pressed', 'false'); });
+    card.classList.add('sel'); card.setAttribute('aria-pressed', 'true');
     state.compressMode = card.dataset.mode;
   };
 });
 
 setupZone('compress-zone', 'compress-input', true, files => {
   state.compress.push(...files);
-  renderFiles('compress-files', state.compress, i => {
+  renderFiles('compress-files', state.compress, function rm(i) {
     state.compress.splice(i, 1);
-    renderFiles('compress-files', state.compress, arguments.callee);
+    renderFiles('compress-files', state.compress, rm);
     updateCompressBtn();
   });
   updateCompressBtn();
@@ -1657,6 +1383,7 @@ document.getElementById('compress-btn').onclick = async () => {
       processingStatus('compress-status', `Compressing file ${fi + 1}/${state.compress.length}: ${f.name}`);
 
       const srcBytes = await readFile(f);
+      const srcSize = srcBytes.byteLength; // read before PDF.js transfers (detaches) the buffer
       const pdfJsDoc = await window.pdfjsLib.getDocument({ data: srcBytes }).promise;
       const outDoc = await PDFLib.PDFDocument.create();
 
@@ -1683,12 +1410,12 @@ document.getElementById('compress-btn').onclick = async () => {
       }
 
       const outBytes = await outDoc.save({ useObjectStreams: true });
-      const savedBytes = srcBytes.byteLength - outBytes.byteLength;
-      const savedPct = ((savedBytes / srcBytes.byteLength) * 100).toFixed(1);
+      const savedBytes = srcSize - outBytes.byteLength;
+      const savedPct = ((savedBytes / srcSize) * 100).toFixed(1);
       results.push({
         name: baseName(f) + '_compressed.pdf',
         blob: new Blob([outBytes], { type: 'application/pdf' }),
-        origSize: srcBytes.byteLength,
+        origSize: srcSize,
         newSize: outBytes.byteLength,
         savedPct: parseFloat(savedPct)
       });
@@ -1713,20 +1440,19 @@ document.getElementById('compress-btn').onclick = async () => {
 
       const meta = document.createElement('div');
       meta.className = 'compress-result-meta';
-      meta.style.cssText = 'width:100%;padding-left:25px;';
+      meta.style.cssText = 'width:100%;padding-left:28px;';
       const sign = savedPct >= 0 ? '-' : '+';
       const absP = Math.abs(savedPct);
       const savingColor = savedPct >= 0 ? 'var(--success)' : 'var(--danger)';
       meta.innerHTML = `
         <span class="compress-stat"><span class="cs-label">Before: </span><span class="cs-val">${fmt(origSize)}</span></span>
         <span class="compress-stat"><span class="cs-label">After: </span><span class="cs-val">${fmt(newSize)}</span></span>
-        <span class="compress-stat"><span class="cs-label">Saved: </span><span class="cs-val" style="color:${savingColor}">${sign}${absP}%</span></span>
+        <span class="compress-stat"><span class="cs-label">Size change: </span><span class="cs-val" style="color:${savingColor}">${sign}${absP}%</span></span>
       `;
 
       const dl = document.createElement('button');
-      dl.className = 'dl-btn';
-      dl.style.marginLeft = 'auto';
-      dl.innerHTML = dlIcon() + ' Download';
+      dl.className = 'btn btn-sm btn-primary dl-btn'; dl.type = 'button'; dl.setAttribute('aria-label', 'Download ' + name);
+      dl.innerHTML = dlIcon() + 'Download';
       dl.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = name; a.click(); };
 
       row.appendChild(dl);
@@ -1742,48 +1468,22 @@ document.getElementById('compress-btn').onclick = async () => {
 /* ══════════════════════════════
    THEME
 ══════════════════════════════ */
-const html = document.documentElement;
-const sysDark = window.matchMedia('(prefers-color-scheme: dark)');
-
-function applyTheme(pref) {
-  if (pref === 'auto') {
-    html.dataset.theme = sysDark.matches ? 'dark' : 'light';
-  } else {
-    html.dataset.theme = pref;
-  }
-  document.querySelectorAll('#theme-toggle .theme-btn, #theme-toggle-mobile .theme-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.theme === pref);
-  });
-  localStorage.setItem('modpdf-theme', pref);
+const THEME_KEY='modpdf-theme';
+function setTheme(t){
+  if(!['auto','light','dark'].includes(t))t='light';
+  document.documentElement.setAttribute('data-theme',t);
+  document.querySelectorAll('[data-theme-set]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.themeSet===t)));
+  try{localStorage.setItem(THEME_KEY,t)}catch(e){}
 }
-
-document.getElementById('theme-toggle').querySelectorAll('.theme-btn').forEach(btn => {
-  btn.onclick = () => applyTheme(btn.dataset.theme);
-});
-document.getElementById('theme-toggle-mobile').querySelectorAll('.theme-btn').forEach(btn => {
-  btn.onclick = () => applyTheme(btn.dataset.theme);
-});
-
-// Show/hide mobile theme toggle
-function syncMobileToggle() {
-  const isMobile = window.innerWidth <= 720;
-  document.getElementById('theme-toggle-mobile').style.display = isMobile ? 'flex' : 'none';
-}
-syncMobileToggle();
-window.addEventListener('resize', syncMobileToggle);
-
-sysDark.addEventListener('change', () => {
-  if (localStorage.getItem('modpdf-theme') === 'auto') applyTheme('auto');
-});
-
-// Init — default to auto, respecting saved preference
-applyTheme(localStorage.getItem('modpdf-theme') || 'auto');
+document.querySelectorAll('[data-theme-set]').forEach(b=>b.addEventListener('click',()=>setTheme(b.dataset.themeSet)));
+(function(){let s='light';try{s=localStorage.getItem(THEME_KEY)||'light'}catch(e){}setTheme(s)})();
 
 document.getElementById('nav').querySelectorAll('.nav-item').forEach(item => {
   item.onclick = () => {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); n.removeAttribute('aria-current'); });
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    item.classList.add('active');
+    item.classList.add('active'); item.setAttribute('aria-current', 'page');
+    item.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     document.getElementById('page-' + item.dataset.page).classList.add('active');
   };
 });

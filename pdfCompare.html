@@ -1,373 +1,471 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Doc Compare — PDF & Word, Multi-Column Aware</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&display=swap');
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-  /* ── Theme tokens ── */
-  :root,[data-theme="dark"]{
-    --bg:#0b0b10;--surface:#13131a;--card:#1a1a24;--border:#2c2c3e;
-    --accent:#7ef0a0;--accent-dim:#7ef0a012;--text:#e8e8f0;--muted:#5a5a78;
-    --added-bg:#0a2618;--added:#4ade80;--removed-bg:#26080a;--removed:#f87171;
-    --eq-color:#5a5a78;--shadow:0 2px 12px #0006;
-    --glow1:#7ef0a008;--glow2:#6060f008;
-  }
-  [data-theme="light"]{
-    --bg:#f4f4f8;--surface:#ffffff;--card:#ffffff;--border:#d4d4e0;
-    --accent:#1a8c40;--accent-dim:#1a8c4012;--text:#1a1a2e;--muted:#7a7a96;
-    --added-bg:#e8fbef;--added:#16a34a;--removed-bg:#fef2f2;--removed:#dc2626;
-    --eq-color:#9090b0;--shadow:0 2px 12px #0001;
-    --glow1:#1a8c4006;--glow2:#4040d006;
-  }
-
-  /* OS preference fallback when data-theme="auto" */
+/* ── drprash/tools · design system base (Swiss) ───────────────────────────── */
+:root,[data-theme="light"]{
+  color-scheme:light;
+  --font-sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --bg:#f8fafc;--surface:#ffffff;--surface-2:#f1f5f9;--surface-3:#e2e8f0;
+  --border:#e2e8f0;--border-strong:#cbd5e1;
+  --text:#0f172a;--text-2:#475569;--text-3:#64748b;
+  --accent:#0f766e;--accent-hover:#115e59;--accent-soft:#f0fdfa;--accent-border:#99f6e4;--on-accent:#ffffff;
+  --success:#15803d;--success-soft:#f0fdf4;--success-border:#bbf7d0;
+  --warning:#b45309;--warning-soft:#fffbeb;--warning-border:#fde68a;
+  --danger:#b91c1c;--danger-soft:#fef2f2;--danger-border:#fecaca;
+  --info:#1d4ed8;--info-soft:#eff6ff;--info-border:#bfdbfe;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
+  --shadow-lg:0 10px 30px -10px rgba(15,23,42,.18);
+  --ring:0 0 0 2px var(--surface),0 0 0 4px var(--accent);
+  --r-sm:6px;--r:8px;--r-lg:12px;
+  --appbar-h:56px;
+}
+[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0b1220;--surface:#111a2e;--surface-2:#172036;--surface-3:#1f2a44;
+  --border:#243049;--border-strong:#334155;
+  --text:#e2e8f0;--text-2:#a3b0c2;--text-3:#8391a7;
+  --accent:#2dd4bf;--accent-hover:#5eead4;--accent-soft:rgba(45,212,191,.12);--accent-border:rgba(45,212,191,.35);--on-accent:#042f2e;
+  --success:#4ade80;--success-soft:rgba(74,222,128,.10);--success-border:rgba(74,222,128,.30);
+  --warning:#fbbf24;--warning-soft:rgba(251,191,36,.10);--warning-border:rgba(251,191,36,.30);
+  --danger:#f87171;--danger-soft:rgba(248,113,113,.10);--danger-border:rgba(248,113,113,.30);
+  --info:#60a5fa;--info-soft:rgba(96,165,250,.10);--info-border:rgba(96,165,250,.30);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+  --shadow:0 1px 3px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25);
+  --shadow-lg:0 12px 32px -12px rgba(0,0,0,.6);
+}
+@media (prefers-color-scheme:dark){
   [data-theme="auto"]{
-    --bg:#f4f4f8;--surface:#ffffff;--card:#ffffff;--border:#d4d4e0;
-    --accent:#1a8c40;--accent-dim:#1a8c4012;--text:#1a1a2e;--muted:#7a7a96;
-    --added-bg:#e8fbef;--added:#16a34a;--removed-bg:#fef2f2;--removed:#dc2626;
-    --eq-color:#9090b0;--shadow:0 2px 12px #0001;
-    --glow1:#1a8c4006;--glow2:#4040d006;
+    color-scheme:dark;
+    --bg:#0b1220;--surface:#111a2e;--surface-2:#172036;--surface-3:#1f2a44;
+    --border:#243049;--border-strong:#334155;
+    --text:#e2e8f0;--text-2:#a3b0c2;--text-3:#8391a7;
+    --accent:#2dd4bf;--accent-hover:#5eead4;--accent-soft:rgba(45,212,191,.12);--accent-border:rgba(45,212,191,.35);--on-accent:#042f2e;
+    --success:#4ade80;--success-soft:rgba(74,222,128,.10);--success-border:rgba(74,222,128,.30);
+    --warning:#fbbf24;--warning-soft:rgba(251,191,36,.10);--warning-border:rgba(251,191,36,.30);
+    --danger:#f87171;--danger-soft:rgba(248,113,113,.10);--danger-border:rgba(248,113,113,.30);
+    --info:#60a5fa;--info-soft:rgba(96,165,250,.10);--info-border:rgba(96,165,250,.30);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+    --shadow:0 1px 3px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25);
+    --shadow-lg:0 12px 32px -12px rgba(0,0,0,.6);
   }
-  @media(prefers-color-scheme:dark){
-    [data-theme="auto"]{
-      --bg:#0b0b10;--surface:#13131a;--card:#1a1a24;--border:#2c2c3e;
-      --accent:#7ef0a0;--accent-dim:#7ef0a012;--text:#e8e8f0;--muted:#5a5a78;
-      --added-bg:#0a2618;--added:#4ade80;--removed-bg:#26080a;--removed:#f87171;
-      --eq-color:#5a5a78;--shadow:0 2px 12px #0006;
-      --glow1:#7ef0a008;--glow2:#6060f008;
-    }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.55 var(--font-sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100vh;display:flex;flex-direction:column}
+h1,h2,h3,h4{margin:0;color:var(--text);font-weight:600;letter-spacing:-.01em}
+h1{font-size:28px;line-height:1.2;letter-spacing:-.02em}
+h2{font-size:18px;line-height:1.35}
+h3{font-size:15px;line-height:1.4}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:2px}
+a:hover{color:var(--accent-hover)}
+code,kbd,.mono{font-family:var(--font-mono);font-size:.92em}
+code{background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+:focus-visible{outline:none;box-shadow:var(--ring);border-radius:var(--r-sm)}
+::selection{background:var(--accent-soft)}
+.icon{width:18px;height:18px;flex-shrink:0;display:inline-block;vertical-align:middle}
+.icon-sm{width:16px;height:16px}.icon-lg{width:24px;height:24px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.muted{color:var(--text-2)}.subtle{color:var(--text-3)}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
+
+/* ── App bar ── */
+.appbar{position:sticky;top:0;z-index:50;height:var(--appbar-h);display:flex;align-items:center;gap:12px;
+  padding:0 24px;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:saturate(1.4) blur(8px);
+  -webkit-backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--border)}
+.brand{display:inline-flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:600;font-size:15px;white-space:nowrap}
+.brand:hover{color:var(--text)}
+.brand-mark{width:28px;height:28px;border-radius:7px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;flex-shrink:0}
+.brand-mark svg{width:16px;height:16px}
+.brand-sub{color:var(--text-3);font-weight:500}
+.crumb-sep{color:var(--border-strong);font-weight:400}
+.crumb{color:var(--text);font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar .spacer{flex:1}
+.appbar-nav{display:flex;gap:4px}
+.appbar-nav a{color:var(--text-2);text-decoration:none;font-size:14px;font-weight:500;padding:8px 10px;border-radius:var(--r-sm)}
+.appbar-nav a:hover{color:var(--text);background:var(--surface-2)}
+
+/* ── Theme toggle ── */
+.theme-toggle{display:inline-flex;gap:2px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r)}
+.theme-toggle button{width:32px;height:28px;display:grid;place-items:center;border:0;border-radius:6px;background:transparent;
+  color:var(--text-3);cursor:pointer;transition:color .15s,background .15s}
+.theme-toggle button:hover{color:var(--text)}
+.theme-toggle button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+.theme-toggle svg{width:16px;height:16px}
+
+/* ── Layout ── */
+.container{width:100%;max-width:1120px;margin:0 auto;padding:32px 24px 48px;flex:1}
+.container.wide{max-width:1360px}
+.page-head{margin-bottom:24px;display:flex;flex-direction:column;gap:8px}
+.page-head .lead{color:var(--text-2);font-size:15px;max-width:72ch}
+.page-head .alert{margin-top:8px}
+.section{margin-bottom:24px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+
+/* ── Card ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-desc{color:var(--text-2);font-size:13px;margin-top:2px}
+.card-body{padding:20px}
+.card-foot{padding:14px 20px;border-top:1px solid var(--border);background:var(--surface-2);border-radius:0 0 var(--r-lg) var(--r-lg)}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;
+  border-radius:var(--r);border:1px solid transparent;font:500 14px/1 var(--font-sans);cursor:pointer;white-space:nowrap;
+  text-decoration:none;transition:background .15s,border-color .15s,color .15s,box-shadow .15s;user-select:none}
+.btn .icon{width:16px;height:16px}
+.btn-primary{background:var(--accent);color:var(--on-accent)}
+.btn-primary:hover{background:var(--accent-hover);color:var(--on-accent)}
+.btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
+.btn-secondary:hover{background:var(--surface-2);color:var(--text)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-ghost:hover{background:var(--surface-2);color:var(--text)}
+.btn-danger{background:#b91c1c;color:#fff}
+.btn-danger:hover{filter:brightness(.95)}
+.btn-sm{min-height:32px;padding:0 12px;font-size:13px}
+.btn-block{width:100%}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed;box-shadow:none}
+.btn-primary:disabled{background:var(--surface-3);color:var(--text-3);opacity:1}
+
+/* ── Segmented control / tabs ── */
+.seg{display:inline-flex;gap:2px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);flex-wrap:wrap}
+.seg button{min-height:32px;padding:0 12px;border:0;border-radius:6px;background:transparent;color:var(--text-2);
+  font:500 13px/1 var(--font-sans);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.seg button:hover{color:var(--text)}
+.seg button.active,.seg button[aria-pressed="true"],.seg button[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+
+/* ── Forms ── */
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:var(--text)}
+.help{font-size:13px;color:var(--text-3);font-weight:400}
+.input,.select,.textarea{width:100%;min-height:40px;padding:8px 12px;background:var(--surface);color:var(--text);
+  border:1px solid var(--border-strong);border-radius:var(--r);font:400 14px/1.4 var(--font-sans);transition:border-color .15s,box-shadow .15s}
+.textarea{min-height:120px;resize:vertical;line-height:1.55}
+.input::placeholder,.textarea::placeholder{color:var(--text-3)}
+.input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--text);cursor:pointer;min-height:32px}
+.check input{width:16px;height:16px;accent-color:var(--accent);margin:0;cursor:pointer}
+
+/* ── Drop zone ── */
+.dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;
+  min-height:150px;padding:24px;background:var(--surface);border:1.5px dashed var(--border-strong);border-radius:var(--r-lg);
+  cursor:pointer;transition:border-color .15s,background .15s}
+.dropzone:hover,.dropzone.is-dragover{border-color:var(--accent);background:var(--accent-soft)}
+.dropzone.has-file{border-style:solid;border-color:var(--accent-border);background:var(--accent-soft)}
+.dz-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);color:var(--text-2);margin-bottom:4px}
+.dz-icon svg{width:20px;height:20px}
+.dropzone.has-file .dz-icon{background:var(--accent);color:var(--on-accent)}
+.dz-title{font-size:14px;font-weight:600;color:var(--text)}
+.dz-hint{font-size:13px;color:var(--text-2)}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:999px;font:500 12px/1 var(--font-sans);
+  white-space:nowrap;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2)}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge-success{background:var(--success-soft);border-color:var(--success-border);color:var(--success)}
+.badge-warning{background:var(--warning-soft);border-color:var(--warning-border);color:var(--warning)}
+.badge-danger{background:var(--danger-soft);border-color:var(--danger-border);color:var(--danger)}
+.badge-info{background:var(--info-soft);border-color:var(--info-border);color:var(--info)}
+.badge-accent{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent)}
+
+/* ── Alerts ── */
+.alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text);font-size:13.5px;line-height:1.55}
+.alert .icon{margin-top:1px}
+.alert strong{font-weight:600}
+.alert-info{background:var(--info-soft);border-color:var(--info-border)}.alert-info .icon{color:var(--info)}
+.alert-warning{background:var(--warning-soft);border-color:var(--warning-border)}.alert-warning .icon{color:var(--warning)}
+.alert-danger{background:var(--danger-soft);border-color:var(--danger-border)}.alert-danger .icon{color:var(--danger)}
+.alert-success{background:var(--success-soft);border-color:var(--success-border)}.alert-success .icon{color:var(--success)}
+
+/* ── Tables ── */
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface)}
+table.table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.table th{position:sticky;top:0;z-index:1;background:var(--surface-2);color:var(--text-2);font-weight:600;font-size:12px;
+  text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap}
+.table tr:last-child td{border-bottom:0}
+.table tbody tr:hover td,.table tr:hover td{background:var(--surface-2)}
+.table .num,.table td.mono{font-family:var(--font-mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px}
+.stat-value{display:block;font-size:24px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat-label{display:block;font-size:13px;color:var(--text-2);margin-top:2px}
+
+/* ── Spinner ── */
+.spinner{width:24px;height:24px;border:2.5px solid var(--border-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Footer ── */
+.site-footer{border-top:1px solid var(--border);background:var(--surface);margin-top:auto}
+.site-footer .inner{max-width:1120px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;font-size:13px;color:var(--text-3)}
+.site-footer a{color:var(--text-2);text-decoration:none;font-weight:500}
+.site-footer a:hover{color:var(--accent)}
+.site-footer .privacy{display:inline-flex;align-items:center;gap:6px}
+.site-footer .links{display:flex;gap:16px;align-items:center}
+
+/* ── Responsive ── */
+@media (max-width:1024px){.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:768px){
+  .appbar{padding:0 16px;gap:8px}
+  .brand-sub,.appbar .badge,.appbar-nav{display:none}
+  .container{padding:24px 16px 40px}
+  h1{font-size:24px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .btn{min-height:44px}
+  .seg button{min-height:40px}
+  .card-head,.card-body{padding:16px}
+  .site-footer .inner{padding:18px 16px;flex-direction:column;align-items:flex-start}
+}
+@media (max-width:480px){
+  .crumb-sep,.brand .brand-name{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* ── Page: Doc Compare ── */
+:root,[data-theme="light"]{
+  --diff-add-bg:#dcfce7;--diff-add-text:#166534;--diff-add-sign:#15803d;
+  --diff-rem-bg:#fee2e2;--diff-rem-text:#991b1b;--diff-rem-sign:#b91c1c;
+  --diff-empty-bg:var(--surface-2);
+}
+[data-theme="dark"]{
+  --diff-add-bg:rgba(74,222,128,.13);--diff-add-text:#86efac;--diff-add-sign:#4ade80;
+  --diff-rem-bg:rgba(248,113,113,.14);--diff-rem-text:#fca5a5;--diff-rem-sign:#f87171;
+  --diff-empty-bg:rgba(148,163,184,.06);
+}
+@media (prefers-color-scheme:dark){
+  [data-theme="auto"]{
+    --diff-add-bg:rgba(74,222,128,.13);--diff-add-text:#86efac;--diff-add-sign:#4ade80;
+    --diff-rem-bg:rgba(248,113,113,.14);--diff-rem-text:#fca5a5;--diff-rem-sign:#f87171;
+    --diff-empty-bg:rgba(148,163,184,.06);
   }
+}
 
-  body{
-    background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;
-    min-height:100vh;padding:40px 24px 80px;transition:background .25s,color .25s;
-    overflow-x:hidden;
-  }
-  body::before{
-    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-    background-image:radial-gradient(circle at 20% 20%,var(--glow1) 0%,transparent 50%),
-                     radial-gradient(circle at 80% 80%,var(--glow2) 0%,transparent 50%);
-  }
-  .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto}
+/* Drop zones */
+.drop-row{margin-bottom:16px}
+.dropzone.drag-over{border-color:var(--accent);background:var(--accent-soft)}
+.dropzone .drop-text{max-width:100%;overflow-wrap:anywhere}
+.dropzone.has-file .drop-text{color:var(--text);font-weight:500}
+.file-meta{font-family:var(--font-mono);font-size:12px;color:var(--text-2);min-height:1em}
+.file-meta:empty{display:none}
 
-  /* ── Theme toggle ── */
-  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-  .theme-toggle{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:3px;box-shadow:var(--shadow)}
-  .theme-btn{
-    display:flex;align-items:center;gap:5px;padding:5px 10px;border:none;border-radius:5px;
-    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
-    cursor:pointer;background:transparent;color:var(--muted);transition:all .18s;white-space:nowrap;
-  }
-  .theme-btn:hover{color:var(--text)}
-  .theme-btn.active{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)}
-  .theme-btn svg{width:12px;height:12px;flex-shrink:0}
+/* Options */
+.opts{display:flex;flex-wrap:wrap;gap:20px 32px;align-items:flex-start}
+.opt-field{display:flex;flex-direction:column;gap:8px;min-width:0}
+.opt-label{font-size:13px;font-weight:500;color:var(--text)}
+#colModeRow{transition:opacity .15s}
+.col-desc{font-size:13px;color:var(--text-2)}
+.col-note{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--warning);margin-top:12px}
 
-  /* ── Header ── */
-  .tag{display:inline-flex;align-items:center;gap:8px;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;padding:5px 12px;border-radius:4px;margin-bottom:16px}
-  h1{font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-2px;margin-bottom:8px}
-  h1 span{color:var(--accent)}
-  .subtitle{color:var(--muted);font-size:13px;margin-bottom:28px;line-height:1.6}
-  .badge{display:inline-flex;align-items:center;gap:6px;background:var(--added-bg);border:1px solid var(--added);color:var(--added);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;padding:4px 10px;border-radius:20px;margin-left:8px;vertical-align:middle}
+/* Actions */
+.actions{display:flex;gap:12px;margin:20px 0 24px}
+.actions #compareBtn{flex:1 1 auto;width:auto}
 
-  /* ── Drop zones ── */
-  .drop-row{display:grid;grid-template-columns:1fr 36px 1fr;align-items:center;margin-bottom:20px}
-  .vs{text-align:center;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px}
-  .drop-zone{
-    background:var(--card);border:2px dashed var(--border);border-radius:14px;
-    padding:26px 18px;text-align:center;cursor:pointer;transition:all .2s;
-    min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
-    box-shadow:var(--shadow);
-  }
-  .drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:var(--accent-dim)}
-  .drop-zone.has-file{border-style:solid;border-color:#6060f0;background:var(--surface)}
-  .drop-icon{font-size:32px}
-  .drop-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--accent)}
-  .drop-text{font-size:13px;color:var(--muted)}
-  .drop-zone.has-file .drop-text{color:var(--text);font-weight:700;font-size:13px}
-  .file-meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
+/* Loader / error */
+.loader{display:none;flex-direction:column;align-items:center;gap:8px;padding:32px 16px;text-align:center}
+.loader.active{display:flex}
+.loader-text{font-size:14px;font-weight:500;color:var(--text)}
+.loader-stage{font-size:13px;color:var(--text-2)}
+.error-box{display:none;margin-bottom:20px}
+.error-box.active{display:flex}
+.error-box .err-msg{overflow-wrap:anywhere}
 
-  /* ── Options rows ── */
-  .options-row,.col-mode-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-  .col-mode-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow)}
-  .col-mode-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);margin-right:4px}
-  .col-desc{font-size:12px;color:var(--muted);margin-left:4px;font-style:italic}
-  .opt-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;white-space:nowrap}
-  .opt-group{display:flex;gap:6px;flex-wrap:wrap}
-  .opt-btn{
-    background:var(--card);border:1px solid var(--border);color:var(--muted);
-    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;
-    padding:6px 12px;border-radius:6px;cursor:pointer;transition:all .15s;
-  }
-  .opt-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
-  .opt-btn:hover:not(.active){border-color:var(--muted);color:var(--text)}
+/* Results */
+#results{scroll-margin-top:calc(var(--appbar-h) + 16px)}
+.extract-info{display:flex;flex-wrap:wrap;gap:8px 24px;padding:12px 16px;margin-bottom:16px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text-2)}
+.extract-info span{color:var(--text);font-family:var(--font-mono);font-size:12.5px}
+.stats-wrap{margin-bottom:24px}
+.num-add{color:var(--success)}.num-rem{color:var(--danger)}.num-tot{color:var(--text)}.num-sim{color:var(--accent)}
+.sec-label{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.identical-banner{margin-bottom:24px;padding:16px 18px}
+.identical-banner .icon{width:20px;height:20px}
+.identical-banner .msg{font-weight:600;font-size:15px;color:var(--text)}
+.identical-banner .sub{font-size:13px;color:var(--text-2);margin-top:2px}
 
-  /* ── Compare button ── */
-  #compareBtn{
-    width:100%;padding:14px;background:var(--accent);color:var(--bg);
-    border:none;border-radius:12px;font-family:'IBM Plex Mono',monospace;
-    font-size:13px;font-weight:600;letter-spacing:3px;text-transform:uppercase;
-    cursor:pointer;transition:all .2s;margin-bottom:28px;
-  }
-  #compareBtn:hover{filter:brightness(1.08);transform:translateY(-1px)}
-  #compareBtn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none;filter:none}
-  #resetBtn{display:none;width:100%;padding:9px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:12px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:-20px;margin-bottom:28px}
-  #resetBtn:hover{border-color:var(--muted);color:var(--text)}
+.diff-view{display:none}.diff-view.active{display:block}
 
-  /* ── Loader ── */
-  .loader{display:none;text-align:center;padding:40px}
-  .loader.active{display:block}
-  .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loader-text{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--muted);animation:pulse 1.5s ease-in-out infinite}
-  .loader-stage{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);margin-top:8px;letter-spacing:1px}
-  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+/* Unified diff */
+.diff-unified{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;
+  font-family:var(--font-mono);font-size:12.5px}
+.diff-line{display:flex;line-height:1.7}
+.diff-line.add{background:var(--diff-add-bg)}.diff-line.rem{background:var(--diff-rem-bg)}.diff-line.ctx{background:transparent}
+.diff-line.sep{background:var(--surface-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.diff-line:first-child.sep{border-top:0}
+.line-num{min-width:44px;padding:2px 8px;text-align:right;color:var(--text-3);font-size:11.5px;font-variant-numeric:tabular-nums;
+  user-select:none;border-right:1px solid var(--border);flex-shrink:0}
+.line-sign{min-width:22px;padding:2px 4px;text-align:center;font-weight:500;flex-shrink:0;user-select:none}
+.diff-line.add .line-sign{color:var(--diff-add-sign)}.diff-line.rem .line-sign{color:var(--diff-rem-sign)}
+.diff-line.ctx .line-sign,.diff-line.sep .line-sign{color:var(--text-3)}
+.line-text{padding:2px 12px;white-space:pre-wrap;word-break:break-word;flex:1;min-width:0}
+.diff-line.add .line-text{color:var(--diff-add-text)}.diff-line.rem .line-text{color:var(--diff-rem-text)}
+.diff-line.ctx .line-text{color:var(--text-2)}.diff-line.sep .line-text{color:var(--text-3);font-style:italic}
+.diff-empty{padding:24px;text-align:center;color:var(--text-2);font-family:var(--font-sans);font-size:14px}
 
-  /* ── Error ── */
-  .error-box{display:none;background:var(--removed-bg);border:1px solid var(--removed);border-radius:10px;padding:14px 18px;color:var(--removed);font-size:13px;margin-bottom:20px;font-family:'IBM Plex Mono',monospace}
-  .error-box.active{display:block}
+/* Side-by-side */
+.diff-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);overflow:hidden;font-family:var(--font-mono);font-size:12px}
+.split-header{background:var(--surface-2);padding:10px 14px;font:600 13px/1.4 var(--font-sans);color:var(--text);border-bottom:1px solid var(--border)}
+.split-col{min-width:0}
+.split-col:first-child{border-right:1px solid var(--border)}
+.split-line{display:flex;line-height:1.65;min-height:26px;align-items:flex-start}
+.split-line.add{background:var(--diff-add-bg)}.split-line.rem{background:var(--diff-rem-bg)}.split-line.ctx{background:transparent}
+.split-line.empty{background:var(--diff-empty-bg)}
+.split-line.split-gap{background:var(--surface-2);padding:2px 10px;color:var(--text-3);min-height:0}
+.split-line .line-num{min-width:38px;padding:2px 6px;font-size:11px}
+.split-line .line-text{padding:2px 10px}
+.split-line.add .line-text{color:var(--diff-add-text)}.split-line.rem .line-text{color:var(--diff-rem-text)}.split-line.ctx .line-text{color:var(--text-2)}
 
-  /* ── Results ── */
-  #results{animation:fadeUp .4s ease}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* Text preview */
+.summary-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:24px}
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);overflow:hidden}
+.summary-card h3{font-size:15px;font-weight:600;padding:12px 16px;border-bottom:1px solid var(--border)}
+.text-preview{font-family:var(--font-mono);font-size:12px;color:var(--text-2);line-height:1.6;max-height:360px;overflow-y:auto;
+  white-space:pre-wrap;word-break:break-word;padding:12px 16px}
 
-  /* Stats */
-  .stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:24px}
-  .stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;box-shadow:var(--shadow)}
-  .stat-num{font-size:26px;font-weight:800;letter-spacing:-1px;display:block}
-  .stat-lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);display:block;margin-top:3px}
-  .num-add{color:var(--added)}.num-rem{color:var(--removed)}.num-tot{color:var(--accent)}.num-sim{color:#a0a0ff}
-  [data-theme="light"] .num-sim{color:#5050cc}
-
-  .sec-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:10px}
-  .sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
-
-  .identical-banner{background:var(--added-bg);border:1px solid var(--added);border-radius:12px;padding:20px 24px;text-align:center;margin-bottom:24px}
-  .identical-banner .big{font-size:36px;margin-bottom:8px}
-  .identical-banner .msg{font-weight:700;font-size:16px;color:var(--added)}
-  .identical-banner .sub{font-size:13px;color:var(--muted);margin-top:4px}
-
-  /* Tabs */
-  .view-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-  .view-tab{background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;padding:7px 14px;border-radius:6px;cursor:pointer;transition:all .15s}
-  .view-tab.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
-
-  /* Diff views */
-  .diff-view{display:none}.diff-view.active{display:block}
-
-  /* Unified */
-  .diff-unified{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;font-family:'IBM Plex Mono',monospace;font-size:12.5px;box-shadow:var(--shadow)}
-  .diff-line{display:flex;line-height:1.7}
-  .diff-line:hover{filter:brightness(1.06)}
-  .diff-line.add{background:var(--added-bg)}.diff-line.rem{background:var(--removed-bg)}.diff-line.ctx{background:transparent}.diff-line.sep{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-  .line-num{min-width:42px;padding:2px 8px;text-align:right;color:var(--muted);font-size:11px;user-select:none;border-right:1px solid var(--border);flex-shrink:0}
-  .line-sign{min-width:20px;padding:2px 4px;text-align:center;font-weight:600;flex-shrink:0;user-select:none}
-  .diff-line.add .line-sign{color:var(--added)}.diff-line.rem .line-sign{color:var(--removed)}.diff-line.ctx .line-sign,.diff-line.sep .line-sign{color:var(--muted)}
-  .line-text{padding:2px 10px;white-space:pre-wrap;word-break:break-word;flex:1}
-  .diff-line.add .line-text{color:var(--added)}.diff-line.rem .line-text{color:var(--removed)}.diff-line.ctx .line-text{color:var(--eq-color)}.diff-line.sep .line-text{color:var(--muted);font-style:italic}
-
-  /* Split */
-  .diff-split{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);border-radius:12px;overflow:hidden;font-family:'IBM Plex Mono',monospace;font-size:11.5px;box-shadow:var(--shadow)}
-  .split-header{background:var(--surface);padding:10px 14px;font-size:10px;letter-spacing:2px;color:var(--muted);border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace}
-  .split-col:first-child{border-right:1px solid var(--border)}
-  .split-line{display:flex;line-height:1.65;min-height:26px;align-items:flex-start}
-  .split-line.add{background:var(--added-bg)}.split-line.rem{background:var(--removed-bg)}.split-line.ctx{background:transparent}.split-line.empty{background:var(--surface);opacity:.4}
-  .split-line .line-num{min-width:34px;padding:2px 6px;font-size:10px;color:var(--muted);border-right:1px solid var(--border);flex-shrink:0;font-family:'IBM Plex Mono',monospace}
-  .split-line .line-text{padding:2px 8px;white-space:pre-wrap;word-break:break-word;flex:1}
-  .split-line.add .line-text{color:var(--added)}.split-line.rem .line-text{color:var(--removed)}.split-line.ctx .line-text{color:var(--eq-color)}
-
-  /* Preview */
-  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
-  .summary-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
-  .summary-card h3{font-size:11px;color:var(--muted);letter-spacing:2px;font-family:'IBM Plex Mono',monospace;margin-bottom:10px}
-  .text-preview{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);line-height:1.6;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
-
-  /* Extract info */
-  .extract-info{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:18px;display:flex;gap:20px;flex-wrap:wrap}
-  .extract-info span{color:var(--text)}
-
-  footer{margin-top:56px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
-  footer span{color:var(--accent)}
-  .pp-credit{margin-top:14px;padding-top:10px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:7px}
-  .pp-li{color:var(--muted);display:inline-flex;align-items:center;text-decoration:none;transition:color .15s}
-  .pp-li:hover{color:var(--accent)}
-
-  /* ── Mobile — base ── */
-  @media(max-width:768px){
-    body{padding:20px 14px 60px}
-    .wrap{max-width:100%}
-
-    /* Topbar */
-    .topbar{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:14px}
-    .theme-toggle{width:100%;justify-content:stretch}
-    .theme-btn{flex:1;justify-content:center;padding:6px 4px;font-size:9px;letter-spacing:1px}
-    .theme-btn svg{width:11px;height:11px}
-
-    /* Header */
-    h1{font-size:clamp(22px,7vw,36px);letter-spacing:-1px}
-    .subtitle{font-size:12px;margin-bottom:20px}
-    .badge{font-size:9px;padding:3px 7px}
-    .tag{font-size:9px;letter-spacing:1.5px;padding:4px 10px}
-
-    /* Drop zones */
-    .drop-row{grid-template-columns:1fr;gap:10px}
-    .vs{display:none}
-    .drop-zone{padding:18px 14px;min-height:110px}
-    .drop-icon{font-size:26px}
-    .drop-label{font-size:9px;letter-spacing:2px}
-    .drop-text{font-size:12px}
-
-    /* Layout / options rows */
-    .col-mode-row{flex-direction:column;align-items:flex-start;gap:8px;padding:10px 12px}
-    .col-mode-title{margin-right:0}
-    .col-desc{margin-left:0;display:block;width:100%}
-    .options-row{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:12px}
-    .opt-label{margin-left:0!important}
-    .opt-group{flex-wrap:wrap;gap:5px}
-    .opt-btn{font-size:10px;padding:8px 10px}  /* min ~36px tap height */
-
-    /* Compare button */
-    #compareBtn{padding:13px;font-size:12px;letter-spacing:2px}
-
-    /* Stats bar */
-    .stats-bar{grid-template-columns:repeat(2,1fr);gap:8px}
-    .stat{padding:10px}
-    .stat-num{font-size:20px}
-
-    /* Tabs */
-    .view-tabs{gap:5px}
-    .view-tab{font-size:10px;padding:6px 10px}
-
-    /* Unified diff */
-    .diff-unified{font-size:11px}
-    .line-num{min-width:30px;padding:2px 5px;font-size:10px}
-    .line-sign{min-width:16px;padding:2px 2px}
-    .line-text{padding:2px 6px;font-size:11px}
-
-    /* Split → stack */
-    .diff-split{grid-template-columns:1fr}
-    .split-col:first-child{border-right:none;border-bottom:1px solid var(--border)}
-    .split-header{font-size:9px;padding:8px 10px}
-    .split-line .line-num{min-width:26px;padding:2px 4px;font-size:10px}
-    .split-line .line-text{font-size:11px}
-
-    /* Summary grid → stack */
-    .summary-grid{grid-template-columns:1fr}
-
-    /* Extract info */
-    .extract-info{gap:10px;font-size:10px}
-
-    /* Loader */
-    .loader{padding:28px 14px}
-  }
-
-  /* ── Small phones ── */
-  @media(max-width:400px){
-    body{padding:14px 10px 50px}
-    .theme-btn{font-size:8px;letter-spacing:0.5px}
-    h1{font-size:22px}
-    .opt-btn{font-size:9px;padding:5px 8px}
-    .stats-bar{grid-template-columns:repeat(2,1fr);gap:6px}
-    .stat-num{font-size:18px}
-    .line-num{min-width:24px;padding:2px 3px}
-  }
+@media (max-width:768px){
+  .opts{flex-direction:column;gap:16px}
+  .opt-field,.opt-field .seg{width:100%}
+  .opt-field .seg{display:flex;flex-wrap:nowrap}
+  .opt-field .seg button{flex:1;padding:0 8px}
+  .actions{flex-direction:column}
+  .actions #compareBtn{width:100%}
+  .sec-label .seg{width:100%;display:flex}
+  .sec-label .seg button{flex:1;padding:0 6px}
+  .diff-unified{font-size:11.5px}
+  .line-num{min-width:32px;padding:2px 5px;font-size:10.5px}
+  .line-sign{min-width:16px;padding:2px}
+  .line-text{padding:2px 8px}
+  .diff-split{grid-template-columns:minmax(0,1fr)}
+  .split-col:first-child{border-right:0;border-bottom:1px solid var(--border)}
+  .summary-grid{grid-template-columns:minmax(0,1fr)}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stat-value{font-size:20px}
+}
 </style>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('pdf-diff-theme')||'light')}catch(e){}</script>
 </head>
 <body>
-<div class="wrap">
+<header class="appbar">
+  <a class="brand" href="index.html" aria-label="All tools by Dr. Prashant Patel">
+    <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg></span>
+    <span class="brand-name">drprash<span class="brand-sub">/tools</span></span>
+  </a>
+  <span class="crumb-sep" aria-hidden="true">/</span>
+  <span class="crumb">Doc Compare</span>
+  <span class="spacer"></span>
+  <span class="badge badge-success"><span class="dot"></span>100% offline</span>
+  <div class="theme-toggle" role="group" aria-label="Colour theme">
+    <button type="button" data-theme-set="auto" aria-label="Match system theme" title="System"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>
+    <button type="button" data-theme-set="light" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
+    <button type="button" data-theme-set="dark" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+  </div>
+</header>
 
-  <!-- Topbar: header + theme toggle -->
-  <div class="topbar">
-    <div>
-      <div class="tag">◈ Multi-Column Aware</div>
-    </div>
-    <div class="theme-toggle" role="group" aria-label="Theme">
-      <button class="theme-btn" id="theme-auto" onclick="setTheme('auto')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-        Auto
-      </button>
-      <button class="theme-btn" id="theme-light" onclick="setTheme('light')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        Light
-      </button>
-      <button class="theme-btn active" id="theme-dark" onclick="setTheme('dark')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        Dark
-      </button>
-    </div>
+<main class="container">
+  <div class="page-head">
+    <span class="eyebrow">Multi-column aware</span>
+    <h1>Doc Compare</h1>
+    <p class="lead">Column-aware text extraction · PDF &amp; Word (.docx) support · Handles 2-column pharmaceutical inserts, mixed layouts &amp; tables · 100% local, no upload.</p>
   </div>
 
-  <h1>Doc <span>Compare</span> <span class="badge">● OFFLINE</span></h1>
-  <p class="subtitle">Column-aware text extraction · PDF & Word (.docx) support · Handles 2-column pharmaceutical inserts, mixed layouts & tables · 100% local, no upload.</p>
-
   <!-- Drop zones -->
-  <div class="drop-row">
-    <div class="drop-zone" id="zoneA" onclick="document.getElementById('fileA').click()"
+  <div class="grid-2 drop-row">
+    <div class="dropzone" id="zoneA" role="button" tabindex="0" aria-label="Select Document A (original)" onclick="document.getElementById('fileA').click()"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"
       ondragover="event.preventDefault();this.classList.add('drag-over')"
       ondragleave="this.classList.remove('drag-over')" ondrop="handleDrop(event,'A')">
-      <div class="drop-icon" id="iconA">📂</div>
-      <div class="drop-label">Document A — Original</div>
-      <div class="drop-text" id="textA">Drop PDF or Word (.docx) here</div>
-      <div class="file-meta" id="metaA"></div>
+      <span class="dz-icon" id="iconA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+      <span class="dz-title drop-label">Document A — Original</span>
+      <span class="dz-hint drop-text" id="textA">Drop PDF or Word (.docx) here</span>
+      <span class="file-meta" id="metaA"></span>
     </div>
-    <div class="vs">VS</div>
-    <div class="drop-zone" id="zoneB" onclick="document.getElementById('fileB').click()"
+    <div class="dropzone" id="zoneB" role="button" tabindex="0" aria-label="Select Document B (revised)" onclick="document.getElementById('fileB').click()"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"
       ondragover="event.preventDefault();this.classList.add('drag-over')"
       ondragleave="this.classList.remove('drag-over')" ondrop="handleDrop(event,'B')">
-      <div class="drop-icon" id="iconB">📂</div>
-      <div class="drop-label">Document B — Revised</div>
-      <div class="drop-text" id="textB">Drop PDF or Word (.docx) here</div>
-      <div class="file-meta" id="metaB"></div>
+      <span class="dz-icon" id="iconB"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+      <span class="dz-title drop-label">Document B — Revised</span>
+      <span class="dz-hint drop-text" id="textB">Drop PDF or Word (.docx) here</span>
+      <span class="file-meta" id="metaB"></span>
     </div>
   </div>
   <input type="file" id="fileA" accept="application/pdf,.pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="setFile(event,'A')">
   <input type="file" id="fileB" accept="application/pdf,.pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="setFile(event,'B')">
 
-  <!-- Layout mode -->
-  <div class="col-mode-row" id="colModeRow">
-    <span class="col-mode-title">LAYOUT</span>
-    <div class="opt-group">
-      <button class="opt-btn active" id="col-auto" onclick="setColMode('auto')">AUTO-DETECT</button>
-      <button class="opt-btn" id="col-2col" onclick="setColMode('2col')">2-COLUMN</button>
-      <button class="opt-btn" id="col-1col" onclick="setColMode('1col')">SINGLE COLUMN</button>
+  <!-- Options -->
+  <section class="card">
+    <div class="card-body">
+      <div class="opts">
+        <div class="opt-field" id="colModeRow">
+          <span class="opt-label" id="lbl-layout">Layout</span>
+          <div class="seg opt-group" role="group" aria-labelledby="lbl-layout">
+            <button type="button" class="opt-btn active" id="col-auto" onclick="setColMode('auto')">Auto-detect</button>
+            <button type="button" class="opt-btn" id="col-2col" onclick="setColMode('2col')">2-column</button>
+            <button type="button" class="opt-btn" id="col-1col" onclick="setColMode('1col')">Single column</button>
+          </div>
+          <span class="col-desc" id="colDesc">Detects column count per page using x-position clustering</span>
+        </div>
+        <div class="opt-field">
+          <span class="opt-label" id="lbl-mode">Compare by</span>
+          <div class="seg opt-group" role="group" aria-labelledby="lbl-mode">
+            <button type="button" class="opt-btn active" id="opt-line" onclick="setMode('line')">Line</button>
+            <button type="button" class="opt-btn" id="opt-word" onclick="setMode('word')">Word</button>
+            <button type="button" class="opt-btn" id="opt-char" onclick="setMode('char')">Character</button>
+          </div>
+        </div>
+        <div class="opt-field">
+          <span class="opt-label" id="lbl-ctx">Context</span>
+          <div class="seg opt-group" role="group" aria-labelledby="lbl-ctx">
+            <button type="button" class="opt-btn" id="ctx-3" onclick="setCtx(3)">3</button>
+            <button type="button" class="opt-btn active" id="ctx-5" onclick="setCtx(5)">5</button>
+            <button type="button" class="opt-btn" id="ctx-10" onclick="setCtx(10)">10</button>
+            <button type="button" class="opt-btn" id="ctx-all" onclick="setCtx(-1)">All</button>
+          </div>
+        </div>
+      </div>
+      <p class="col-note" id="colDocxNote" style="display:none"><svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Layout applies to PDF only — Word docs are extracted as-is</p>
     </div>
-    <span class="col-desc" id="colDesc">Detects column count per page using x-position clustering</span>
-    <span class="col-desc" id="colDocxNote" style="display:none;color:var(--removed)">⚠ Layout applies to PDF only — Word docs are extracted as-is</span>
+  </section>
+
+  <div class="actions">
+    <button type="button" class="btn btn-primary btn-block" id="compareBtn" onclick="runCompare()" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg>Compare documents</button>
+    <button type="button" class="btn btn-secondary" id="resetBtn" onclick="resetAll()" style="display:none"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Reset</button>
   </div>
 
-  <!-- Diff options -->
-  <div class="options-row">
-    <span class="opt-label">COMPARE BY:</span>
-    <div class="opt-group">
-      <button class="opt-btn active" id="opt-line" onclick="setMode('line')">LINE</button>
-      <button class="opt-btn" id="opt-word" onclick="setMode('word')">WORD</button>
-      <button class="opt-btn" id="opt-char" onclick="setMode('char')">CHARACTER</button>
-    </div>
-    <span class="opt-label" style="margin-left:10px">CONTEXT:</span>
-    <div class="opt-group">
-      <button class="opt-btn" id="ctx-3" onclick="setCtx(3)">3</button>
-      <button class="opt-btn active" id="ctx-5" onclick="setCtx(5)">5</button>
-      <button class="opt-btn" id="ctx-10" onclick="setCtx(10)">10</button>
-      <button class="opt-btn" id="ctx-all" onclick="setCtx(-1)">ALL</button>
-    </div>
-  </div>
-
-  <button id="compareBtn" onclick="runCompare()" disabled>⟶ Compare Documents</button>
-  <button id="resetBtn" onclick="resetAll()">↺ Reset</button>
-
-  <div class="loader" id="loader">
+  <div class="loader" id="loader" role="status" aria-live="polite">
     <div class="spinner"></div>
-    <div class="loader-text">PROCESSING…</div>
+    <div class="loader-text">Processing…</div>
     <div class="loader-stage" id="loaderStage"></div>
   </div>
-  <div class="error-box" id="errorBox"></div>
+  <div class="alert alert-danger error-box" id="errorBox" role="alert"></div>
   <div id="results"></div>
+</main>
 
-  <footer>100% local · <span>PDF.js</span> column-aware extraction · <span>Mammoth.js</span> Word extraction · Myers diff · No data leaves your device<div class="pp-credit">Built by <a href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener" class="pp-li">Dr. Prashant Patel</a></div></footer>
-</div>
+<footer class="site-footer">
+  <div class="inner">
+    <span class="privacy"><svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>100% local · PDF.js column-aware extraction · Mammoth.js Word extraction · Myers diff · No data leaves your device</span>
+    <span class="links"><a href="index.html">All tools</a><span>Built by <a href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener" class="pp-li">Dr. Prashant Patel</a></span></span>
+  </div>
+</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
@@ -377,16 +475,25 @@ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/p
 let files={A:null,B:null}, diffMode='line', ctxLines=5, colMode='auto';
 
 // ── Theme ────────────────────────────────────────────────────────────────────
+const THEME_KEY='pdf-diff-theme';
 function setTheme(t){
+  if(!['auto','light','dark'].includes(t))t='light';
   document.documentElement.setAttribute('data-theme',t);
-  ['auto','light','dark'].forEach(x=>document.getElementById('theme-'+x).classList.toggle('active',x===t));
-  try{localStorage.setItem('pdf-diff-theme',t)}catch(e){}
+  document.querySelectorAll('[data-theme-set]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.themeSet===t)));
+  try{localStorage.setItem(THEME_KEY,t)}catch(e){}
 }
-(function initTheme(){
-  let saved='dark';
-  try{saved=localStorage.getItem('pdf-diff-theme')||'dark'}catch(e){}
-  setTheme(saved);
-})();
+document.querySelectorAll('[data-theme-set]').forEach(b=>b.addEventListener('click',()=>setTheme(b.dataset.themeSet)));
+(function(){let s='light';try{s=localStorage.getItem(THEME_KEY)||'light'}catch(e){}setTheme(s)})();
+
+// ── Icons (inline SVG, replaces emoji) ────────────────────────────────────────
+const SVG_OPEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+const ICON={
+  upload:SVG_OPEN+'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+  pdf:SVG_OPEN+'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+  word:SVG_OPEN+'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+  ok:'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
+  alert:'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+};
 
 // ── File type helpers ─────────────────────────────────────────────────────────
 function isDocx(f){
@@ -406,7 +513,7 @@ function handleDrop(e,s){
 function attachFile(f,s){
   files[s]=f;
   document.getElementById('zone'+s).classList.add('has-file');
-  document.getElementById('icon'+s).textContent=isDocx(f)?'📝':'📄';
+  document.getElementById('icon'+s).innerHTML=isDocx(f)?ICON.word:ICON.pdf;
   document.getElementById('text'+s).textContent=f.name;
   const type=isDocx(f)?'WORD':'PDF';
   document.getElementById('meta'+s).textContent=(f.size/1024).toFixed(1)+' KB · '+type;
@@ -593,12 +700,12 @@ function renderUnified(chunks){
     else if(c.type==='del'){html+=`<div class="diff-line rem"><span class="line-num">${aL}</span><span class="line-num"></span><span class="line-sign">−</span><span class="line-text">${esc(c.text)}</span></div>`;aL++}
     else{html+=`<div class="diff-line add"><span class="line-num"></span><span class="line-num">${bL}</span><span class="line-sign">+</span><span class="line-text">${esc(c.text)}</span></div>`;bL++}
   }
-  document.getElementById('unifiedOut').innerHTML=html||'<div style="padding:20px;text-align:center;color:var(--muted);font-family:monospace">No differences</div>';
+  document.getElementById('unifiedOut').innerHTML=html||'<div class="diff-empty">No differences</div>';
 }
 function renderSplit(chunks){
   let lh='',rh='',aL=1,bL=1;
   for(const c of chunks){
-    if(c.gapBefore){const s=`<div class="split-line ctx" style="background:var(--surface);padding:4px 8px;font-size:10px;color:var(--muted);font-family:monospace">⋯</div>`;lh+=s;rh+=s}
+    if(c.gapBefore){const s=`<div class="split-line ctx split-gap">⋯</div>`;lh+=s;rh+=s}
     if(c.type==='eq'){
       lh+=`<div class="split-line ctx"><span class="line-num">${aL}</span><span class="line-text">${esc(c.text)}</span></div>`;
       rh+=`<div class="split-line ctx"><span class="line-num">${bL}</span><span class="line-text">${esc(c.text)}</span></div>`;
@@ -643,27 +750,27 @@ async function runCompare(){
     const lA=tA.split('\n').length,lB=tB.split('\n').length;
     let html='';
     if(changed===0){
-      html=`<div class="identical-banner"><div class="big">✅</div><div class="msg">Documents are identical</div><div class="sub">No textual differences found</div></div>`;
+      html=`<div class="alert alert-success identical-banner" role="status">${ICON.ok}<div><div class="msg">Documents are identical</div><div class="sub">No textual differences found</div></div></div>`;
     }else{
       html+=`<div class="extract-info"><div>Doc A: <span>${lA} lines · ${isDocx(files.A)?'WORD':'PDF'}</span></div><div>Doc B: <span>${lB} lines · ${isDocx(files.B)?'WORD':'PDF'}</span></div><div>Layout: <span>${isDocx(files.A)&&isDocx(files.B)?'N/A (Word)':colMode==='2col'?'2-Column':colMode==='auto'?'Auto-Detected':'Single Column'}</span></div><div>Mode: <span>${diffMode.toUpperCase()}</span></div></div>`;
-      html+=`<div class="stats-bar"><div class="stat"><span class="stat-num num-add">+${added}</span><span class="stat-lbl">Added</span></div><div class="stat"><span class="stat-num num-rem">-${removed}</span><span class="stat-lbl">Removed</span></div><div class="stat"><span class="stat-num num-tot">${changed}</span><span class="stat-lbl">Changes</span></div><div class="stat"><span class="stat-num num-sim">${sim}%</span><span class="stat-lbl">Similarity</span></div></div>`;
-      html+=`<div class="sec-label">DIFF VIEW</div>
-      <div class="view-tabs">
-        <button class="view-tab active" id="tab-unified" onclick="switchTab('unified')">Unified</button>
-        <button class="view-tab" id="tab-split" onclick="switchTab('split')">Side by Side</button>
-        <button class="view-tab" id="tab-summary" onclick="switchTab('summary')">Text Preview</button>
-      </div>
+      html+=`<div class="stats stats-wrap"><div class="stat"><span class="stat-value num-add">+${added}</span><span class="stat-label">Added</span></div><div class="stat"><span class="stat-value num-rem">-${removed}</span><span class="stat-label">Removed</span></div><div class="stat"><span class="stat-value num-tot">${changed}</span><span class="stat-label">Changes</span></div><div class="stat"><span class="stat-value num-sim">${sim}%</span><span class="stat-label">Similarity</span></div></div>`;
+      html+=`<div class="sec-label"><h2>Diff view</h2>
+      <div class="seg view-tabs" role="group" aria-label="Diff view">
+        <button type="button" class="view-tab active" id="tab-unified" onclick="switchTab('unified')">Unified</button>
+        <button type="button" class="view-tab" id="tab-split" onclick="switchTab('split')">Side by side</button>
+        <button type="button" class="view-tab" id="tab-summary" onclick="switchTab('summary')">Text preview</button>
+      </div></div>
       <div class="diff-view active" id="view-unified"><div class="diff-unified" id="unifiedOut"></div></div>
       <div class="diff-view" id="view-split">
         <div class="diff-split">
-          <div class="split-col"><div class="split-header">DOCUMENT A — ORIGINAL</div><div id="splitLeft"></div></div>
-          <div class="split-col"><div class="split-header">DOCUMENT B — REVISED</div><div id="splitRight"></div></div>
+          <div class="split-col"><div class="split-header">Document A — Original</div><div id="splitLeft"></div></div>
+          <div class="split-col"><div class="split-header">Document B — Revised</div><div id="splitRight"></div></div>
         </div>
       </div>
       <div class="diff-view" id="view-summary">
         <div class="summary-grid">
-          <div class="summary-card"><h3>DOCUMENT A TEXT</h3><div class="text-preview" id="previewA"></div></div>
-          <div class="summary-card"><h3>DOCUMENT B TEXT</h3><div class="text-preview" id="previewB"></div></div>
+          <div class="summary-card"><h3>Document A text</h3><div class="text-preview" id="previewA"></div></div>
+          <div class="summary-card"><h3>Document B text</h3><div class="text-preview" id="previewB"></div></div>
         </div>
       </div>`;
     }
@@ -678,7 +785,7 @@ async function runCompare(){
     document.getElementById('loader').classList.remove('active');
     document.getElementById('compareBtn').disabled=false;
     const box=document.getElementById('errorBox');
-    box.textContent='⚠️ '+err.message;box.classList.add('active');
+    box.innerHTML=ICON.alert+'<div class="err-msg"></div>';box.lastChild.textContent=err.message;box.classList.add('active');
     console.error(err);
   }
 }
@@ -686,7 +793,7 @@ function resetAll(){
   files={A:null,B:null};
   ['A','B'].forEach(s=>{
     document.getElementById('zone'+s).classList.remove('has-file','drag-over');
-    document.getElementById('icon'+s).textContent='📂';
+    document.getElementById('icon'+s).innerHTML=ICON.upload;
     document.getElementById('text'+s).textContent='Drop PDF or Word (.docx) here';
     document.getElementById('meta'+s).textContent='';
     document.getElementById('file'+s).value='';

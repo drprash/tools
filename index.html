@@ -1,706 +1,676 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prashant Patel — MD × Dev</title>
 <meta name="description" content="9+ years in pharmaceuticals. Tired of bad tools. Built my own. Browser-based PDF tools by Dr. Prashant Patel.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-/* ── Tokens ── */
-:root{
-  --bg:#0b0b10;--surface:#13131a;--card:#1a1a24;--border:#2c2c3e;
-  --accent:#7ef0a0;--accent2:#e8d5a0;--accent3:#a0b4f0;--accent4:#a78bfa;
-  --accent-dim:#7ef0a010;--text:#e8e8f0;--muted:#5a5a78;--muted2:#3a3a52;
-  --shadow:0 4px 24px #0008;--shadow-sm:0 2px 10px #0005;
-  --glow-g:#7ef0a008;--glow-b:#6060f008;--glow-a:#e8d5a006;
-  --radius:10px;--radius-lg:16px;
+/* ── drprash/tools · design system base (Swiss) ───────────────────────────── */
+:root,[data-theme="light"]{
+  color-scheme:light;
+  --font-sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --bg:#f8fafc;--surface:#ffffff;--surface-2:#f1f5f9;--surface-3:#e2e8f0;
+  --border:#e2e8f0;--border-strong:#cbd5e1;
+  --text:#0f172a;--text-2:#475569;--text-3:#64748b;
+  --accent:#0f766e;--accent-hover:#115e59;--accent-soft:#f0fdfa;--accent-border:#99f6e4;--on-accent:#ffffff;
+  --success:#15803d;--success-soft:#f0fdf4;--success-border:#bbf7d0;
+  --warning:#b45309;--warning-soft:#fffbeb;--warning-border:#fde68a;
+  --danger:#b91c1c;--danger-soft:#fef2f2;--danger-border:#fecaca;
+  --info:#1d4ed8;--info-soft:#eff6ff;--info-border:#bfdbfe;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
+  --shadow-lg:0 10px 30px -10px rgba(15,23,42,.18);
+  --ring:0 0 0 2px var(--surface),0 0 0 4px var(--accent);
+  --r-sm:6px;--r:8px;--r-lg:12px;
+  --appbar-h:56px;
 }
-[data-theme="light"]{
-  --bg:#f2f2f6;--surface:#ffffff;--card:#ffffff;--border:#dcdce8;
-  --accent:#1a8c40;--accent2:#8a6e2f;--accent3:#3a60c0;--accent4:#6d28d9;
-  --accent-dim:#1a8c4010;--text:#18182a;--muted:#7a7a96;--muted2:#c8c8d8;
-  --shadow:0 4px 24px #0001;--shadow-sm:0 2px 10px #0001;
-  --glow-g:#1a8c4006;--glow-b:#3030a006;--glow-a:#8a6e2f06;
+[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0b1220;--surface:#111a2e;--surface-2:#172036;--surface-3:#1f2a44;
+  --border:#243049;--border-strong:#334155;
+  --text:#e2e8f0;--text-2:#a3b0c2;--text-3:#8391a7;
+  --accent:#2dd4bf;--accent-hover:#5eead4;--accent-soft:rgba(45,212,191,.12);--accent-border:rgba(45,212,191,.35);--on-accent:#042f2e;
+  --success:#4ade80;--success-soft:rgba(74,222,128,.10);--success-border:rgba(74,222,128,.30);
+  --warning:#fbbf24;--warning-soft:rgba(251,191,36,.10);--warning-border:rgba(251,191,36,.30);
+  --danger:#f87171;--danger-soft:rgba(248,113,113,.10);--danger-border:rgba(248,113,113,.30);
+  --info:#60a5fa;--info-soft:rgba(96,165,250,.10);--info-border:rgba(96,165,250,.30);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+  --shadow:0 1px 3px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25);
+  --shadow-lg:0 12px 32px -12px rgba(0,0,0,.6);
+}
+@media (prefers-color-scheme:dark){
+  [data-theme="auto"]{
+    color-scheme:dark;
+    --bg:#0b1220;--surface:#111a2e;--surface-2:#172036;--surface-3:#1f2a44;
+    --border:#243049;--border-strong:#334155;
+    --text:#e2e8f0;--text-2:#a3b0c2;--text-3:#8391a7;
+    --accent:#2dd4bf;--accent-hover:#5eead4;--accent-soft:rgba(45,212,191,.12);--accent-border:rgba(45,212,191,.35);--on-accent:#042f2e;
+    --success:#4ade80;--success-soft:rgba(74,222,128,.10);--success-border:rgba(74,222,128,.30);
+    --warning:#fbbf24;--warning-soft:rgba(251,191,36,.10);--warning-border:rgba(251,191,36,.30);
+    --danger:#f87171;--danger-soft:rgba(248,113,113,.10);--danger-border:rgba(248,113,113,.30);
+    --info:#60a5fa;--info-soft:rgba(96,165,250,.10);--info-border:rgba(96,165,250,.30);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+    --shadow:0 1px 3px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25);
+    --shadow-lg:0 12px 32px -12px rgba(0,0,0,.6);
+  }
 }
 
-/* ── Base ── */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.55 var(--font-sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100vh;display:flex;flex-direction:column}
+h1,h2,h3,h4{margin:0;color:var(--text);font-weight:600;letter-spacing:-.01em}
+h1{font-size:28px;line-height:1.2;letter-spacing:-.02em}
+h2{font-size:18px;line-height:1.35}
+h3{font-size:15px;line-height:1.4}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:2px}
+a:hover{color:var(--accent-hover)}
+code,kbd,.mono{font-family:var(--font-mono);font-size:.92em}
+code{background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+:focus-visible{outline:none;box-shadow:var(--ring);border-radius:var(--r-sm)}
+::selection{background:var(--accent-soft)}
+.icon{width:18px;height:18px;flex-shrink:0;display:inline-block;vertical-align:middle}
+.icon-sm{width:16px;height:16px}.icon-lg{width:24px;height:24px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.muted{color:var(--text-2)}.subtle{color:var(--text-3)}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
+
+/* ── App bar ── */
+.appbar{position:sticky;top:0;z-index:50;height:var(--appbar-h);display:flex;align-items:center;gap:12px;
+  padding:0 24px;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:saturate(1.4) blur(8px);
+  -webkit-backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--border)}
+.brand{display:inline-flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-weight:600;font-size:15px;white-space:nowrap}
+.brand:hover{color:var(--text)}
+.brand-mark{width:28px;height:28px;border-radius:7px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;flex-shrink:0}
+.brand-mark svg{width:16px;height:16px}
+.brand-sub{color:var(--text-3);font-weight:500}
+.crumb-sep{color:var(--border-strong);font-weight:400}
+.crumb{color:var(--text);font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appbar .spacer{flex:1}
+.appbar-nav{display:flex;gap:4px}
+.appbar-nav a{color:var(--text-2);text-decoration:none;font-size:14px;font-weight:500;padding:8px 10px;border-radius:var(--r-sm)}
+.appbar-nav a:hover{color:var(--text);background:var(--surface-2)}
+
+/* ── Theme toggle ── */
+.theme-toggle{display:inline-flex;gap:2px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r)}
+.theme-toggle button{width:32px;height:28px;display:grid;place-items:center;border:0;border-radius:6px;background:transparent;
+  color:var(--text-3);cursor:pointer;transition:color .15s,background .15s}
+.theme-toggle button:hover{color:var(--text)}
+.theme-toggle button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+.theme-toggle svg{width:16px;height:16px}
+
+/* ── Layout ── */
+.container{width:100%;max-width:1120px;margin:0 auto;padding:32px 24px 48px;flex:1}
+.container.wide{max-width:1360px}
+.page-head{margin-bottom:24px;display:flex;flex-direction:column;gap:8px}
+.page-head .lead{color:var(--text-2);font-size:15px;max-width:72ch}
+.page-head .alert{margin-top:8px}
+.section{margin-bottom:24px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+
+/* ── Card ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-desc{color:var(--text-2);font-size:13px;margin-top:2px}
+.card-body{padding:20px}
+.card-foot{padding:14px 20px;border-top:1px solid var(--border);background:var(--surface-2);border-radius:0 0 var(--r-lg) var(--r-lg)}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;
+  border-radius:var(--r);border:1px solid transparent;font:500 14px/1 var(--font-sans);cursor:pointer;white-space:nowrap;
+  text-decoration:none;transition:background .15s,border-color .15s,color .15s,box-shadow .15s;user-select:none}
+.btn .icon{width:16px;height:16px}
+.btn-primary{background:var(--accent);color:var(--on-accent)}
+.btn-primary:hover{background:var(--accent-hover);color:var(--on-accent)}
+.btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
+.btn-secondary:hover{background:var(--surface-2);color:var(--text)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-ghost:hover{background:var(--surface-2);color:var(--text)}
+.btn-danger{background:#b91c1c;color:#fff}
+.btn-danger:hover{filter:brightness(.95)}
+.btn-sm{min-height:32px;padding:0 12px;font-size:13px}
+.btn-block{width:100%}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed;box-shadow:none}
+.btn-primary:disabled{background:var(--surface-3);color:var(--text-3);opacity:1}
+
+/* ── Segmented control / tabs ── */
+.seg{display:inline-flex;gap:2px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);flex-wrap:wrap}
+.seg button{min-height:32px;padding:0 12px;border:0;border-radius:6px;background:transparent;color:var(--text-2);
+  font:500 13px/1 var(--font-sans);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.seg button:hover{color:var(--text)}
+.seg button.active,.seg button[aria-pressed="true"],.seg button[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+
+/* ── Forms ── */
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:var(--text)}
+.help{font-size:13px;color:var(--text-3);font-weight:400}
+.input,.select,.textarea{width:100%;min-height:40px;padding:8px 12px;background:var(--surface);color:var(--text);
+  border:1px solid var(--border-strong);border-radius:var(--r);font:400 14px/1.4 var(--font-sans);transition:border-color .15s,box-shadow .15s}
+.textarea{min-height:120px;resize:vertical;line-height:1.55}
+.input::placeholder,.textarea::placeholder{color:var(--text-3)}
+.input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--text);cursor:pointer;min-height:32px}
+.check input{width:16px;height:16px;accent-color:var(--accent);margin:0;cursor:pointer}
+
+/* ── Drop zone ── */
+.dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;
+  min-height:150px;padding:24px;background:var(--surface);border:1.5px dashed var(--border-strong);border-radius:var(--r-lg);
+  cursor:pointer;transition:border-color .15s,background .15s}
+.dropzone:hover,.dropzone.is-dragover{border-color:var(--accent);background:var(--accent-soft)}
+.dropzone.has-file{border-style:solid;border-color:var(--accent-border);background:var(--accent-soft)}
+.dz-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);color:var(--text-2);margin-bottom:4px}
+.dz-icon svg{width:20px;height:20px}
+.dropzone.has-file .dz-icon{background:var(--accent);color:var(--on-accent)}
+.dz-title{font-size:14px;font-weight:600;color:var(--text)}
+.dz-hint{font-size:13px;color:var(--text-2)}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:999px;font:500 12px/1 var(--font-sans);
+  white-space:nowrap;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2)}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge-success{background:var(--success-soft);border-color:var(--success-border);color:var(--success)}
+.badge-warning{background:var(--warning-soft);border-color:var(--warning-border);color:var(--warning)}
+.badge-danger{background:var(--danger-soft);border-color:var(--danger-border);color:var(--danger)}
+.badge-info{background:var(--info-soft);border-color:var(--info-border);color:var(--info)}
+.badge-accent{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent)}
+
+/* ── Alerts ── */
+.alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text);font-size:13.5px;line-height:1.55}
+.alert .icon{margin-top:1px}
+.alert strong{font-weight:600}
+.alert-info{background:var(--info-soft);border-color:var(--info-border)}.alert-info .icon{color:var(--info)}
+.alert-warning{background:var(--warning-soft);border-color:var(--warning-border)}.alert-warning .icon{color:var(--warning)}
+.alert-danger{background:var(--danger-soft);border-color:var(--danger-border)}.alert-danger .icon{color:var(--danger)}
+.alert-success{background:var(--success-soft);border-color:var(--success-border)}.alert-success .icon{color:var(--success)}
+
+/* ── Tables ── */
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface)}
+table.table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.table th{position:sticky;top:0;z-index:1;background:var(--surface-2);color:var(--text-2);font-weight:600;font-size:12px;
+  text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap}
+.table tr:last-child td{border-bottom:0}
+.table tbody tr:hover td,.table tr:hover td{background:var(--surface-2)}
+.table .num,.table td.mono{font-family:var(--font-mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px}
+.stat-value{display:block;font-size:24px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat-label{display:block;font-size:13px;color:var(--text-2);margin-top:2px}
+
+/* ── Spinner ── */
+.spinner{width:24px;height:24px;border:2.5px solid var(--border-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Footer ── */
+.site-footer{border-top:1px solid var(--border);background:var(--surface);margin-top:auto}
+.site-footer .inner{max-width:1120px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;font-size:13px;color:var(--text-3)}
+.site-footer a{color:var(--text-2);text-decoration:none;font-weight:500}
+.site-footer a:hover{color:var(--accent)}
+.site-footer .privacy{display:inline-flex;align-items:center;gap:6px}
+.site-footer .links{display:flex;gap:16px;align-items:center}
+
+/* ── Responsive ── */
+@media (max-width:1024px){.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:768px){
+  .appbar{padding:0 16px;gap:8px}
+  .brand-sub,.appbar .badge,.appbar-nav{display:none}
+  .container{padding:24px 16px 40px}
+  h1{font-size:24px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .btn{min-height:44px}
+  .seg button{min-height:40px}
+  .card-head,.card-body{padding:16px}
+  .site-footer .inner{padding:18px 16px;flex-direction:column;align-items:flex-start}
+}
+@media (max-width:480px){
+  .crumb-sep,.brand .brand-name{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* ── Landing page (index.html) ─────────────────────────────────────────────── */
 html{scroll-behavior:smooth}
-body{
-  font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);
-  min-height:100vh;overflow-x:hidden;transition:background .25s,color .25s;
-}
+[id]{scroll-margin-top:calc(var(--appbar-h) + 16px)}
+.appbar-nav a.nav-gh{display:inline-flex;align-items:center;gap:6px}
+.appbar-gh{display:none;width:40px;height:40px;place-items:center;border-radius:var(--r-sm);color:var(--text-2)}
+.appbar-gh:hover{color:var(--text);background:var(--surface-2)}
+.appbar-gh svg{width:18px;height:18px}
 
-/* ── Noise overlay ── */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-}
-body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 60% 50% at 10% 10%,var(--glow-g),transparent),
-    radial-gradient(ellipse 50% 40% at 90% 80%,var(--glow-b),transparent),
-    radial-gradient(ellipse 40% 40% at 60% 40%,var(--glow-a),transparent);
-}
+.landing{padding-top:0;padding-bottom:24px}
 
-/* ── Layout wrapper ── */
-.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 28px}
-
-/* ── NAV ── */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:0 28px;height:58px;
-  display:flex;align-items:center;justify-content:space-between;
-  background:color-mix(in srgb,var(--bg) 80%,transparent);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border);
-}
-.nav-logo{
-  font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;
-  letter-spacing:2px;color:var(--accent);text-transform:uppercase;
-  display:flex;align-items:center;gap:8px;
-}
-.nav-logo-dot{
-  width:8px;height:8px;border-radius:50%;background:var(--accent);
-  animation:pulse-dot 2.5s ease-in-out infinite;
-}
-@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-.nav-right{display:flex;align-items:center;gap:8px}
-.theme-toggle{
-  display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);
-  border-radius:8px;padding:3px;
-}
-.theme-btn{
-  display:flex;align-items:center;justify-content:center;
-  width:28px;height:24px;border:none;border-radius:5px;
-  background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;
-}
-.theme-btn:hover{color:var(--text)}
-.theme-btn.active{background:var(--accent-dim);color:var(--accent)}
-.theme-btn svg{width:12px;height:12px}
-.nav-gh{
-  display:flex;align-items:center;gap:6px;
-  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;
-  color:var(--muted);text-decoration:none;
-  border:1px solid var(--border);border-radius:7px;padding:5px 10px;
-  transition:all .18s;white-space:nowrap;
-}
-.nav-gh:hover{color:var(--text);border-color:var(--muted)}
-.nav-gh svg{width:13px;height:13px}
-
-/* ── HERO ── */
-.hero{
-  min-height:100vh;display:flex;flex-direction:column;justify-content:center;
-  padding-top:58px;
-}
-.hero-inner{padding:80px 0 60px}
-
-.hero-eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;
-  text-transform:uppercase;color:var(--accent);
-  background:var(--accent-dim);border:1px solid var(--accent);
-  padding:5px 12px;border-radius:4px;margin-bottom:28px;
-}
-.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse-dot 2s infinite}
-
-.hero-name{
-  font-size:clamp(13px,2vw,16px);font-family:'IBM Plex Mono',monospace;
-  color:var(--muted);letter-spacing:3px;text-transform:uppercase;
-  margin-bottom:16px;
-}
-
-.hero-headline{
-  font-size:clamp(36px,6.5vw,80px);font-weight:800;
-  line-height:1.05;letter-spacing:-3px;margin-bottom:28px;
-  max-width:820px;
-}
-.hero-headline .hl-dim{color:var(--muted)}
+/* Hero */
+.hero{padding:72px 0 64px}
+.hero-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.hero-name{font-size:15px;font-weight:600;color:var(--text)}
+.hero-eyebrow{font-size:13px;color:var(--text-2)}
+.hero-meta-sep{width:1px;height:14px;background:var(--border-strong)}
+.hero-headline{font-size:56px;line-height:1.05;font-weight:700;letter-spacing:-.035em;max-width:18ch;color:var(--text)}
+.hero-headline>span{display:block}
+#top{scroll-margin-top:200px}
+.hero-headline .hl-dim{color:var(--text-3)}
+.hero-headline .hl-gold{color:var(--text)}
 .hero-headline .hl-green{color:var(--accent)}
-.hero-headline .hl-gold{color:var(--accent2)}
-.hero-headline .hl-blue{color:var(--accent3)}
-
-.hero-sub{
-  font-size:clamp(14px,1.8vw,18px);color:var(--muted);
-  line-height:1.7;max-width:560px;margin-bottom:44px;
-}
+.hero-sub{margin-top:24px;font-size:17px;line-height:1.6;color:var(--text-2);max-width:60ch}
 .hero-sub strong{color:var(--text);font-weight:600}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.hero-ctas .btn{min-height:44px;padding:0 18px;font-size:15px}
+.hero-stats{margin-top:48px;max-width:640px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.hero-stats .stat-value{font-size:28px}
 
-.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:64px}
-.btn-primary{
-  display:inline-flex;align-items:center;gap:8px;
-  background:var(--accent);color:#050f08;
-  font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
-  letter-spacing:2px;text-transform:uppercase;text-decoration:none;
-  padding:13px 22px;border-radius:var(--radius);border:none;cursor:pointer;
-  transition:all .2s;
-}
-.btn-primary:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 30%,transparent)}
-.btn-secondary{
-  display:inline-flex;align-items:center;gap:8px;
-  background:transparent;color:var(--text);
-  font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;
-  letter-spacing:2px;text-transform:uppercase;text-decoration:none;
-  padding:13px 22px;border-radius:var(--radius);
-  border:1px solid var(--border);transition:all .2s;
-}
-.btn-secondary:hover{border-color:var(--muted);transform:translateY(-2px)}
-.btn-icon{width:14px;height:14px;flex-shrink:0}
+/* Sections */
+.lp-section{padding:56px 0;border-top:1px solid var(--border)}
+.lp-head{display:grid;grid-template-columns:200px minmax(0,1fr);gap:8px 32px;margin-bottom:28px}
+.lp-head .eyebrow{padding-top:6px}
+.lp-title{font-size:26px;line-height:1.25;letter-spacing:-.02em;font-weight:600}
+.lp-sub{grid-column:2;color:var(--text-2);font-size:15px;max-width:64ch}
+.lp-body{margin-left:232px}
 
-/* ── Hero stats strip ── */
-.hero-stats{
-  display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius-lg);
-  overflow:hidden;background:var(--surface);max-width:560px;
-}
-.hero-stat{
-  flex:1;padding:18px 20px;border-right:1px solid var(--border);
-  text-align:center;
-}
-.hero-stat:last-child{border-right:none}
-.hs-num{
-  font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-1px;
-  display:block;margin-bottom:4px;
-}
-.hs-lbl{
-  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;
-  color:var(--muted);text-transform:uppercase;
-}
-.hs-green .hs-num{color:var(--accent)}
-.hs-gold .hs-num{color:var(--accent2)}
-.hs-blue .hs-num{color:var(--accent3)}
+/* Tool grid */
+.tools-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.tool-card{display:flex;flex-direction:column;padding:24px;transition:border-color .15s,box-shadow .15s}
+.tool-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow)}
+.tool-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px}
+.tool-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);
+  border:1px solid var(--accent-border);color:var(--accent);flex-shrink:0}
+.tool-icon svg{width:20px;height:20px}
+.tool-label{margin-bottom:4px}
+.tool-name{font-size:18px;line-height:1.3;font-weight:600;letter-spacing:-.01em;color:var(--text);margin:0}
+.tool-desc{margin-top:8px;font-size:14px;line-height:1.6;color:var(--text-2)}
+.tool-features{list-style:none;margin:18px 0 0;padding:16px 0 0;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:9px}
+.tool-feature{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:var(--text)}
+.tool-feature svg{width:16px;height:16px;margin-top:2px;color:var(--accent);flex-shrink:0}
+.tool-feature code{font-size:.88em}
+.tool-foot{margin-top:auto;padding-top:22px}
+.tool-launch .icon{transition:transform .15s}
+.tool-launch:hover .icon{transform:translateX(2px)}
 
-/* ── Section chrome ── */
-.section{padding:90px 0}
-.sec-tag{
-  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;
-  text-transform:uppercase;color:var(--accent);
-  display:flex;align-items:center;gap:12px;margin-bottom:14px;
-}
-.sec-tag::after{content:'';flex:1;height:1px;background:var(--border);max-width:60px}
-.sec-title{font-size:clamp(26px,4vw,42px);font-weight:800;letter-spacing:-1.5px;margin-bottom:10px}
-.sec-sub{font-size:15px;color:var(--muted);line-height:1.7;max-width:500px;margin-bottom:48px}
+/* Regulatory + Productivity side by side (one card each) */
+.lp-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px;border-top:1px solid var(--border);padding:56px 0}
+.lp-pair>.lp-col{display:grid;grid-row:span 4;grid-template-rows:subgrid;align-content:start}
+.lp-col .eyebrow{margin-bottom:8px}
+.lp-col .lp-title{margin-bottom:8px}
+.lp-col .lp-sub{grid-column:auto;margin-bottom:24px}
+.lp-col .tools-grid{grid-template-columns:1fr}
 
-/* ── TOOLS section ── */
-.tools-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;
-}
-.tool-card{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);
-  overflow:hidden;transition:all .25s;box-shadow:var(--shadow-sm);
-  display:flex;flex-direction:column;
-}
-.tool-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--muted2)}
-.tool-card-header{
-  padding:28px 28px 20px;border-bottom:1px solid var(--border);
-  position:relative;overflow:hidden;
-}
-.tool-card-header::before{
-  content:'';position:absolute;inset:0;opacity:1;
-  background:radial-gradient(ellipse 80% 80% at 90% 10%,var(--card-glow),transparent);
-}
-.tool-card.green{--card-glow:#7ef0a00a}
-.tool-card.blue{--card-glow:#a0b4f00a}
-.tool-icon{
-  width:44px;height:44px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;margin-bottom:16px;
-  position:relative;
-}
-.tool-card.green .tool-icon{background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent)}
-.tool-card.blue .tool-icon{background:color-mix(in srgb,var(--accent3) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent3) 25%,transparent)}
-.tool-icon svg{width:22px;height:22px}
-.tool-card.green .tool-icon svg{color:var(--accent)}
-.tool-card.blue .tool-icon svg{color:var(--accent3)}
-.tool-label{
-  font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;
-  text-transform:uppercase;margin-bottom:8px;
-}
-.tool-card.green .tool-label{color:var(--accent)}
-.tool-card.blue .tool-label{color:var(--accent3)}
-.tool-name{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px}
-.tool-desc{font-size:13px;color:var(--muted);line-height:1.65}
-.tool-card-body{padding:20px 28px;flex:1;display:flex;flex-direction:column;gap:16px}
-.tool-features{display:flex;flex-direction:column;gap:7px;flex:1}
-.tool-feature{
-  display:flex;align-items:flex-start;gap:9px;
-  font-size:13px;color:var(--muted);line-height:1.5;
-}
-.tool-feature-dot{
-  width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:6px;
-}
-.tool-card.green .tool-feature-dot{background:var(--accent)}
-.tool-card.blue .tool-feature-dot{background:var(--accent3)}
-.tool-offline{
-  display:inline-flex;align-items:center;gap:6px;
-  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;
-  text-transform:uppercase;padding:5px 10px;border-radius:99px;
-  background:var(--accent-dim);color:var(--accent);
-  border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);
-  align-self:flex-start;
-}
-.tool-card.blue .tool-offline{background:color-mix(in srgb,var(--accent3) 8%,transparent);color:var(--accent3);border-color:color-mix(in srgb,var(--accent3) 25%,transparent)}
-.tool-offline-dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse-dot 2s infinite}
-.tool-launch{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:13px 16px;border-radius:var(--radius);
-  font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
-  letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;
-  border:1px solid;transition:all .2s;cursor:pointer;
-}
-.tool-card.green .tool-launch{background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
-.tool-card.green .tool-launch:hover{background:var(--accent);color:#050f08}
-.tool-card.blue .tool-launch{background:color-mix(in srgb,var(--accent3) 10%,transparent);color:var(--accent3);border-color:color-mix(in srgb,var(--accent3) 30%,transparent)}
-.tool-card.blue .tool-launch:hover{background:var(--accent3);color:#05080f}
-.tool-card.gold{--card-glow:#e8d5a00a}
-.tool-card.gold .tool-icon{background:color-mix(in srgb,var(--accent2) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent2) 25%,transparent)}
-.tool-card.gold .tool-icon svg{color:var(--accent2)}
-.tool-card.gold .tool-label{color:var(--accent2)}
-.tool-card.gold .tool-feature-dot{background:var(--accent2)}
-.tool-card.gold .tool-offline{background:color-mix(in srgb,var(--accent2) 8%,transparent);color:var(--accent2);border-color:color-mix(in srgb,var(--accent2) 25%,transparent)}
-.tool-card.gold .tool-launch{background:color-mix(in srgb,var(--accent2) 10%,transparent);color:var(--accent2);border-color:color-mix(in srgb,var(--accent2) 30%,transparent)}
-.tool-card.gold .tool-launch:hover{background:var(--accent2);color:#0f0a02}
-.tool-card.purple{--card-glow:#a78bfa0a}
-.tool-card.purple .tool-icon{background:color-mix(in srgb,var(--accent4) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent4) 25%,transparent)}
-.tool-card.purple .tool-icon svg{color:var(--accent4)}
-.tool-card.purple .tool-label{color:var(--accent4)}
-.tool-card.purple .tool-feature-dot{background:var(--accent4)}
-.tool-card.purple .tool-offline{background:color-mix(in srgb,var(--accent4) 8%,transparent);color:var(--accent4);border-color:color-mix(in srgb,var(--accent4) 25%,transparent)}
-.tool-card.purple .tool-launch{background:color-mix(in srgb,var(--accent4) 10%,transparent);color:var(--accent4);border-color:color-mix(in srgb,var(--accent4) 30%,transparent)}
-.tool-card.purple .tool-launch:hover{background:var(--accent4);color:#05000f}
-.tool-launch svg{width:14px;height:14px;transition:transform .2s}
-.tool-launch:hover svg{transform:translateX(3px)}
+/* About */
+.about-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:40px;align-items:start}
+.about-copy{display:flex;flex-direction:column;gap:16px;font-size:16px;line-height:1.7;color:var(--text-2);max-width:62ch}
+.about-copy strong{color:var(--text);font-weight:600}
+.credentials{padding:4px 0}
+.cred{display:flex;gap:14px;align-items:flex-start;padding:14px 20px;border-top:1px solid var(--border)}
+.cred:first-child{border-top:0}
+.cred-icon{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--surface-2);color:var(--text-2);flex-shrink:0}
+.cred-icon svg{width:16px;height:16px}
+.cred.highlight .cred-icon{background:var(--accent-soft);color:var(--accent)}
+.cred-title{font-size:15px;font-weight:600;color:var(--text)}
+.cred-sub{font-size:13px;color:var(--text-2);margin-top:2px}
 
-/* ── ABOUT section ── */
-.about-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;
-}
-.about-copy{}
-.about-copy p{font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:16px}
-.about-copy p strong{color:var(--text);font-weight:600}
-.about-copy p:last-child{margin-bottom:0}
+/* Stack */
+.stack-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid var(--border);border-radius:var(--r-lg);
+  background:var(--surface);overflow:hidden}
+.stack-badge{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid var(--border);font-size:14px}
+.stack-badge:nth-child(odd){border-right:1px solid var(--border)}
+.stack-badge:nth-last-child(-n+2){border-bottom:0}
+.stack-badge-name{font-weight:600;color:var(--text)}
+.stack-badge-role{color:var(--text-2)}
 
-.credentials{display:flex;flex-direction:column;gap:10px}
-.cred{
-  display:flex;align-items:center;gap:14px;
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px 16px;transition:border-color .2s;
-}
-.cred:hover{border-color:var(--muted2)}
-.cred-icon{
-  width:36px;height:36px;border-radius:8px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--card);border:1px solid var(--border);
-}
-.cred-icon svg{width:18px;height:18px}
-.cred-body{}
-.cred-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
-.cred-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.5px}
-.cred.highlight{border-color:color-mix(in srgb,var(--accent) 30%,transparent);background:var(--accent-dim)}
-.cred.highlight .cred-icon{background:color-mix(in srgb,var(--accent) 12%,transparent);border-color:color-mix(in srgb,var(--accent) 25%,transparent)}
-.cred.highlight .cred-icon svg{color:var(--accent)}
-.cred.highlight .cred-title{color:var(--accent)}
+/* Philosophy */
+.philosophy-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.phil-card{padding:24px;display:flex;flex-direction:column;gap:8px}
+.phil-num{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--accent)}
+.phil-title{font-size:16px;font-weight:600;color:var(--text)}
+.phil-body{font-size:14px;line-height:1.65;color:var(--text-2)}
 
-/* ── TECH STACK section ── */
-.stack-section{
-  background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
-  padding:60px 0;
-}
-.stack-grid{
-  display:flex;flex-wrap:wrap;gap:10px;
-}
-.stack-badge{
-  display:flex;align-items:center;gap:8px;
-  background:var(--card);border:1px solid var(--border);border-radius:8px;
-  padding:10px 16px;transition:all .2s;
-}
-.stack-badge:hover{border-color:var(--muted2);transform:translateY(-2px)}
-.stack-badge-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.stack-badge-name{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--text);letter-spacing:.5px}
-.stack-badge-role{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)}
+/* Footer */
+.footer-brand{color:var(--text);font-weight:600;margin-right:4px}
+.site-footer .links{flex-wrap:wrap}
+.site-footer .privacy{align-items:flex-start}
+.site-footer .privacy>.icon{margin-top:2px}
+.landing>.lp-section:last-child{padding-bottom:16px;margin-bottom:0}
+.footer-link{display:inline-flex;align-items:center;gap:6px}
+.footer-link svg{width:16px;height:16px}
 
-/* ── PHILOSOPHY section ── */
-.philosophy-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+/* Reveal (only hides when JS is running and motion is allowed) */
+@media (prefers-reduced-motion:no-preference){
+  .js .reveal{opacity:0;transform:translateY(10px);transition:opacity .35s ease,transform .35s ease}
+  .js .reveal.visible{opacity:1;transform:none}
 }
-.phil-card{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);
-  padding:24px;transition:all .2s;
-}
-.phil-card:hover{transform:translateY(-3px);border-color:var(--muted2)}
-.phil-num{
-  font-size:clamp(36px,4vw,48px);font-weight:800;letter-spacing:-2px;
-  color:var(--muted2);margin-bottom:12px;display:block;
-  font-family:'IBM Plex Mono',monospace;
-}
-.phil-title{font-size:15px;font-weight:700;margin-bottom:8px;letter-spacing:-.3px}
-.phil-body{font-size:13px;color:var(--muted);line-height:1.65}
 
-/* ── FOOTER ── */
-footer{
-  border-top:1px solid var(--border);padding:40px 0;
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
-}
-.footer-left{}
-.footer-brand{
-  font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;
-  letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:4px;
-}
-.footer-copy{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.5px}
-.footer-links{display:flex;gap:8px;flex-wrap:wrap}
-.footer-link{
-  display:inline-flex;align-items:center;gap:5px;
-  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;
-  color:var(--muted);text-decoration:none;
-  border:1px solid var(--border);border-radius:6px;padding:6px 10px;
-  transition:all .15s;
-}
-.footer-link:hover{color:var(--text);border-color:var(--muted)}
-.footer-link svg{width:12px;height:12px}
-
-/* ── Reveal animation ── */
-.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
-.reveal.visible{opacity:1;transform:none}
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--muted2);border-radius:3px}
-
-/* ── MOBILE ── */
-@media(max-width:900px){
-  .about-grid{grid-template-columns:1fr;gap:32px}
-  .philosophy-grid{grid-template-columns:1fr 1fr}
-}
-@media(max-width:680px){
-  .wrap{padding:0 16px}
-  nav{padding:0 16px}
-  .nav-logo span:not(.nav-logo-dot){display:none}
-  .nav-logo::after{content:'PP';font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--accent)}
-  .hero-inner{padding:50px 0 40px}
-  .hero-stats{flex-direction:column;max-width:100%}
-  .hero-stat{border-right:none;border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
-  .hero-stat:last-child{border-bottom:none}
-  .hs-num{font-size:22px;margin-bottom:0}
-  .section{padding:60px 0}
+/* Responsive */
+@media (max-width:1024px){
+  .lp-head{grid-template-columns:1fr}
+  .lp-sub{grid-column:auto}
+  .lp-body{margin-left:0}
+  .about-grid{grid-template-columns:1fr;gap:28px}
   .philosophy-grid{grid-template-columns:1fr}
-  .tools-grid{grid-template-columns:1fr}
-  footer{flex-direction:column;align-items:flex-start;gap:16px}
-  .hero-ctas{flex-direction:column}
-  .btn-primary,.btn-secondary{width:100%;justify-content:center}
-  .hero-headline{letter-spacing:-1.5px}
+  .hero-headline{font-size:48px}
 }
-@media(max-width:400px){
-  .wrap{padding:0 12px}
-  .hero-headline{font-size:32px;letter-spacing:-1px}
-  .sec-title{font-size:24px}
-  .philosophy-grid{grid-template-columns:1fr}
-  .stack-badge{padding:8px 12px}
-  .nav-gh-text{display:none}
-  .nav-gh{padding:5px 8px}
+@media (max-width:768px){
+  .appbar-gh{display:grid}
+  .hero{padding:44px 0 40px}
+  .hero-headline{font-size:36px}
+  .hero-sub{font-size:16px}
+  .hero-stats{margin-top:36px}
+  .hero-stats .stat-value{font-size:24px}
+  .lp-section,.lp-pair{padding:40px 0}
+  .lp-title{font-size:22px}
+  .tools-grid,.lp-pair{grid-template-columns:1fr}
+  .lp-pair>.lp-col{display:block}
+  .lp-pair>.lp-col+.lp-col{margin-top:40px;padding-top:40px;border-top:1px solid var(--border)}
+  .tool-card{padding:20px}
+  .stack-grid{grid-template-columns:1fr}
+  .stack-badge:nth-child(odd){border-right:0}
+  .stack-badge:nth-last-child(2){border-bottom:1px solid var(--border)}
+  .site-footer .links{gap:12px 16px}
+}
+@media (max-width:480px){
+  .hero-headline{font-size:32px}
+  .hero-stats{gap:8px}
+  .hero-stats .stat{padding:12px}
+  .hero-stats .stat-value{font-size:22px}
+  .hero-ctas .btn{flex:1 1 auto}
+  .cred{padding:14px 16px}
+  .stack-badge{padding:12px 16px}
 }
 </style>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('pp-theme')||'light')}catch(e){}</script>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">
-    <span class="nav-logo-dot"></span>
-    <span>Prashant Patel</span>
+<!-- APP BAR -->
+<header class="appbar">
+  <a class="brand" href="#top" aria-label="Dr. Prashant Patel — back to top">
+    <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg></span>
+    <span class="brand-name">drprash<span class="brand-sub">/tools</span></span>
+  </a>
+  <span class="spacer"></span>
+  <nav class="appbar-nav" aria-label="Sections">
+    <a href="#tools">Tools</a>
+    <a href="#literature">Literature</a>
+    <a href="#regulatory">Regulatory</a>
+    <a href="#focus">Productivity</a>
+    <a href="#about">About</a>
+    <a class="nav-gh" href="https://github.com/drprash" target="_blank" rel="noopener"><svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg><span class="nav-gh-text">GitHub</span></a>
+  </nav>
+  <a class="appbar-gh" href="https://github.com/drprash" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></a>
+  <div class="theme-toggle" role="group" aria-label="Colour theme">
+    <button type="button" id="t-auto" data-theme-set="auto" aria-label="Match system theme" title="System"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button>
+    <button type="button" id="t-light" data-theme-set="light" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
+    <button type="button" id="t-dark" data-theme-set="dark" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
   </div>
-  <div class="nav-right">
-    <div class="theme-toggle" role="group" aria-label="Theme">
-      <button class="theme-btn" id="t-auto" title="Auto" onclick="setTheme('auto')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-      </button>
-      <button class="theme-btn" id="t-light" title="Light" onclick="setTheme('light')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-      </button>
-      <button class="theme-btn active" id="t-dark" title="Dark" onclick="setTheme('dark')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
+</header>
+
+<main class="container landing">
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <div class="hero-meta reveal">
+      <span class="hero-name">Dr. Prashant Patel</span>
+      <span class="hero-meta-sep" aria-hidden="true"></span>
+      <span class="hero-eyebrow">MD · Pharmacologist · Builder</span>
     </div>
-    <a class="nav-gh" href="https://github.com/drprash" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.24c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49v-1.71c-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.12.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.72 0 0 .84-.27 2.75 1.05a9.4 9.4 0 0 1 2.5-.35c.85 0 1.7.11 2.5.35 1.91-1.32 2.75-1.05 2.75-1.05.55 1.42.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9v2.81c0 .27.18.59.69.49C19.13 20.6 22 16.77 22 12.24 22 6.58 17.52 2 12 2z"/></svg>
-      <span class="nav-gh-text">GitHub</span>
-    </a>
-  </div>
-</nav>
 
-<!-- HERO -->
-<div class="wrap">
-  <section class="hero">
-    <div class="hero-inner">
+    <h1 class="hero-headline reveal">
+      9+ years in
+      <span class="hl-dim">pharmaceuticals.</span>
+      <span class="hl-gold">Tired of bad tools.</span>
+      <span class="hl-green">Built my own.</span>
+    </h1>
 
-      <div class="hero-eyebrow reveal">
-        <span class="hero-eyebrow-dot"></span>
-        MD · Pharmacologist · Builder
+    <p class="hero-sub reveal">
+      Pharmacovigilance, regulatory affairs, and medical affairs veteran who decided to solve his own workflow problems — <strong>100% in the browser, zero uploads, zero servers.</strong>
+    </p>
+
+    <div class="hero-ctas reveal">
+      <a href="#tools" class="btn btn-primary">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Explore Tools
+      </a>
+      <a href="#about" class="btn btn-secondary">
+        About me
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="stats hero-stats reveal">
+      <div class="stat hero-stat hs-gold">
+        <span class="stat-value hs-num">9+</span>
+        <span class="stat-label hs-lbl">Yrs Pharma</span>
       </div>
-
-      <div class="hero-name reveal" style="transition-delay:.08s">Dr. Prashant Patel</div>
-
-      <h1 class="hero-headline reveal" style="transition-delay:.14s">
-        9+ years in<br>
-        <span class="hl-dim">pharmaceuticals.</span><br>
-        <span class="hl-gold">Tired of bad tools.</span><br>
-        <span class="hl-green">Built my own.</span>
-      </h1>
-
-      <p class="hero-sub reveal" style="transition-delay:.2s">
-        Pharmacovigilance, regulatory affairs, and medical affairs veteran who decided to solve his own workflow problems — <strong>100% in the browser, zero uploads, zero servers.</strong>
-      </p>
-
-      <div class="hero-ctas reveal" style="transition-delay:.26s">
-        <a href="#tools" class="btn-primary">
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M17.5 17.5h.01M14 17.5h3.5v-3.5"/></svg>
-          Explore Tools
-        </a>
-        <a href="#about" class="btn-secondary">
-          About me
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
+      <div class="stat hero-stat hs-green">
+        <span class="stat-value hs-num">6</span>
+        <span class="stat-label hs-lbl">Tools Live</span>
       </div>
-
-      <div class="hero-stats reveal" style="transition-delay:.32s">
-        <div class="hero-stat hs-gold">
-          <span class="hs-num">9+</span>
-          <span class="hs-lbl">Yrs Pharma</span>
-        </div>
-        <div class="hero-stat hs-green">
-          <span class="hs-num">5</span>
-          <span class="hs-lbl">Tools Live</span>
-        </div>
-        <div class="hero-stat hs-blue">
-          <span class="hs-num">0</span>
-          <span class="hs-lbl">Data Uploaded</span>
-        </div>
+      <div class="stat hero-stat hs-blue">
+        <span class="stat-value hs-num">0</span>
+        <span class="stat-label hs-lbl">Data Uploaded</span>
       </div>
-
     </div>
   </section>
-</div>
 
-<!-- TOOLS -->
-<div class="wrap">
-  <section class="section" id="tools">
-    <div class="sec-tag reveal">Tools</div>
-    <h2 class="sec-title reveal" style="transition-delay:.06s">Built for document-heavy work</h2>
-    <p class="sec-sub reveal" style="transition-delay:.1s">Every tool runs entirely in your browser. Your files never leave your device — critical when working with regulatory or clinical documents.</p>
+  <!-- TOOLS -->
+  <section class="lp-section section" id="tools">
+    <div class="lp-head reveal">
+      <div class="eyebrow sec-tag">Tools</div>
+      <h2 class="lp-title sec-title">Built for document-heavy work</h2>
+      <p class="lp-sub sec-sub">Every tool runs entirely in your browser. Your files never leave your device — critical when working with regulatory or clinical documents.</p>
+    </div>
 
     <div class="tools-grid">
 
       <!-- PraxDocs -->
-      <div class="tool-card blue reveal" style="transition-delay:.12s">
-        <div class="tool-card-header">
-          <div class="tool-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          </div>
-          <div class="tool-label">Tool 01</div>
-          <div class="tool-name">PraxDocs</div>
-          <div class="tool-desc">A complete PDF manipulation suite. Merge, split, stamp, watermark, rotate, convert, and compress — all offline.</div>
+      <article class="card tool-card blue reveal">
+        <div class="tool-top">
+          <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <span class="badge badge-success tool-offline"><span class="dot"></span>100% offline</span>
         </div>
-        <div class="tool-card-body">
-          <div class="tool-features">
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Merge & selective-merge PDFs with page range control</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Stamp or watermark with a custom PDF overlay</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Rotate, convert to JPEG, and compress with quality presets</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Batch processing — drop multiple files at once</div>
-          </div>
-          <span class="tool-offline"><span class="tool-offline-dot"></span>100% Offline</span>
-          <a href="praxdocs.html" class="tool-launch" target="_blank">
-            Launch PraxDocs
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+        <div class="eyebrow tool-label">Tool 01</div>
+        <h3 class="tool-name">PraxDocs</h3>
+        <p class="tool-desc">A complete PDF manipulation suite. Merge, split, stamp, watermark, rotate, convert, and compress — all offline.</p>
+        <ul class="tool-features">
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Merge &amp; selective-merge PDFs with page range control</li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Stamp or watermark with a custom PDF overlay</li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Rotate, convert to JPEG, and compress with quality presets</li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Batch processing — drop multiple files at once</li>
+        </ul>
+        <div class="tool-foot">
+          <a href="praxdocs.html" class="btn btn-secondary tool-launch" target="_blank">Launch PraxDocs<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
-      </div>
+      </article>
 
       <!-- PDF Compare -->
-      <div class="tool-card green reveal" style="transition-delay:.18s">
-        <div class="tool-card-header">
-          <div class="tool-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
-          </div>
-          <div class="tool-label">Tool 02</div>
-          <div class="tool-name">PDF Compare</div>
-          <div class="tool-desc">Column-aware diff tool built for pharmaceutical inserts and regulatory documents with multi-column layouts.</div>
+      <article class="card tool-card green reveal">
+        <div class="tool-top">
+          <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg></div>
+          <span class="badge badge-success tool-offline"><span class="dot"></span>100% offline</span>
         </div>
-        <div class="tool-card-body">
-          <div class="tool-features">
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Auto-detects 2-column layouts — reads left column before right</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Line, word, and character-level diff modes</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Unified and side-by-side diff views with similarity score</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Myers diff algorithm — fast even on large documents</div>
-          </div>
-          <span class="tool-offline"><span class="tool-offline-dot"></span>100% Offline</span>
-          <a href="pdfCompare.html" class="tool-launch" target="_blank">
-            Launch PDF Compare
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+        <div class="eyebrow tool-label">Tool 02</div>
+        <h3 class="tool-name">PDF Compare</h3>
+        <p class="tool-desc">Column-aware diff tool built for pharmaceutical inserts and regulatory documents with multi-column layouts.</p>
+        <ul class="tool-features">
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Auto-detects 2-column layouts — reads left column before right</li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Line, word, and character-level diff modes</li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Unified and side-by-side diff views with similarity score</li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Myers diff algorithm — fast even on large documents</li>
+        </ul>
+        <div class="tool-foot">
+          <a href="pdfCompare.html" class="btn btn-secondary tool-launch" target="_blank">Launch PDF Compare<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
-      </div>
+      </article>
 
     </div>
   </section>
-</div>
 
-<!-- LITERATURE -->
-<div class="wrap">
-  <section class="section" id="literature">
-    <div class="sec-tag reveal">Literature</div>
-    <h2 class="sec-title reveal" style="transition-delay:.06s">Built for literature review</h2>
-    <p class="sec-sub reveal" style="transition-delay:.1s">Scan and analyse safety literature at scale — keyword-based or AI-assisted. Your text stays in your browser, or goes only to your chosen AI provider via your own API key.</p>
+  <!-- LITERATURE -->
+  <section class="lp-section section" id="literature">
+    <div class="lp-head reveal">
+      <div class="eyebrow sec-tag">Literature</div>
+      <h2 class="lp-title sec-title">Built for literature review</h2>
+      <p class="lp-sub sec-sub">Scan and analyse safety literature at scale — keyword-based or AI-assisted. Your text stays in your browser, or goes only to your chosen AI provider via your own API key.</p>
+    </div>
 
     <div class="tools-grid">
 
       <!-- HighLit AI -->
-      <div class="tool-card purple reveal" style="transition-delay:.12s">
-        <div class="tool-card-header">
-          <div class="tool-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
-          </div>
-          <div class="tool-label">Tool 03</div>
-          <div class="tool-name">HighLit AI</div>
-          <div class="tool-desc">AI-assisted safety literature analyser. Paste PubMed abstracts and get signal extraction, causality assessment, or PBRER-ready narratives — using your own API key.</div>
+      <article class="card tool-card purple reveal">
+        <div class="tool-top">
+          <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg></div>
+          <span class="badge badge-info tool-offline"><svg class="icon" style="width:13px;height:13px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>Uses your API key</span>
         </div>
-        <div class="tool-card-body">
-          <div class="tool-features">
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Smart Highlight — colour-coded signal detection across abstracts</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Signal Extraction — PV signals ranked by severity (red / amber / green)</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>PBRER Summary — narrative text ready for PSUR/PBRER sections</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Imputability — structured causality assessment per abstract</div>
-          </div>
-          <span class="tool-offline"><span class="tool-offline-dot"></span>Your API Key</span>
-          <a href="HighLit_AI.html" class="tool-launch" target="_blank">
-            Launch HighLit AI
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+        <div class="eyebrow tool-label">Tool 03</div>
+        <h3 class="tool-name">HighLit AI</h3>
+        <p class="tool-desc">AI-assisted safety literature analyser. Paste PubMed abstracts and get signal extraction, causality assessment, or PBRER-ready narratives — using your own API key.</p>
+        <ul class="tool-features">
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Smart Highlight — colour-coded signal detection across abstracts</li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Signal Extraction — PV signals ranked by severity (red / amber / green)</li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>PBRER Summary — narrative text ready for PSUR/PBRER sections</li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Imputability — structured causality assessment per abstract</li>
+        </ul>
+        <div class="tool-foot">
+          <a href="HighLit_AI.html" class="btn btn-secondary tool-launch" target="_blank">Launch HighLit AI<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
-      </div>
+      </article>
 
       <!-- HighLit -->
-      <div class="tool-card blue reveal" style="transition-delay:.18s">
-        <div class="tool-card-header">
-          <div class="tool-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </div>
-          <div class="tool-label">Tool 04</div>
-          <div class="tool-name">HighLit</div>
-          <div class="tool-desc">Keyword-category highlighter for safety literature. Paste text, upload a PubMed .txt batch, import an Embase .xlsx export, or drop in a PDF — color-code signals, mechanisms, and populations at a glance.</div>
+      <article class="card tool-card blue reveal">
+        <div class="tool-top">
+          <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg></div>
+          <span class="badge badge-success tool-offline"><span class="dot"></span>100% offline</span>
         </div>
-        <div class="tool-card-body">
-          <div class="tool-features">
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Four modes: paste text, PubMed Batch (.txt), Embase (.xlsx), or PDF with page range selection</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Multi-category keyword table with color-coded highlight legend</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Prefix stem matching — <code>injur</code> catches injury, injured, injuries</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Download keyword list as Excel; re-upload edited versions</div>
-          </div>
-          <span class="tool-offline"><span class="tool-offline-dot"></span>100% Offline</span>
-          <a href="HighLit.html" class="tool-launch" target="_blank">
-            Launch HighLit
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+        <div class="eyebrow tool-label">Tool 04</div>
+        <h3 class="tool-name">HighLit</h3>
+        <p class="tool-desc">Keyword-category highlighter for safety literature. Paste text, upload a PubMed .txt batch, import an Embase .xlsx export, or drop in a PDF — color-code signals, mechanisms, and populations at a glance.</p>
+        <ul class="tool-features">
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Four modes: paste text, PubMed Batch (.txt), Embase (.xlsx), or PDF with page range selection</li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Multi-category keyword table with color-coded highlight legend</li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg><span>Prefix stem matching — <code>injur</code> catches injury, injured, injuries</span></li>
+          <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Download keyword list as Excel; re-upload edited versions</li>
+        </ul>
+        <div class="tool-foot">
+          <a href="HighLit.html" class="btn btn-secondary tool-launch" target="_blank">Launch HighLit<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
-      </div>
+      </article>
 
     </div>
   </section>
-</div>
 
-<!-- FOCUS -->
-<div class="wrap">
-  <section class="section" id="focus">
-    <div class="sec-tag reveal">Productivity</div>
-    <h2 class="sec-title reveal" style="transition-delay:.06s">Built for strategic focus</h2>
-    <p class="sec-sub reveal" style="transition-delay:.1s">Between the documents, there's the work of deciding what matters. Tools for protecting your time and driving high-value tasks to completion.</p>
+  <!-- REGULATORY + PRODUCTIVITY -->
+  <div class="lp-pair">
 
-    <div class="tools-grid">
-
-      <!-- FOCUS -->
-      <div class="tool-card gold reveal" style="transition-delay:.12s">
-        <div class="tool-card-header">
-          <div class="tool-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+    <section class="lp-col section" id="regulatory">
+      <div class="eyebrow sec-tag reveal">Regulatory</div>
+      <h2 class="lp-title sec-title reveal">Built for regulatory intelligence</h2>
+      <p class="lp-sub sec-sub reveal">Turn public regulatory datasets into answers for portfolio and generic-entry planning — parsed and filtered in your browser, exported to Excel in seconds.</p>
+      <div class="tools-grid">
+        <!-- PatentCliff -->
+        <article class="card tool-card purple reveal">
+          <div class="tool-top">
+            <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 14v3l2 1"/></svg></div>
+            <span class="badge badge-success tool-offline"><span class="dot"></span>100% offline</span>
           </div>
-          <div class="tool-label">Tool 05</div>
-          <div class="tool-name">FOCUS</div>
-          <div class="tool-desc">A strategic time manager that helps you identify your most important work, block your time, and track priorities — all in the browser.</div>
-        </div>
-        <div class="tool-card-body">
-          <div class="tool-features">
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Daily MIT view — lock in your 3 most important tasks each morning</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Time blocking — schedule and protect deep work slots across your day</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Priority matrix — sort tasks by urgency and importance at a glance</div>
-            <div class="tool-feature"><span class="tool-feature-dot"></span>Overdue alerts and due-soon flags — nothing falls through the cracks</div>
+          <div class="eyebrow tool-label">Tool 05</div>
+          <h3 class="tool-name">PatentCliff</h3>
+          <p class="tool-desc">Find FDA Orange Book patents expiring in any date window. Drop in the official products.txt and patent.txt files and get product- and patent-level results ready for Excel.</p>
+          <ul class="tool-features">
+            <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Joins products and patents on application and product number</li>
+            <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Date presets (6 / 12 / 24 / 36 months) plus custom ranges</li>
+            <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Filter by RX / OTC / discontinued, RLD, delisted, or last patent to expire</li>
+            <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Export to Excel (products, patents, filters) or CSV</li>
+          </ul>
+          <div class="tool-foot">
+            <a href="PatentCliff.html" class="btn btn-secondary tool-launch" target="_blank">Launch PatentCliff<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
           </div>
-          <span class="tool-offline"><span class="tool-offline-dot"></span>100% Offline</span>
-          <a href="FOCUS.html" class="tool-launch" target="_blank">
-            Launch FOCUS
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
+        </article>
       </div>
+    </section>
 
+    <section class="lp-col section" id="focus">
+      <div class="eyebrow sec-tag reveal">Productivity</div>
+      <h2 class="lp-title sec-title reveal">Built for strategic focus</h2>
+      <p class="lp-sub sec-sub reveal">Between the documents, there's the work of deciding what matters. Tools for protecting your time and driving high-value tasks to completion.</p>
+      <div class="tools-grid">
+        <!-- FOCUS -->
+        <article class="card tool-card gold reveal">
+          <div class="tool-top">
+            <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+            <span class="badge badge-success tool-offline"><span class="dot"></span>100% offline</span>
+          </div>
+          <div class="eyebrow tool-label">Tool 06</div>
+          <h3 class="tool-name">FOCUS</h3>
+          <p class="tool-desc">A strategic time manager that helps you identify your most important work, block your time, and track priorities — all in the browser.</p>
+          <ul class="tool-features">
+            <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Daily MIT view — lock in your 3 most important tasks each morning</li>
+            <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Time blocking — schedule and protect deep work slots across your day</li>
+            <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Priority matrix — sort tasks by urgency and importance at a glance</li>
+            <li class="tool-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Overdue alerts and due-soon flags — nothing falls through the cracks</li>
+          </ul>
+          <div class="tool-foot">
+            <a href="FOCUS.html" class="btn btn-secondary tool-launch" target="_blank">Launch FOCUS<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ABOUT -->
+  <section class="lp-section section" id="about">
+    <div class="lp-head reveal">
+      <div class="eyebrow sec-tag">About</div>
+      <h2 class="lp-title sec-title">The clinician who codes</h2>
     </div>
-  </section>
-</div>
-
-<!-- ABOUT -->
-<div class="wrap">
-  <section class="section" id="about">
-    <div class="sec-tag reveal">About</div>
-    <h2 class="sec-title reveal" style="transition-delay:.06s">The clinician who codes</h2>
 
     <div class="about-grid">
-      <div class="about-copy reveal" style="transition-delay:.1s">
+      <div class="about-copy reveal">
         <p>I'm a <strong>Medical Doctor with a specialisation in Pharmacology</strong>, and over the past 9 years I've worked across pharmacovigilance, regulatory affairs, and medical affairs in the pharmaceutical industry.</p>
         <p>Working daily with dense PDFs — clinical study reports, SmPCs, patient information leaflets, regulatory submissions — I kept running into the same friction: <strong>the tools either didn't exist, cost too much, or required uploading confidential documents to a third-party server.</strong></p>
         <p>So I taught myself to build them. These tools are the direct result of real problems I faced at work. No frameworks, no backend, no cloud dependency — just the browser doing the heavy lifting.</p>
       </div>
 
-      <div class="credentials reveal" style="transition-delay:.16s">
+      <div class="card credentials reveal">
         <div class="cred highlight">
-          <div class="cred-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          </div>
+          <div class="cred-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
           <div class="cred-body">
             <div class="cred-title">M.D. Pharmacology</div>
             <div class="cred-sub">Medical Doctor · Drug science specialist</div>
           </div>
         </div>
         <div class="cred">
-          <div class="cred-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-          </div>
+          <div class="cred-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></div>
           <div class="cred-body">
             <div class="cred-title">Pharmacovigilance</div>
             <div class="cred-sub">Drug safety · Signal detection · ICSR</div>
           </div>
         </div>
         <div class="cred">
-          <div class="cred-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-          </div>
+          <div class="cred-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg></div>
           <div class="cred-body">
             <div class="cred-title">Regulatory Affairs</div>
             <div class="cred-sub">Submissions · Labelling · Compliance</div>
           </div>
         </div>
         <div class="cred">
-          <div class="cred-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          </div>
+          <div class="cred-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
           <div class="cred-body">
             <div class="cred-title">Medical Affairs</div>
             <div class="cred-sub">MSL · Medical writing · KOL engagement</div>
           </div>
         </div>
         <div class="cred">
-          <div class="cred-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          </div>
+          <div class="cred-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
           <div class="cred-body">
             <div class="cred-title">Self-taught Developer</div>
             <div class="cred-sub">HTML · CSS · JavaScript · PDF.js · pdf-lib</div>
@@ -709,95 +679,91 @@ footer{
       </div>
     </div>
   </section>
-</div>
 
-<!-- TECH STACK -->
-<div class="stack-section">
-  <div class="wrap">
-    <div class="sec-tag reveal">Stack</div>
-    <h2 class="sec-title reveal" style="transition-delay:.06s">How these tools are built</h2>
-    <p class="sec-sub reveal" style="transition-delay:.1s">No frameworks, no build step, no backend. Just the platform.</p>
-    <div class="stack-grid reveal" style="transition-delay:.14s">
-      <div class="stack-badge"><span class="stack-badge-dot" style="background:#f7e26b"></span><span class="stack-badge-name">JavaScript</span><span class="stack-badge-role">— Core logic</span></div>
-      <div class="stack-badge"><span class="stack-badge-dot" style="background:#e44d26"></span><span class="stack-badge-name">HTML5</span><span class="stack-badge-role">— Structure</span></div>
-      <div class="stack-badge"><span class="stack-badge-dot" style="background:#1572b6"></span><span class="stack-badge-name">CSS3</span><span class="stack-badge-role">— Theming & layout</span></div>
-      <div class="stack-badge"><span class="stack-badge-dot" style="background:#7ef0a0"></span><span class="stack-badge-name">PDF.js</span><span class="stack-badge-role">— PDF rendering & text extraction</span></div>
-      <div class="stack-badge"><span class="stack-badge-dot" style="background:#a0b4f0"></span><span class="stack-badge-name">pdf-lib</span><span class="stack-badge-role">— PDF manipulation</span></div>
-      <div class="stack-badge"><span class="stack-badge-dot" style="background:#e8d5a0"></span><span class="stack-badge-name">Myers Diff</span><span class="stack-badge-role">— Document comparison algorithm</span></div>
-      <div class="stack-badge"><span class="stack-badge-dot" style="background:#ffffff40"></span><span class="stack-badge-name">GitHub Pages</span><span class="stack-badge-role">— Hosting</span></div>
-      <div class="stack-badge"><span class="stack-badge-dot" style="background:#ff6b6b"></span><span class="stack-badge-name">Zero backend</span><span class="stack-badge-role">— Files never leave your device</span></div>
+  <!-- TECH STACK -->
+  <section class="lp-section section stack-section" id="stack">
+    <div class="lp-head reveal">
+      <div class="eyebrow sec-tag">Stack</div>
+      <h2 class="lp-title sec-title">How these tools are built</h2>
+      <p class="lp-sub sec-sub">No frameworks, no build step, no backend. Just the platform.</p>
     </div>
-  </div>
-</div>
-
-<!-- PHILOSOPHY -->
-<div class="wrap">
-  <section class="section">
-    <div class="sec-tag reveal">Philosophy</div>
-    <h2 class="sec-title reveal" style="transition-delay:.06s">Why build this way</h2>
-    <p class="sec-sub reveal" style="transition-delay:.1s">Three constraints shaped every decision.</p>
-    <div class="philosophy-grid">
-      <div class="phil-card reveal" style="transition-delay:.12s">
-        <span class="phil-num">01</span>
-        <div class="phil-title">Privacy by default</div>
-        <div class="phil-body">Regulatory and clinical documents are sensitive. A tool that uploads your files to process them isn't a tool — it's a liability. Everything runs locally, in the tab.</div>
-      </div>
-      <div class="phil-card reveal" style="transition-delay:.18s">
-        <span class="phil-num">02</span>
-        <div class="phil-title">No install friction</div>
-        <div class="phil-body">The best tool is the one people actually use. A URL you can bookmark beats software that needs IT approval, a license key, or a two-hour onboarding call.</div>
-      </div>
-      <div class="phil-card reveal" style="transition-delay:.24s">
-        <span class="phil-num">03</span>
-        <div class="phil-title">Domain expertise first</div>
-        <div class="phil-body">PDF Compare's 2-column mode exists because I've compared hundreds of SmPCs. FOCUS's priority matrix exists because pharma work demands ruthless clarity on what ships today. The features aren't invented — they're extracted from real frustration.</div>
+    <div class="lp-body">
+      <div class="stack-grid reveal">
+        <div class="stack-badge"><span class="stack-badge-name">JavaScript</span><span class="stack-badge-role">— Core logic</span></div>
+        <div class="stack-badge"><span class="stack-badge-name">HTML5</span><span class="stack-badge-role">— Structure</span></div>
+        <div class="stack-badge"><span class="stack-badge-name">CSS3</span><span class="stack-badge-role">— Theming &amp; layout</span></div>
+        <div class="stack-badge"><span class="stack-badge-name">PDF.js</span><span class="stack-badge-role">— PDF rendering &amp; text extraction</span></div>
+        <div class="stack-badge"><span class="stack-badge-name">pdf-lib</span><span class="stack-badge-role">— PDF manipulation</span></div>
+        <div class="stack-badge"><span class="stack-badge-name">Myers Diff</span><span class="stack-badge-role">— Document comparison algorithm</span></div>
+        <div class="stack-badge"><span class="stack-badge-name">GitHub Pages</span><span class="stack-badge-role">— Hosting</span></div>
+        <div class="stack-badge"><span class="stack-badge-name">Zero backend</span><span class="stack-badge-role">— Files never leave your device</span></div>
       </div>
     </div>
   </section>
-</div>
+
+  <!-- PHILOSOPHY -->
+  <section class="lp-section section" id="philosophy">
+    <div class="lp-head reveal">
+      <div class="eyebrow sec-tag">Philosophy</div>
+      <h2 class="lp-title sec-title">Why build this way</h2>
+      <p class="lp-sub sec-sub">Three constraints shaped every decision.</p>
+    </div>
+    <div class="philosophy-grid">
+      <div class="card phil-card reveal">
+        <span class="phil-num">01</span>
+        <h3 class="phil-title">Privacy by default</h3>
+        <p class="phil-body">Regulatory and clinical documents are sensitive. A tool that uploads your files to process them isn't a tool — it's a liability. Everything runs locally, in the tab.</p>
+      </div>
+      <div class="card phil-card reveal">
+        <span class="phil-num">02</span>
+        <h3 class="phil-title">No install friction</h3>
+        <p class="phil-body">The best tool is the one people actually use. A URL you can bookmark beats software that needs IT approval, a license key, or a two-hour onboarding call.</p>
+      </div>
+      <div class="card phil-card reveal">
+        <span class="phil-num">03</span>
+        <h3 class="phil-title">Domain expertise first</h3>
+        <p class="phil-body">PDF Compare's 2-column mode exists because I've compared hundreds of SmPCs. FOCUS's priority matrix exists because pharma work demands ruthless clarity on what ships today. The features aren't invented — they're extracted from real frustration.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
 
 <!-- FOOTER -->
-<div class="wrap">
-  <footer class="reveal">
-    <div class="footer-left">
-      <div class="footer-brand">Prashant Patel</div>
-      <div class="footer-copy">MD · Pharmacologist · Builder — all tools run offline in your browser</div>
-    </div>
-    <div class="footer-links">
-      <a class="footer-link" href="https://github.com/drprash" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.24c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49v-1.71c-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.12.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.72 0 0 .84-.27 2.75 1.05a9.4 9.4 0 0 1 2.5-.35c.85 0 1.7.11 2.5.35 1.91-1.32 2.75-1.05 2.75-1.05.55 1.42.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9v2.81c0 .27.18.59.69.49C19.13 20.6 22 16.77 22 12.24 22 6.58 17.52 2 12 2z"/></svg>
-        GitHub
-      </a>
-      <a class="footer-link" href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-        LinkedIn
-      </a>
-      <a class="footer-link" href="#tools">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        Back to tools
-      </a>
-    </div>
-  </footer>
-</div>
+<footer class="site-footer">
+  <div class="inner">
+    <span class="privacy"><svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span><span class="footer-brand">Prashant Patel</span> MD · Pharmacologist · Builder — all tools run offline in your browser</span></span>
+    <span class="links">
+      <a class="footer-link" href="https://github.com/drprash" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>GitHub</a>
+      <a class="footer-link" href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn</a>
+      <a class="footer-link" href="#tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Back to tools</a>
+      <span>Built by <a href="https://linkedin.com/in/drprashantpatel" target="_blank" rel="noopener" class="pp-li">Dr. Prashant Patel</a></span>
+    </span>
+  </div>
+</footer>
 
 <script>
 // ── Theme ────────────────────────────────────────────────────────────────────
+const THEME_KEY='pp-theme';
 function setTheme(t){
+  if(!['auto','light','dark'].includes(t))t='light';
   document.documentElement.setAttribute('data-theme',t);
-  ['auto','light','dark'].forEach(x=>document.getElementById('t-'+x).classList.toggle('active',x===t));
-  try{localStorage.setItem('pp-theme',t)}catch(e){}
+  document.querySelectorAll('[data-theme-set]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.themeSet===t)));
+  try{localStorage.setItem(THEME_KEY,t)}catch(e){}
 }
-(function(){
-  let saved='dark';
-  try{saved=localStorage.getItem('pp-theme')||'dark'}catch(e){}
-  setTheme(saved);
-})();
+document.querySelectorAll('[data-theme-set]').forEach(b=>b.addEventListener('click',()=>setTheme(b.dataset.themeSet)));
+(function(){let s='light';try{s=localStorage.getItem(THEME_KEY)||'light'}catch(e){}setTheme(s)})();
 
-// ── Reveal on scroll ─────────────────────────────────────────────────────────
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}});
-},{threshold:0.12});
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+// ── Reveal on scroll (content stays visible if this never runs) ────────────
+(function(){
+  const els=document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){els.forEach(el=>el.classList.add('visible'));return}
+  document.documentElement.classList.add('js');
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}});
+  },{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+  els.forEach(el=>observer.observe(el));
+})();
 </script>
 </body>
 </html>
