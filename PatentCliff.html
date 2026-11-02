@@ -274,6 +274,13 @@ details.howto ol b{color:var(--text);font-weight:600}
   .results-bar .dl{flex:1}
   .tbl{max-height:440px}
 }
+details.usenote{margin-top:12px}
+details.usenote summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text-3)}
+details.usenote summary:hover{color:var(--text-2)}
+details.usenote summary::-webkit-details-marker{display:none}
+details.usenote summary .chev{transition:transform .15s}
+details.usenote[open] summary .chev{transform:rotate(90deg)}
+details.usenote p{margin:8px 0 0;max-width:72ch;font-size:13px;line-height:1.6;color:var(--text-2)}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('patent-expiry-theme')||'light')}catch(e){}</script>
 </head>
@@ -299,7 +306,7 @@ details.howto ol b{color:var(--text);font-weight:600}
     <span class="eyebrow">FDA Orange Book · Patent expiry finder</span>
     <h1>PatentCliff</h1>
     <p class="lead">Find Orange Book patents expiring in any date window, at product or patent level, and export the results to Excel or CSV. Products and patents are joined on Appl_Type + Appl_No + Product_No.</p>
-    <div class="alert alert-warning" role="note"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div><strong>For research use only.</strong> Results reflect FDA Orange Book listings only and do not account for regulatory exclusivities, patent term extensions, pediatric exclusivity, litigation or unlisted patents. Not legal advice — verify before making business or regulatory decisions.</div></div>
+    <details class="usenote"><summary><svg class="icon icon-sm chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>Intended use and limitations</summary><p>For research use only. Results reflect FDA Orange Book listings only and do not account for regulatory exclusivities, patent term extensions, pediatric exclusivity, litigation or unlisted patents. Not legal advice — verify before making business or regulatory decisions.</p></details>
   </div>
 
   <section class="card section">

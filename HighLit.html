@@ -295,6 +295,13 @@ mark{color:var(--hl-ink);border-radius:3px;padding:0 2px}
   .card-title{flex-wrap:wrap}
   .title-note{flex-basis:100%;padding-left:32px;margin-top:-4px}
 }
+details.usenote{margin-top:12px}
+details.usenote summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text-3)}
+details.usenote summary:hover{color:var(--text-2)}
+details.usenote summary::-webkit-details-marker{display:none}
+details.usenote summary .chev{transition:transform .15s}
+details.usenote[open] summary .chev{transform:rotate(90deg)}
+details.usenote p{margin:8px 0 0;max-width:72ch;font-size:13px;line-height:1.6;color:var(--text-2)}
 </style>
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('highlit-theme')||'light')}catch(e){}</script>
 </head>
@@ -320,7 +327,7 @@ mark{color:var(--hl-ink);border-radius:3px;padding:0 2px}
     <span class="eyebrow">Pharmacovigilance</span>
     <h1>HighLit</h1>
     <p class="lead">Safety Literature Highlight Tool</p>
-    <div class="alert alert-warning" role="note"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div><strong>For research use only.</strong> This tool has not been validated under GAMP 5 or equivalent computer system validation (CSV) guidelines. Use in a regulated GxP or pharmacovigilance environment without prior formal validation may not comply with applicable quality system requirements.</div></div>
+    <details class="usenote"><summary><svg class="icon icon-sm chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>Intended use and limitations</summary><p>For research use only. This tool has not been validated under GAMP 5 or equivalent computer system validation (CSV) guidelines. Use in a regulated GxP or pharmacovigilance environment without prior formal validation may not comply with applicable quality system requirements.</p></details>
   </div>
 
   <section class="card section">
